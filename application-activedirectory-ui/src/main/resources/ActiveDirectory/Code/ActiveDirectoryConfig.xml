@@ -1,0 +1,732 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.2" reference="ActiveDirectory.Code.ActiveDirectoryConfig" locale="">
+  <web>ActiveDirectory.Code</web>
+  <name>ActiveDirectoryConfig</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <parent>ActiveDirectory.Code.WebHome</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <creationDate>1470225264000</creationDate>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <date>1471335757000</date>
+  <contentUpdateDate>1471335656000</contentUpdateDate>
+  <version>1.1</version>
+  <title/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <content>{{velocity}}
+#macro (displayForm)
+  #set ($params = ['ldap', 'ldap_server', 'ldap_port', 'ldap_bind_DN', 'ldap_bind_pass', 'ldap_base_DN', 'ldap_user_group', 'ldap_exclude_group', 'ldap_UID_attr', 'ldap_trylocal', 'ldap_update_user', 'ldap_update_photo', 'ldap_photo_attachment_name', 'ldap_photo_attribute', 'ldap_fields_mapping', 'ldap_group_mapping', 'ldap_groupcache_expiration', 'ldap_mode_group_sync'])
+  #set ($configClassName = 'XWiki.XWikiPreferences')
+  #set ($obj = $doc.getObject($configClassName))
+  #if ($obj)
+    #set ($discard = $xwiki.jsx.use('ActiveDirectory.Code.ActiveDirectoryConfig'))
+    #set ($discard = $xwiki.ssx.use('ActiveDirectory.Code.ActiveDirectoryConfig'))
+    {{html clean="false"}}
+    &lt;form id="$section.toLowerCase()" method="post" action="$xwiki.getURL($doc, 'saveandcontinue')" class="xform half"&gt;
+      &lt;dl&gt;
+        #foreach ($param in $params)
+          &lt;dt&gt;
+            &lt;label for="${configClassName}_${obj.number}_${param}" class="$param"&gt;
+              $services.localization.render("activeDirectory.${param}.label")
+            &lt;/label&gt;
+            &lt;span class="xHint"&gt;
+              #set ($hintKey = "activeDirectory.${param}.hint")
+              #set ($hint = $services.localization.render($hintKey))
+              #if ($hint != $hintKey) $hint #end
+            &lt;/span&gt;
+          &lt;/dt&gt;
+          &lt;dd&gt;$obj.display($param, 'edit').replaceAll('(^..html.*?}})|(../html..$)', '')&lt;/dd&gt;
+        #end
+      &lt;/dl&gt;
+      #set ($currentURL = $xwiki.getURL($doc, 'admin', "editor=$escapetool.url($editor)&amp;section=$escapetool.url($section)&amp;space=$escapetool.url($currentSpace)"))
+      &lt;div class="hidden"&gt;
+        &lt;input type="hidden" name="form_token" value="${escapetool.xml($services.csrf.getToken())}" /&gt;
+        &lt;input type="hidden" name="xcontinue" value="${escapetool.xml($currentURL)}" /&gt;
+        &lt;input type="hidden" name="xredirect" value="${escapetool.xml($currentURL)}" /&gt;
+        &lt;input type="hidden" name="classname" value="${escapetool.xml($configClassName)}" /&gt;
+      &lt;/div&gt;
+      &lt;input class="button" type="submit" name="formactionsac" value="${escapetool.xml($services.localization.render('activeDirectory.save.submit'))}" /&gt;
+    &lt;/form&gt;
+    {{/html}}
+  #end
+#end
+
+#if ($services.ldap)
+  #if ($services.ldap.isXWikiLDAPAuthenticator())
+    #if ($request.action_resetGroupCache)
+      #set ($discard = $services.ldap.resetGroupCache())
+      {{success}}$services.localization.render('activeDirectory.success.resetGroupCache'){{/success}}
+    #end
+    = $services.localization.render('activeDirectory.configuration.title') =
+
+    #displayForm($configClassName)
+
+    = $services.localization.render('activeDirectory.miscellaneous.title') =
+
+    {{html clean="false"}}
+      &lt;form method="post" action="${escapetool.xml($xwiki.requestURL)}" enctype="multipart/form-data"&gt;
+      &lt;input name="action_resetGroupCache" value="${escapetool.xml($services.localization.render('activeDirectory.resetGroupCache.submit'))}" class="button" type="submit"&gt;
+      &lt;/form&gt;
+    {{/html}}
+  #else
+    {{warning}}$services.localization.render('activeDirectory.warning.ldapAuthenticationIsNotEnabled', ['webapps/xwiki/WEB-INF/xwiki.cfg', '# xwiki.authentication.authclass=com.xpn.xwiki.user.impl.LDAP.XWikiLDAPAuthServiceImpl']){{/warning}}
+  #end
+#else 
+  {{error}}$services.localization.render('activeDirectory.error.missingLdapService'){{/error}}
+#end
+{{/velocity}}
+
+
+
+ </content>
+  <object>
+    <name>ActiveDirectory.Code.ActiveDirectoryConfig</name>
+    <number>0</number>
+    <className>XWiki.ConfigurableClass</className>
+    <guid>66353a77-4d2d-480e-ac56-18c404f93c81</guid>
+    <class>
+      <name>XWiki.ConfigurableClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <categoryIcon>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>categoryIcon</name>
+        <number>11</number>
+        <picker>0</picker>
+        <prettyName>categoryIcon</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </categoryIcon>
+      <codeToExecute>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <editor>Text</editor>
+        <name>codeToExecute</name>
+        <number>7</number>
+        <picker>0</picker>
+        <prettyName>codeToExecute</prettyName>
+        <rows>5</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </codeToExecute>
+      <configurationClass>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>configurationClass</name>
+        <number>3</number>
+        <picker>0</picker>
+        <prettyName>configurationClass</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </configurationClass>
+      <configureGlobally>
+        <customDisplay/>
+        <defaultValue/>
+        <disabled>0</disabled>
+        <displayFormType>checkbox</displayFormType>
+        <displayType/>
+        <name>configureGlobally</name>
+        <number>4</number>
+        <prettyName>configureGlobally</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </configureGlobally>
+      <displayBeforeCategory>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>displayBeforeCategory</name>
+        <number>10</number>
+        <picker>0</picker>
+        <prettyName>displayBeforeCategory</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </displayBeforeCategory>
+      <displayInCategory>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>displayInCategory</name>
+        <number>9</number>
+        <picker>0</picker>
+        <prettyName>displayInCategory</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </displayInCategory>
+      <displayInSection>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>displayInSection</name>
+        <number>1</number>
+        <picker>0</picker>
+        <prettyName>displayInSection</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </displayInSection>
+      <heading>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>heading</name>
+        <number>2</number>
+        <picker>0</picker>
+        <prettyName>heading</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </heading>
+      <iconAttachment>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>iconAttachment</name>
+        <number>8</number>
+        <picker>0</picker>
+        <prettyName>iconAttachment</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </iconAttachment>
+      <linkPrefix>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>linkPrefix</name>
+        <number>5</number>
+        <picker>0</picker>
+        <prettyName>linkPrefix</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </linkPrefix>
+      <propertiesToShow>
+        <cache>0</cache>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <displayType>input</displayType>
+        <multiSelect>1</multiSelect>
+        <name>propertiesToShow</name>
+        <number>6</number>
+        <picker>0</picker>
+        <prettyName>propertiesToShow</prettyName>
+        <relationalStorage>1</relationalStorage>
+        <separator> </separator>
+        <separators> ,|</separators>
+        <size>20</size>
+        <sort>none</sort>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <values/>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </propertiesToShow>
+      <sectionOrder>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>sectionOrder</name>
+        <number>12</number>
+        <numberType>integer</numberType>
+        <prettyName>sectionOrder</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.NumberClass</classType>
+      </sectionOrder>
+      <visibility>
+        <cache>0</cache>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>1</multiSelect>
+        <name>visibility</name>
+        <number>13</number>
+        <picker>0</picker>
+        <prettyName>visibility</prettyName>
+        <relationalStorage>1</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <sort>none</sort>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <values>space|wiki</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </visibility>
+    </class>
+    <property>
+      <categoryIcon/>
+    </property>
+    <property>
+      <codeToExecute>{{include reference="ActiveDirectory.Code.ActiveDirectoryConfig" /}}</codeToExecute>
+    </property>
+    <property>
+      <configurationClass/>
+    </property>
+    <property>
+      <configureGlobally>1</configureGlobally>
+    </property>
+    <property>
+      <displayBeforeCategory/>
+    </property>
+    <property>
+      <displayInCategory/>
+    </property>
+    <property>
+      <displayInSection>Active Directory</displayInSection>
+    </property>
+    <property>
+      <heading/>
+    </property>
+    <property>
+      <iconAttachment/>
+    </property>
+    <property>
+      <linkPrefix/>
+    </property>
+    <property>
+      <propertiesToShow/>
+    </property>
+    <property>
+      <sectionOrder/>
+    </property>
+    <property>
+      <visibility/>
+    </property>
+  </object>
+  <object>
+    <name>ActiveDirectory.Code.ActiveDirectoryConfig</name>
+    <number>0</number>
+    <className>XWiki.JavaScriptExtension</className>
+    <guid>b42fb9ce-daa3-4518-9d5d-66ae36b89ec7</guid>
+    <class>
+      <name>XWiki.JavaScriptExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>5</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <disabled>0</disabled>
+        <editor>PureText</editor>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Code</prettyName>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>4</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>3</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage|onDemand|always</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <property>
+      <cache>long</cache>
+    </property>
+    <property>
+      <code>var XWiki = function(XWiki) {
+
+  // Get a hold on the widgets namespace.
+  var widgets = XWiki.widgets = XWiki.widgets || {};
+
+  /**
+   * A properties editor widget that can replace textareas with key/value input properties.
+   */
+  widgets.PropertiesEditor = Class.create({
+
+    options: {
+      separator: ',',
+      newEntryMessage: "${escapetool.javascript($services.localization.render('activeDirectory.newEntry.title'))}"
+    },
+
+    /**
+     * @param {String | NSIDomElement} input the input element selector or element that this properties editor will replace.
+     * @param {Object options} this selector options. Optional. See the default options above.
+     */
+    initialize:function(input, options) {
+      this.input = $(input);
+      this.options = Object.extend(Object.clone(this.options), options || {});
+      this.inputParent = this.input.parent('dd') || this.input;
+      this.inputParent.addClass('hidden');
+      this.inputContainer = this.inputParent.parent();
+      this.value = this.input.val() || '';
+      this.id = Math.random() * Math.pow(10, 17);
+      this.inputParent.after(
+        new Element('span', {
+          'class' : 'new-entry'
+        }).update(this.options.newEntryMessage).observe('click',
+          this.onNewEntry.bindAsEventListener(this))
+      );
+      this.inputParent.after(this.createPropertyEntry('', ''));
+      this.properties = [];
+      this.initializeAndDisplayExistingProperties();
+    },
+
+    /**
+     * Callback when the new entry button has been clicked.
+     *
+     * @param {Event} the original click event leading to this callback
+     */
+    onNewEntry: function(event) {
+      (this.inputContainer.find('.' + this.id).last() || this.inputParent).after(this.createPropertyEntry('', ''));
+    },
+
+    /**
+     * Initializes a collection of existing properties based on the original input value, and displays them as a pair of two input elements.
+     */
+    initializeAndDisplayExistingProperties: function() {
+      var props = this.value == '' ? [] : this.value.split(this.options.separator);
+      for (var i = 0; i &lt; props.length; i++) {
+        var key = props[i].substring(0, props[i].indexOf('='));
+        var value = props[i].substring(props[i].indexOf('=') + 1) || '';
+        this.properties.push( [key, value] );
+      }
+      for (var i = this.properties.length-1; i &gt;= 0; i--) {
+        this.inputParent.after(this.createPropertyEntry(this.properties[i][0], this.properties[i][1]));
+      }
+    },
+
+    /**
+     * Creates and returns the DOM fragment for an property entry for this widget
+     */
+    createPropertyEntry: function(key, value) {
+      var keyInput = new Element('input', {
+                      'type'  : 'text',
+                      'class' : 'key',
+                      'value' : this.input[0].dataset.keyTip || '',
+                      'style' : 'width:45%' // Somewhat magic number to make the 2 fields + separator and red cross fit.
+                                              // FIXME need to refactor this to use flexible box model when available.
+                    });
+      var valueInput = new Element('input', {
+                      'type'  : 'text',
+                      'class' : 'value',
+                      'value' : this.input[0].dataset.valueTip || '',
+                      'style' : 'width:45%'
+                    });
+      var result = new Element(this.input.parent('dd') ? 'dd' : 'div', {
+                      'class' : 'property ' + this.id})
+                    .insert(keyInput).observe('change', this.updateValue.bind(this))
+                    .insert(' \u2192 ')
+                    .insert(valueInput).observe('change', this.updateValue.bind(this))
+                    .insert(new Element('span', {
+                      'class':'remove'
+                    }).observe('click', this.onRemoveProperty.bindAsEventListener(this)));
+
+      keyInput.value = key || this.input[0].dataset.keyTip || '';
+      valueInput.value = value || this.input[0].dataset.valueTip || '';
+
+      // If there are tips defined for the key and/or the value, hook their input the "withTip" behavior
+      if (key === '' &amp;&amp; this.input[0].dataset.keyTip) {
+        result.down('input.key').value = this.input[0].dataset.keyTip || '';
+        document.fire('xwiki:addBehavior:withTip', {'element' : result.down('input.key').addClassName('withTip')});
+      }
+      if (value === '' &amp;&amp; this.input[0].dataset.valueTip) {
+        result.down('input.value').value = this.input[0].dataset.valueTip || '';
+        document.fire('xwiki:addBehavior:withTip', {'element' : result.down('input.value').addClassName('withTip')});
+      }
+      return result;
+    },
+
+    /**
+     * Callback when user removed a property entry.
+     *
+     * @param {Event} the original click event that led to this callback
+     */
+    onRemoveProperty: function(event) {
+      event.element().up('dd').remove();
+      this.updateValue();
+    },
+
+    /**
+     * Computes the new value for the original underlaying input element (textarea or input text), and updates its value with the result.
+     */
+    updateValue: function() {
+      var value = this.inputContainer.find('.' + this.id + " .key[value!='']").map(function(key, value){
+        if (value.value == value.defaultValue) {
+          return '';
+        }
+        return value.value + '=' + value.next('input').value;
+      }).get().join(this.options.separator);
+      if (this.input.prop('tagName').toLowerCase() === 'textarea') {
+        this.input.text(value);
+      }
+      else {
+        this.input.attr('value', value);
+      }
+    }
+  });
+  return XWiki;
+}(XWiki || {});
+
+require(['jquery'], function($) {
+  $(document).ready(function() {
+    // (function(){
+    var fieldMapping = $('#XWiki\\.XWikiPreferences_0_ldap_fields_mapping');
+    fieldMapping.attr({
+      'data-key-tip'  : "${escapetool.javascript($services.localization.render('activeDirectory.xWikiUserProperty.placeholder'))}",
+      'data-value-tip': "${escapetool.javascript($services.localization.render('activeDirectory.aDUserField.placeholder'))}"
+    });
+    var groupMapping = $('#XWiki\\.XWikiPreferences_0_ldap_group_mapping');
+    groupMapping.attr({
+      'data-key-tip'  : "${escapetool.javascript($services.localization.render('activeDirectory.xWikiGroup.placeholder'))}",
+      'data-value-tip': "${escapetool.javascript($services.localization.render('activeDirectory.aDGroup.placehoder'))}",
+      'data-separator': '|'
+    });
+    $.each([fieldMapping, groupMapping], function(){
+      var options = {};
+      var separator = this.attr('data-separator');
+      if (separator) {
+        options.separator = separator;
+      }
+      new XWiki.widgets.PropertiesEditor(this, options);
+    });
+  });
+});</code>
+    </property>
+    <property>
+      <name/>
+    </property>
+    <property>
+      <parse>1</parse>
+    </property>
+    <property>
+      <use>onDemand</use>
+    </property>
+  </object>
+  <object>
+    <name>ActiveDirectory.Code.ActiveDirectoryConfig</name>
+    <number>0</number>
+    <className>XWiki.StyleSheetExtension</className>
+    <guid>0b9b5e14-24b2-41de-b744-11faec10212b</guid>
+    <class>
+      <name>XWiki.StyleSheetExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>6</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <disabled>0</disabled>
+        <editor>PureText</editor>
+        <name>code</name>
+        <number>3</number>
+        <prettyName>Code</prettyName>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <contentType>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>contentType</name>
+        <number>1</number>
+        <prettyName>Content Type</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>CSS|LESS</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </contentType>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>2</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>5</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>4</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage|onDemand|always</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <property>
+      <cache>long</cache>
+    </property>
+    <property>
+      <code>dd.property span.remove {
+  display: inline-block;
+  min-height: 30px;
+  min-width: 20px;
+  background:url($xwiki.getSkinFile('icons/silk/cross.png')) no-repeat scroll 4px 15px transparent;
+  cursor:pointer;
+}
+
+span.new-entry {
+  font-size: 0.8em;
+  background:url($xwiki.getSkinFile('icons/silk/add.png')) no-repeat scroll 0 0 transparent;
+  padding-left:20px;
+  display:inline-block;
+  line-height:20px;
+  min-height:20px;
+  margin-top:5px;
+  cursor:pointer;
+}
+
+</code>
+    </property>
+    <property>
+      <contentType>CSS</contentType>
+    </property>
+    <property>
+      <name/>
+    </property>
+    <property>
+      <parse>1</parse>
+    </property>
+    <property>
+      <use>currentPage</use>
+    </property>
+  </object>
+</xwikidoc>

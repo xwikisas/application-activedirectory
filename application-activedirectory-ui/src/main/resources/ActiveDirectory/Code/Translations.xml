@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.2" reference="ActiveDirectory.Code.Translations" locale="">
+  <web>ActiveDirectory.Code</web>
+  <name>Translations</name>
+  <language/>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>0</translation>
+  <parent>ActiveDirectory.Code.WebHome</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <creationDate>1470231752000</creationDate>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <date>1471334443000</date>
+  <contentUpdateDate>1471333897000</contentUpdateDate>
+  <version>1.1</version>
+  <title/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>activeDirectory.error.missingLdapService=Active Directory service is not available. Please verify your installation.
+activeDirectory.warning.ldapAuthenticationIsNotEnabled=The system could not connect to Active Directory server because the LDAP authentication is not enabled. Please set the LDAP as authentication service by editing ##{0}##. Search for line ##{1}##, uncomment it and restart the wiki. 
+activeDirectory.aDGroup.placehoder=Active Directory group
+activeDirectory.xWikiGroup.placeholder=XWiki group
+activeDirectory.aDUserField.placeholder=Active Directory user field
+activeDirectory.xWikiUserProperty.placeholder=XWiki user property
+activeDirectory.resetGroupCache.submit=Reset group cache
+activeDirectory.save.submit=Save
+activeDirectory.configuration.title=Configuration
+activeDirectory.miscellaneous.title=Miscellaneous
+activeDirectory.resetGroupCacheSuccess=Groups cache has been reseted.
+activeDirectory.newEntry.title=New Entry
+
+activeDirectory.ldap.label=Active Directory
+activeDirectory.ldap.hint=Enable the Active Directory authentication for this wiki. If enabled and configured properly, a local user will be created whenever an Active Directory user visit this wiki for the first time. The default is 'yes'.
+activeDirectory.ldap_server.label=Active Directory server address
+activeDirectory.ldap_server.hint=The default is '127.0.0.1'.
+activeDirectory.ldap_port.label=Active Directory server port
+activeDirectory.ldap_port.hint=The default is '389'.
+activeDirectory.ldap_bind_DN.label=Active Directory login matching
+activeDirectory.ldap_bind_DN.hint=Leave empty for anonymous access, otherwise specify full dn. E.g: cn=admin,dc=example,dc=com.
+activeDirectory.ldap_bind_pass.label=Active Directory password matching
+activeDirectory.ldap_bind_pass.hint=The password used in combination with Active Directory login matching.
+activeDirectory.ldap_user_group.label=Restrict to group
+activeDirectory.ldap_user_group.hint=Only the members of the following Active Directory group can authenticate. If you leave empty, all the users from the Base DN will be verified. E.g.: cn=developers,ou=groups,o=XWiki,c=FR.
+activeDirectory.ldap_exclude_group.label=Active Directory group to exclude
+activeDirectory.ldap_exclude_group.hint=The users that are member of the following group can't authenticate. E.g.: cn=designers,ou=groups,o=XWiki,c=FR.
+activeDirectory.ldap_base_DN.label=Active Directory Base DN
+activeDirectory.ldap_base_DN.hint=The Base DN is the root of the tree where the server performs the search. E.g: dc=example,dc=com.
+activeDirectory.ldap_UID_attr.label=Active Directory UID attribute name
+activeDirectory.ldap_UID_attr.hint=Specifies the Active Directory attribute containing the identifier to be used as the XWiki user name. The default is 'cn'.
+activeDirectory.ldap_trylocal.label=Try local login
+activeDirectory.ldap_trylocal.hint=If Active Directory authentication fails for any reason, try XWiki DB authentication with the same credentials. The default is 'yes'.
+activeDirectory.ldap_update_user.label=Update user from Active Directory after login
+activeDirectory.ldap_update_user.hint=If 'Yes', update the mapped attributes from Active Directory to XWiki on every login, else the mapping will be updated only when the user is created. The default is 'yes'.
+activeDirectory.ldap_update_photo.label=Update user photo from LDAP
+activeDirectory.ldap_update_photo.hint=If 'Yes', the XWiki avatar will be synchronized with the Active Directory on every login, else the photo will not be updated. The default in 'no'.
+activeDirectory.ldap_photo_attachment_name.label=Attachment name used to save the Active Directory photo
+activeDirectory.ldap_photo_attachment_name.hint=The Active Directory photo name that will be used in XWiki profile.
+activeDirectory.ldap_photo_attribute.label=Active Directory photo attribute name
+activeDirectory.ldap_photo_attribute.hint=Specifies the Active Directory attribute that contains the photo image.
+activeDirectory.ldap_fields_mapping.label=Active Directory user fields mapping
+activeDirectory.ldap_fields_mapping.hint=Map an Active Directory user field to a XWiki user property. E.g.: first_name-&gt;givenName.
+activeDirectory.ldap_group_mapping.label=Active Directory groups mapping
+activeDirectory.ldap_group_mapping.hint=Map an Active Directory group to a XWiki group. E.g.: XWiki.XWikiAdminGroup-&gt;cn=marketing,ou=groups,dc=example.
+activeDirectory.ldap_groupcache_expiration.label=Active Directory groups cache expiration
+activeDirectory.ldap_groupcache_expiration.hint=Time in seconds after which the list of members in a group is refreshed from Active Directory. The default is 21600 (6 hours).
+activeDirectory.ldap_mode_group_sync.label=When to synchronize the Active Directory groups
+activeDirectory.ldap_mode_group_sync.hint=The groups will be syncronized by default on every authentication of a user.
+activeDirectory.ldap_mode_group_sync_always=At each authentication of a user
+activeDirectory.ldap_mode_group_sync_create=Upon creation of a user</content>
+  <object>
+    <name>ActiveDirectory.Code.Translations</name>
+    <number>0</number>
+    <className>XWiki.TranslationDocumentClass</className>
+    <guid>38a16c7c-ea2a-4ee8-bfc5-cf39d60929bb</guid>
+    <class>
+      <name>XWiki.TranslationDocumentClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <scope>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>scope</name>
+        <number>1</number>
+        <prettyName>Scope</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>GLOBAL|WIKI|USER|ON_DEMAND</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </scope>
+    </class>
+    <property>
+      <scope>WIKI</scope>
+    </property>
+  </object>
+</xwikidoc>
