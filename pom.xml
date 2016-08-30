@@ -7,6 +7,7 @@
     <groupId>org.xwiki.contrib</groupId>
     <artifactId>parent-platform</artifactId>
     <version>7.4-7</version>
+    <relativePath/>
   </parent>
   <groupId>com.xwiki.activedirectory</groupId>
   <artifactId>application-activedirectory</artifactId>
@@ -31,7 +32,7 @@
   </scm>
   <distributionManagement>
     <repository>
-      <id>nexus.xwikisas.com</id>
+      <id>nexus.xwikisas.com-psr</id>
       <name>Public Store Releases</name>
       <url>https://nexus.xwikisas.com/nexus/content/repositories/public-store-releases/</url>
     </repository>
