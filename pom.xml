@@ -28,11 +28,20 @@
     <url>https://git.xwikisas.com/acotiuga/application-activedirectory</url>
     <tag>HEAD</tag>
   </scm>
+  <issueManagement>
+    <system>jira</system>
+    <url>https://jira.xwikisas.com/projects/ADAPP</url>
+  </issueManagement>
   <distributionManagement>
     <repository>
       <id>nexus.xwikisas.com-psr</id>
-      <name>Public Store Releases</name>
+      <name>XWiki SAS Maven Remote Repository for Public Store Releases</name>
       <url>https://nexus.xwikisas.com/nexus/content/repositories/public-store-releases/</url>
     </repository>
+    <snapshotRepository>
+      <id>nexus.xwikisas.com-pss</id>
+      <name>XWiki SAS Maven Development Repository for Public Store Snapshots</name>
+      <url>https://nexus.xwikisas.com/nexus/content/repositories/public-store-snapshots/</url>
+    </snapshotRepository>
   </distributionManagement>
 </project>
