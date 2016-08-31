@@ -7,6 +7,7 @@
     <groupId>org.xwiki.contrib</groupId>
     <artifactId>parent-platform</artifactId>
     <version>7.4-7</version>
+    <relativePath/>
   </parent>
   <groupId>com.xwiki.activedirectory</groupId>
   <artifactId>application-activedirectory</artifactId>
@@ -20,6 +21,9 @@
       <name>Alexandru Nicolae Cotiugă</name>
     </developer>
   </developers>
+  <modules>
+    <module>application-activedirectory-ui</module>
+  </modules>
   <scm>
     <connection>scm:git:https://git.xwikisas.com/acotiuga/application-activedirectory.git</connection>
     <developerConnection>scm:git:https://git.xwikisas.com/acotiuga/application-activedirectory.git</developerConnection>
@@ -32,13 +36,5 @@
       <name>Public Store Releases</name>
       <url>https://nexus.xwikisas.com/nexus/content/repositories/public-store-releases/</url>
     </repository>
-    <snapshotRepository>
-      <id>nexus.xwikisas.com-pss</id>
-      <name>XWiki SAS Public Store Repository for Snapshots</name>
-      <url>https://nexus.xwikisas.com/nexus/content/repositories/public-store-snapshots/</url>
-    </snapshotRepository>
   </distributionManagement>
-  <modules>
-    <module>application-activedirectory-ui</module>
-  </modules>
 </project>
