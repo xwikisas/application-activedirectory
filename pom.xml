@@ -17,8 +17,8 @@
   <description>Application to manipulate Active Directory in XWiki.</description>
   <developers>
     <developer>
-      <id>acotiuga</id>
-      <name>Alexandru Nicolae Cotiugă</name>
+      <id>xwikisas</id>
+      <name>XWiki SAS</name>
     </developer>
   </developers>
   <modules>
