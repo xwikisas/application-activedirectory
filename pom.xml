@@ -4,10 +4,9 @@
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <groupId>org.xwiki.contrib</groupId>
-    <artifactId>parent-platform</artifactId>
-    <version>7.4-7</version>
-    <relativePath/>
+    <groupId>com.xwiki.parent</groupId>
+    <artifactId>xwikisas-parent-platform</artifactId>
+    <version>7.4</version>
   </parent>
   <groupId>com.xwiki.activedirectory</groupId>
   <artifactId>application-activedirectory</artifactId>
@@ -15,12 +14,6 @@
   <packaging>pom</packaging>
   <name>Active Directory</name>
   <description>Application to manipulate Active Directory in XWiki.</description>
-  <developers>
-    <developer>
-      <id>xwikisas</id>
-      <name>XWiki SAS</name>
-    </developer>
-  </developers>
   <modules>
     <module>application-activedirectory-ui</module>
   </modules>
@@ -33,8 +26,13 @@
   <distributionManagement>
     <repository>
       <id>nexus.xwikisas.com-psr</id>
-      <name>Public Store Releases</name>
+      <name>XWiki SAS Public Store Repository for Releases</name>
       <url>https://nexus.xwikisas.com/nexus/content/repositories/public-store-releases/</url>
     </repository>
+    <snapshotRepository>
+      <id>nexus.xwikisas.com-pss</id>
+      <name>XWiki SAS Public Store Repository for Snapshots</name>
+      <url>https://nexus.xwikisas.com/nexus/content/repositories/public-store-snapshots/</url>
+    </snapshotRepository>
   </distributionManagement>
 </project>
