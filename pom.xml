@@ -18,9 +18,9 @@
     <module>application-activedirectory-ui</module>
   </modules>
   <scm>
-    <connection>scm:git:https://git.xwikisas.com/acotiuga/application-activedirectory.git</connection>
-    <developerConnection>scm:git:https://git.xwikisas.com/acotiuga/application-activedirectory.git</developerConnection>
-    <url>https://git.xwikisas.com/acotiuga/application-activedirectory</url>
+    <connection>scm:git:https://git.xwikisas.com/xwiki-sas-products/application-activedirectory.git</connection>
+    <developerConnection>scm:git:https://git.xwikisas.com/xwiki-sas-products/application-activedirectory.git</developerConnection>
+    <url>https://git.xwikisas.com/xwiki-sas-products/application-activedirectory/</url>
     <tag>HEAD</tag>
   </scm>
   <distributionManagement>
