@@ -7,4 +7,4 @@
 * License: Proprietary - Copyright XWiki SAS
 * Translations: N/A 
 * Sonar Dashboard: N/A 
-* Continuous Integration Status: N/A 
+* Continuous Integration Status: [![Build Status](http://ci.xwikisas.com/buildStatus/icon?job=application-activedirectory)](http://ci.xwikisas.com/job/application-activedirectory/)
