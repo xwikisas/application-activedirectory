@@ -6,7 +6,7 @@
   <parent>
     <groupId>com.xwiki.parent</groupId>
     <artifactId>xwikisas-parent-platform</artifactId>
-    <version>7.4</version>
+    <version>7.4-SNAPSHOT</version>
   </parent>
   <groupId>com.xwiki.activedirectory</groupId>
   <artifactId>application-activedirectory</artifactId>
@@ -23,16 +23,4 @@
     <url>https://git.xwikisas.com/xwiki-sas-products/application-activedirectory/</url>
     <tag>HEAD</tag>
   </scm>
-  <distributionManagement>
-    <repository>
-      <id>nexus.xwikisas.com-psr</id>
-      <name>XWiki SAS Public Store Repository for Releases</name>
-      <url>https://nexus.xwikisas.com/nexus/content/repositories/public-store-releases/</url>
-    </repository>
-    <snapshotRepository>
-      <id>nexus.xwikisas.com-pss</id>
-      <name>XWiki SAS Public Store Repository for Snapshots</name>
-      <url>https://nexus.xwikisas.com/nexus/content/repositories/public-store-snapshots/</url>
-    </snapshotRepository>
-  </distributionManagement>
 </project>
