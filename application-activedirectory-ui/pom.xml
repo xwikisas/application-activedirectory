@@ -20,7 +20,7 @@
     <dependency>
       <groupId>org.xwiki.contrib.ldap</groupId>
       <artifactId>ldap-api</artifactId>
-      <version>9.0.2</version>
+      <version>9.1</version>
       <scope>runtime</scope>
     </dependency>
     <dependency>
