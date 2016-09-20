@@ -17,6 +17,19 @@
   <modules>
     <module>application-activedirectory-ui</module>
   </modules>
+  <repositories>
+    <repository>
+      <id>public-store-releases</id>
+      <name>XWiki SAS Public Store Repository for Releases</name>
+      <url>https://nexus.xwikisas.com/nexus/content/repositories/public-store-releases/</url>
+      <releases>
+        <enabled>true</enabled>
+      </releases>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots> 
+    </repository>
+  </repositories>
   <scm>
     <connection>scm:git:https://git.xwikisas.com/xwiki-sas-products/application-activedirectory.git</connection>
     <developerConnection>scm:git:https://git.xwikisas.com/xwiki-sas-products/application-activedirectory.git</developerConnection>
