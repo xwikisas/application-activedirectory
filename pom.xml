@@ -21,7 +21,7 @@
     <repository>
       <id>public-store-releases</id>
       <name>XWiki SAS Public Store Repository for Releases</name>
-      <url>https://nexus.xwikisas.com/nexus/content/repositories/public-store-releases/</url>
+      <url>https://nexus.xwiki.com/nexus/content/repositories/public-store-releases/</url>
       <releases>
         <enabled>true</enabled>
       </releases>
