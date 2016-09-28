@@ -77,28 +77,34 @@
   #end
 #end
 
-#if ($services.ldap)
-  #if ($services.ldap.isXWikiLDAPAuthenticator())
-    #if ($request.action_resetGroupCache)
-      #set ($discard = $services.ldap.resetGroupCache())
-      {{success}}$services.localization.render('activeDirectory.success.resetGroupCache'){{/success}}
+#if ($services.licensor.hasLicense())
+  #if ($services.ldap)
+    #if ($services.ldap.isXWikiLDAPAuthenticator())
+      #if ($request.action_resetGroupCache)
+        #set ($discard = $services.ldap.resetGroupCache())
+        {{success}}$services.localization.render('activeDirectory.success.resetGroupCache'){{/success}}
+      #end
+      = $services.localization.render('activeDirectory.configuration.title') =
+
+      #displayForm($configClassName)
+
+      = $services.localization.render('activeDirectory.miscellaneous.title') =
+
+      {{html clean="false"}}
+        &lt;form method="post" action="${escapetool.xml($xwiki.requestURL)}" enctype="multipart/form-data"&gt;
+        &lt;input name="action_resetGroupCache" value="${escapetool.xml($services.localization.render('activeDirectory.resetGroupCache.submit'))}" class="button" type="submit"&gt;
+        &lt;/form&gt;
+      {{/html}}
+    #else
+      {{warning}}$services.localization.render('activeDirectory.warning.ldapAuthenticationIsNotEnabled', ['webapps/xwiki/WEB-INF/xwiki.cfg', '# xwiki.authentication.authclass=com.xpn.xwiki.user.impl.LDAP.XWikiLDAPAuthServiceImpl']){{/warning}}
     #end
-    = $services.localization.render('activeDirectory.configuration.title') =
-
-    #displayForm($configClassName)
-
-    = $services.localization.render('activeDirectory.miscellaneous.title') =
-
-    {{html clean="false"}}
-      &lt;form method="post" action="${escapetool.xml($xwiki.requestURL)}" enctype="multipart/form-data"&gt;
-      &lt;input name="action_resetGroupCache" value="${escapetool.xml($services.localization.render('activeDirectory.resetGroupCache.submit'))}" class="button" type="submit"&gt;
-      &lt;/form&gt;
-    {{/html}}
-  #else
-    {{warning}}$services.localization.render('activeDirectory.warning.ldapAuthenticationIsNotEnabled', ['webapps/xwiki/WEB-INF/xwiki.cfg', '# xwiki.authentication.authclass=com.xpn.xwiki.user.impl.LDAP.XWikiLDAPAuthServiceImpl']){{/warning}}
+  #else 
+    {{error}}$services.localization.render('activeDirectory.error.missingLdapService'){{/error}}
   #end
-#else 
-  {{error}}$services.localization.render('activeDirectory.error.missingLdapService'){{/error}}
+#else
+  {{error}}
+    $services.localization.render('activeDirectory.error.noValidLicense', ['[[', "&gt;&gt;path:$xwiki.getURL('XWiki.XWikiPreferences', 'admin', 'editor=globaladmin&amp;section=Licenses')]]"])
+  {{/error}}
 #end
 {{/velocity}}
 
