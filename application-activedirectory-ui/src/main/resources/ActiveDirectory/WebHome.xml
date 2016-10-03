@@ -20,33 +20,33 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.2" reference="ActiveDirectory.Code.ActiveDirectoryConfig" locale="">
-  <web>ActiveDirectory.Code</web>
-  <name>ActiveDirectoryConfig</name>
+<xwikidoc version="1.2" reference="ActiveDirectory.WebHome" locale="">
+  <web>ActiveDirectory</web>
+  <name>WebHome</name>
   <language/>
   <defaultLanguage/>
   <translation>0</translation>
-  <parent>ActiveDirectory.Code.WebHome</parent>
   <creator>xwiki:XWiki.Admin</creator>
   <creationDate>1470225264000</creationDate>
+  <parent>ActiveDirectory.Code.WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1471335757000</date>
-  <contentUpdateDate>1471335656000</contentUpdateDate>
+  <date>1475495863000</date>
+  <contentUpdateDate>1475495852000</contentUpdateDate>
   <version>1.1</version>
-  <title/>
+  <title>Active Directory</title>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
   <content>{{velocity}}
-#macro (displayForm)
+#macro (displayMainForm)
   #set ($params = ['ldap', 'ldap_server', 'ldap_port', 'ldap_bind_DN', 'ldap_bind_pass', 'ldap_base_DN', 'ldap_user_group', 'ldap_exclude_group', 'ldap_UID_attr', 'ldap_trylocal', 'ldap_update_user', 'ldap_update_photo', 'ldap_photo_attachment_name', 'ldap_photo_attribute', 'ldap_fields_mapping', 'ldap_group_mapping', 'ldap_groupcache_expiration', 'ldap_mode_group_sync'])
   #set ($configClassName = 'XWiki.XWikiPreferences')
   #set ($obj = $doc.getObject($configClassName))
   #if ($obj)
-    #set ($discard = $xwiki.jsx.use('ActiveDirectory.Code.ActiveDirectoryConfig'))
-    #set ($discard = $xwiki.ssx.use('ActiveDirectory.Code.ActiveDirectoryConfig'))
+    #set ($discard = $xwiki.jsx.use('ActiveDirectory.WebHome'))
+    #set ($discard = $xwiki.ssx.use('ActiveDirectory.WebHome'))
     {{html clean="false"}}
     &lt;form id="$section.toLowerCase()" method="post" action="$xwiki.getURL($doc, 'saveandcontinue')" class="xform half"&gt;
       &lt;dl&gt;
@@ -76,8 +76,8 @@
     {{/html}}
   #end
 #end
-
-#if ($services.licensor.hasLicense())
+##
+#if ($services.licensor.licensor.hasLicensure())
   #if ($services.ldap)
     #if ($services.ldap.isXWikiLDAPAuthenticator())
       #if ($request.action_resetGroupCache)
@@ -85,11 +85,8 @@
         {{success}}$services.localization.render('activeDirectory.success.resetGroupCache'){{/success}}
       #end
       = $services.localization.render('activeDirectory.configuration.title') =
-
-      #displayForm($configClassName)
-
+      #displayMainForm($configClassName)
       = $services.localization.render('activeDirectory.miscellaneous.title') =
-
       {{html clean="false"}}
         &lt;form method="post" action="${escapetool.xml($xwiki.requestURL)}" enctype="multipart/form-data"&gt;
         &lt;input name="action_resetGroupCache" value="${escapetool.xml($services.localization.render('activeDirectory.resetGroupCache.submit'))}" class="button" type="submit"&gt;
@@ -112,10 +109,10 @@
 
  </content>
   <object>
-    <name>ActiveDirectory.Code.ActiveDirectoryConfig</name>
+    <name>ActiveDirectory.WebHome</name>
     <number>0</number>
     <className>XWiki.ConfigurableClass</className>
-    <guid>66353a77-4d2d-480e-ac56-18c404f93c81</guid>
+    <guid>4d5956ad-2126-46b0-93e1-e7578b856a0d</guid>
     <class>
       <name>XWiki.ConfigurableClass</name>
       <customClass/>
@@ -292,33 +289,12 @@
         <validationRegExp/>
         <classType>com.xpn.xwiki.objects.classes.NumberClass</classType>
       </sectionOrder>
-      <visibility>
-        <cache>0</cache>
-        <customDisplay/>
-        <disabled>0</disabled>
-        <displayType>select</displayType>
-        <multiSelect>1</multiSelect>
-        <name>visibility</name>
-        <number>13</number>
-        <picker>0</picker>
-        <prettyName>visibility</prettyName>
-        <relationalStorage>1</relationalStorage>
-        <separator> </separator>
-        <separators>|, </separators>
-        <size>1</size>
-        <sort>none</sort>
-        <unmodifiable>0</unmodifiable>
-        <validationMessage/>
-        <validationRegExp/>
-        <values>space|wiki</values>
-        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-      </visibility>
     </class>
     <property>
       <categoryIcon/>
     </property>
     <property>
-      <codeToExecute>{{include reference="ActiveDirectory.Code.ActiveDirectoryConfig" /}}</codeToExecute>
+      <codeToExecute>{{include reference="ActiveDirectory.WebHome" /}}</codeToExecute>
     </property>
     <property>
       <configurationClass/>
@@ -350,15 +326,12 @@
     <property>
       <sectionOrder/>
     </property>
-    <property>
-      <visibility/>
-    </property>
   </object>
   <object>
-    <name>ActiveDirectory.Code.ActiveDirectoryConfig</name>
+    <name>ActiveDirectory.WebHome</name>
     <number>0</number>
     <className>XWiki.JavaScriptExtension</className>
-    <guid>b42fb9ce-daa3-4518-9d5d-66ae36b89ec7</guid>
+    <guid>23d08758-a703-4dbf-82fa-7a5569590b03</guid>
     <class>
       <name>XWiki.JavaScriptExtension</name>
       <customClass/>
@@ -605,10 +578,10 @@ require(['jquery'], function($) {
     </property>
   </object>
   <object>
-    <name>ActiveDirectory.Code.ActiveDirectoryConfig</name>
+    <name>ActiveDirectory.WebHome</name>
     <number>0</number>
     <className>XWiki.StyleSheetExtension</className>
-    <guid>0b9b5e14-24b2-41de-b744-11faec10212b</guid>
+    <guid>f22c3ca6-c237-4af4-8978-7905e3c054c7</guid>
     <class>
       <name>XWiki.StyleSheetExtension</name>
       <customClass/>
