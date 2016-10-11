@@ -96,7 +96,11 @@
         &lt;/form&gt;
       {{/html}}
     #else
-      {{warning}}$services.localization.render('activeDirectory.warning.ldapAuthenticationIsNotEnabled', ['webapps/xwiki/WEB-INF/xwiki.cfg', '# xwiki.authentication.authclass=com.xpn.xwiki.user.impl.LDAP.XWikiLDAPAuthServiceImpl']){{/warning}}
+      {{warning}}
+        $services.localization.render('activeDirectory.warning.ldapAuthenticationIsNotEnabled', ['webapps/xwiki/WEB-INF/xwiki.cfg'])
+        xwiki.authentication.authclass=org.xwiki.contrib.ldap.XWikiLDAPAuthServiceImpl
+        xwiki.authentication.ldap.trylocal=1
+      {{/warning}}
     #end
   #else 
     {{error}}$services.localization.render('activeDirectory.error.missingLdapService'){{/error}}
