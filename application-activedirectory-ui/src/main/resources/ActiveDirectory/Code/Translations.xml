@@ -40,7 +40,7 @@
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
   <content>activeDirectory.error.missingLdapService=Active Directory service is not available. Please verify your installation.
-activeDirectory.warning.ldapAuthenticationIsNotEnabled=The system could not connect to Active Directory server because the LDAP authentication service is not enabled. To do that, edit the ##{0}## file and add the following lines, then restart the wiki:
+activeDirectory.warning.ldapAuthenticationIsNotEnabled=The system could not connect to Active Directory server because the LDAP authentication service is not enabled. Edit the ##{0}## file and add the following lines, then restart the wiki:
 activeDirectory.aDGroup.placehoder=Active Directory group
 activeDirectory.xWikiGroup.placeholder=XWiki group
 activeDirectory.aDUserField.placeholder=Active Directory user field
@@ -90,9 +90,7 @@ activeDirectory.ldap_groupcache_expiration.hint=Time in seconds after which the 
 activeDirectory.ldap_mode_group_sync.label=When to synchronize the Active Directory groups
 activeDirectory.ldap_mode_group_sync.hint=The groups will be syncronized by default on every authentication of a user.
 activeDirectory.ldap_mode_group_sync_always=At each authentication of a user
-activeDirectory.ldap_mode_group_sync_create=Upon creation of a user
-
-activeDirectory.error.noValidLicense=There is no valid license for Active Directory application. In order to find out how to get one, please visit the {0}Licenses section{1}.</content>
+activeDirectory.ldap_mode_group_sync_create=Upon creation of a user</content>
   <object>
     <name>ActiveDirectory.Code.Translations</name>
     <number>0</number>
