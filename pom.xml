@@ -15,7 +15,8 @@
   <name>Active Directory</name>
   <description>Application to manipulate Active Directory in XWiki.</description>
   <modules>
-    <module>application-activedirectory-ui</module>
+    <module>application-activedirectory-entry</module>
+    <module>application-activedirectory-main</module>
   </modules>
   <repositories>
     <repository>

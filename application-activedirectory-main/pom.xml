@@ -8,9 +8,9 @@
     <artifactId>application-activedirectory</artifactId>
     <version>1.0-SNAPSHOT</version>
   </parent>
-  <artifactId>application-activedirectory-ui</artifactId>
+  <artifactId>application-activedirectory-main</artifactId>
   <packaging>xar</packaging>
-  <name>Active Directory - UI</name>
+  <name>Active Directory - Main</name>
   <description>UI Application that makes it easier to configure and connect to Active Directory.</description>
   <properties>
     <!-- Name to display by the Extension Manager -->
