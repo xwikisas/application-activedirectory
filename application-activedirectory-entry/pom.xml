@@ -11,7 +11,7 @@
   <artifactId>application-activedirectory-entry</artifactId>
   <packaging>xar</packaging>
   <name>Active Directory - Entry</name>
-  <description>UI Application that makes it easier to configure and connect to Active Directory.</description>
+  <description>Entry point for the Active Directory UI.</description>
   <properties>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Active Directory Application</xwiki.extension.name>
