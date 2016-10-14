@@ -40,7 +40,7 @@
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
   <content>activeDirectory.error.missingLdapService=Active Directory service is not available. Please verify your installation.
-activeDirectory.warning.ldapAuthenticationIsNotEnabled=The system could not connect to Active Directory server because the LDAP authentication is not enabled. Please set the LDAP as authentication service by editing {0}. Search for line {1}, uncomment it and restart the wiki.
+activeDirectory.warning.ldapAuthenticationIsNotEnabled=The system could not connect to Active Directory server because the LDAP authentication service is not enabled. Edit the ##{0}## file, add the following lines and restart the wiki:
 activeDirectory.aDGroup.placehoder=Active Directory group
 activeDirectory.xWikiGroup.placeholder=XWiki group
 activeDirectory.aDUserField.placeholder=Active Directory user field
