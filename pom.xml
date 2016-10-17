@@ -14,6 +14,10 @@
   <packaging>pom</packaging>
   <name>Active Directory</name>
   <description>Application to manipulate Active Directory in XWiki.</description>
+  <issueManagement>
+    <system>xwiki-network</system>
+    <url>https://network.xwiki.com</url>
+  </issueManagement>
   <modules>
     <module>application-activedirectory-entry</module>
     <module>application-activedirectory-main</module>
