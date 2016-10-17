@@ -14,7 +14,7 @@
   <description>UI Application that makes it easier to configure and connect to Active Directory.</description>
   <properties>
     <!-- Name to display by the Extension Manager -->
-    <xwiki.extension.name>Active Directory - Implementation</xwiki.extension.name>
+    <xwiki.extension.name>Active Directory Application (Paying)</xwiki.extension.name>
   </properties>
   <dependencies>
     <dependency>
