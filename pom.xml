@@ -41,6 +41,10 @@
     <module>application-activedirectory-entry</module>
     <module>application-activedirectory-main</module>
   </modules>
+  <!-- Even though this repository is already declared in the parent POM, we still explicitly redeclare it for
+       convenience. This makes it simpler to build this project without having to declare this repository in one's own
+       Maven settings.xml file. In the future We may decide to remove this in the future and make it a rule to have the
+       XWiki SAS Nexus repository in one's settings.xml -->
   <repositories>
     <repository>
       <id>public-store-releases</id>
