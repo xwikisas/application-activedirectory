@@ -27,27 +27,25 @@
     <artifactId>application-activedirectory</artifactId>
     <version>1.1-SNAPSHOT</version>
   </parent>
-  <artifactId>application-activedirectory-entry</artifactId>
-  <packaging>xar</packaging>
-  <name>Active Directory - Entry</name>
-  <description>Makes it easy to configure and connect to an Active Directory server.</description>
+  <artifactId>application-activedirectory-api</artifactId>
+  <packaging>jar</packaging>
+  <name>Active Directory - API</name>
+  <description>Java Authenticator for the Active Directory application</description>
   <properties>
     <!-- Name to display by the Extension Manager -->
-    <xwiki.extension.name>Active Directory Application</xwiki.extension.name>
+    <xwiki.extension.name>Active Directory API</xwiki.extension.name>
   </properties>
   <dependencies>
+    <dependency>
+      <groupId>org.xwiki.contrib.ldap</groupId>
+      <artifactId>ldap-authenticator</artifactId>
+      <version>9.1</version>
+    </dependency>
     <dependency>
       <groupId>com.xwiki.activedirectory</groupId>
       <artifactId>application-activedirectory-main</artifactId>
       <version>1.1-SNAPSHOT</version>
       <type>xar</type>
-      <scope>runtime</scope>
-    </dependency>
-    <dependency>
-      <groupId>com.xwiki.activedirectory</groupId>
-      <artifactId>application-activedirectory-api</artifactId>
-      <version>1.1-SNAPSHOT</version>
-      <scope>runtime</scope>
     </dependency>
   </dependencies>
 </project>
