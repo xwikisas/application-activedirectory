@@ -37,6 +37,12 @@
   </properties>
   <dependencies>
     <dependency>
+      <groupId>org.xwiki.contrib.ldap</groupId>
+      <artifactId>ldap-api</artifactId>
+      <version>9.1</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
       <groupId>com.xwiki.activedirectory</groupId>
       <artifactId>application-activedirectory-api</artifactId>
       <version>${project.version}</version>
