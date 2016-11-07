@@ -43,7 +43,7 @@ import com.xwiki.licensing.Licensor;
  */
 public class ActiveDirectoryAuthServiceImpl extends XWikiLDAPAuthServiceImpl
 {
-    private static final String MAIN_EXTENSION_ID = "com.xwiki.activedirectory:application-activedirectory-main";
+    private static final String EXTENSION_ID = "com.xwiki.activedirectory:application-activedirectory-api";
 
     private Licensor licensor = Utils.getComponent(Licensor.class);
 
@@ -88,7 +88,7 @@ public class ActiveDirectoryAuthServiceImpl extends XWikiLDAPAuthServiceImpl
 
         // The Licensor expects a version so we need to discover the installed version for now. Hopefully in the future
         // the Licensor could find it how automatically.
-        InstalledExtension mainExtension = this.repository.getInstalledExtension(MAIN_EXTENSION_ID, "wiki:xwiki");
+        InstalledExtension mainExtension = this.repository.getInstalledExtension(EXTENSION_ID, null);
         if (mainExtension != null) {
             isLicensed = this.licensor.hasLicensure(mainExtension.getId());
         }

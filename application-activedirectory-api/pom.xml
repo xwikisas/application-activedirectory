@@ -33,7 +33,9 @@
   <description>Java Authenticator for the Active Directory application</description>
   <properties>
     <!-- Name to display by the Extension Manager -->
-    <xwiki.extension.name>Active Directory API</xwiki.extension.name>
+    <xwiki.extension.name>Active Directory Authenticator</xwiki.extension.name>
+    <!-- XWiki supports only one authenticator for the same instance -->
+    <xwiki.extension.namespaces>{root}</xwiki.extension.namespaces>
   </properties>
   <dependencies>
     <dependency>
@@ -42,10 +44,9 @@
       <version>9.1</version>
     </dependency>
     <dependency>
-      <groupId>com.xwiki.activedirectory</groupId>
-      <artifactId>application-activedirectory-main</artifactId>
-      <version>1.1-SNAPSHOT</version>
-      <type>xar</type>
+      <groupId>com.xwiki.licensing</groupId>
+      <artifactId>application-licensing-licensor-api</artifactId>
+      <version>1.0</version>
     </dependency>
   </dependencies>
 </project>
