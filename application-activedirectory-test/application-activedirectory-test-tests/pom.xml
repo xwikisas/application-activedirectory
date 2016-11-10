@@ -52,7 +52,11 @@
       <version>${project.version}</version>
       <exclusions>
         <!-- Exclude the License API module so that there's no license check for the AD app and so that we can easily
-             test it! Clever, isn't it? ;) -->
+             test it! Clever, isn't it? ;)
+
+             Note: This is not working yet! Probably because the Pacaker plugin doesn't support exclusions for some
+                   reasons
+        -->
         <exclusion>
             <groupId>com.xwiki.licensing</groupId>
             <artifactId>application-licensing-licensor-api</artifactId>
