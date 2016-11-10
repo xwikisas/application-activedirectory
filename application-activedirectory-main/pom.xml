@@ -51,7 +51,7 @@
     <dependency>
       <groupId>com.xwiki.licensing</groupId>
       <artifactId>application-licensing-licensor-api</artifactId>
-      <version>1.0</version>
+      <version>${licensing.version}</version>
     </dependency>
     <dependency>
       <groupId>org.xwiki.rendering</groupId>

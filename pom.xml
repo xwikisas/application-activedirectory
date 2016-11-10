@@ -39,6 +39,7 @@
   </issueManagement>
   <properties>
     <ldap.version>9.1.1-SNAPSHOT</ldap.version>
+    <licensing.version>1.1-SNAPSHOT</licensing.version>
   </properties>
   <modules>
     <module>application-activedirectory-api</module>
