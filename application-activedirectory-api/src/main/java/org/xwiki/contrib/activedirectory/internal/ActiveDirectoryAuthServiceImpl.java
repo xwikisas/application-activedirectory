@@ -21,7 +21,9 @@ package org.xwiki.contrib.activedirectory.internal;
 
 import java.security.Principal;
 
+import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.contrib.ldap.XWikiLDAPAuthServiceImpl;
+import org.xwiki.contrib.ldap.XWikiLDAPConfig;
 import org.xwiki.extension.InstalledExtension;
 import org.xwiki.extension.repository.InstalledExtensionRepository;
 
@@ -50,6 +52,14 @@ public class ActiveDirectoryAuthServiceImpl extends XWikiLDAPAuthServiceImpl
     private InstalledExtensionRepository repository = Utils.getComponent(InstalledExtensionRepository.class);
 
     private XWikiAuthService fallbackAuthService = new XWikiAuthServiceImpl();
+
+    private ConfigurationSource configurationSource = Utils.getComponent(ConfigurationSource.class, "activedirectory");
+
+    @Override
+    protected XWikiLDAPConfig createXWikiLDAPConfig(String authInput)
+    {
+        return new XWikiLDAPConfig(authInput, this.configurationSource);
+    }
 
     @Override
     public XWikiUser checkAuth(XWikiContext context) throws XWikiException

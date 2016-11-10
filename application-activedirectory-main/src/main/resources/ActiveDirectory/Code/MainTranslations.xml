@@ -39,7 +39,10 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>activeDirectory.error.missingLdapService=Active Directory service is not available. Please verify your installation.
+  <content>admin.activeDirectoryConnection=Connection Settings
+admin.activeDirectoryConfiguration=Configuration
+admin.activeDirectoryMiscellaneous=Miscellaneous
+activeDirectory.error.missingLdapService=Active Directory service is not available. Please verify your installation.
 activeDirectory.warning.ldapAuthenticationIsNotEnabled=The system could not connect to Active Directory server because the LDAP authentication service is not enabled. Edit the ##{0}## file, add the following lines and restart the wiki:
 activeDirectory.aDGroup.placehoder=Active Directory group
 activeDirectory.xWikiGroup.placeholder=XWiki group
@@ -47,50 +50,47 @@ activeDirectory.aDUserField.placeholder=Active Directory user field
 activeDirectory.xWikiUserProperty.placeholder=XWiki user property
 activeDirectory.resetGroupCache.submit=Reset group cache
 activeDirectory.save.submit=Save
-activeDirectory.connectionSettings.title=Connection settings
-activeDirectory.configuration.title=Configuration
-activeDirectory.miscellaneous.title=Miscellaneous
-activeDirectory.resetGroupCacheSuccess=Groups cache has been reseted.
+activeDirectory.resetGroupCacheSuccess=Groups cache has been reset.
 activeDirectory.newEntry.title=New Entry
 
-activeDirectory.ldap.label=Enable the Active Directory authentification
-activeDirectory.ldap.hint=Enable the Active Directory authentication for this wiki. If enabled and configured properly, a local user will be created whenever an Active Directory user visit this wiki for the first time. The default is 'yes'.
-activeDirectory.ldap_server.label=Active Directory server address
-activeDirectory.ldap_server.hint=The default is '127.0.0.1'.
-activeDirectory.ldap_port.label=Active Directory server port
-activeDirectory.ldap_port.hint=The default is '389'.
-activeDirectory.ldap_bind_DN.label=Active Directory login matching
-activeDirectory.ldap_bind_DN.hint=Leave empty for anonymous access, otherwise specify full dn. E.g: cn=admin,dc=example,dc=com.
-activeDirectory.ldap_bind_pass.label=Active Directory password matching
-activeDirectory.ldap_bind_pass.hint=The password used in combination with Active Directory login matching.
-activeDirectory.ldap_user_group.label=Restrict to group
-activeDirectory.ldap_user_group.hint=Only the members of the following Active Directory group can authenticate. If you leave empty, all the users from the Base DN will be verified. E.g.: cn=developers,ou=groups,o=XWiki,c=FR.
-activeDirectory.ldap_exclude_group.label=Active Directory group to exclude
-activeDirectory.ldap_exclude_group.hint=The users that are member of the following group can't authenticate. E.g.: cn=designers,ou=groups,o=XWiki,c=FR.
-activeDirectory.ldap_base_DN.label=Active Directory Base DN
-activeDirectory.ldap_base_DN.hint=The Base DN is the root of the tree where the server performs the search. E.g: dc=example,dc=com.
-activeDirectory.ldap_UID_attr.label=Active Directory UID attribute name
-activeDirectory.ldap_UID_attr.hint=Specifies the Active Directory attribute containing the identifier to be used as the XWiki user name. The default is 'cn'.
-activeDirectory.ldap_trylocal.label=Try local login
-activeDirectory.ldap_trylocal.hint=If Active Directory authentication fails for any reason, try XWiki DB authentication with the same credentials. The default is 'yes'.
-activeDirectory.ldap_update_user.label=Update user from Active Directory after login
-activeDirectory.ldap_update_user.hint=If 'Yes', update the mapped attributes from Active Directory to XWiki on every login, else the mapping will be updated only when the user is created. The default is 'yes'.
-activeDirectory.ldap_update_photo.label=Update user photo from LDAP
-activeDirectory.ldap_update_photo.hint=If 'Yes', the XWiki avatar will be synchronized with the Active Directory on every login, else the photo will not be updated. The default in 'no'.
-activeDirectory.ldap_photo_attachment_name.label=Attachment name used to save the Active Directory photo
-activeDirectory.ldap_photo_attachment_name.hint=The Active Directory photo name that will be used in XWiki profile.
-activeDirectory.ldap_photo_attribute.label=Active Directory photo attribute name
-activeDirectory.ldap_photo_attribute.hint=Specifies the Active Directory attribute that contains the photo image.
-activeDirectory.ldap_fields_mapping.label=Active Directory user fields mapping
-activeDirectory.ldap_fields_mapping.hint=Map an Active Directory user field to a XWiki user property. E.g.: first_name-&gt;givenName.
-activeDirectory.ldap_group_mapping.label=Active Directory groups mapping
-activeDirectory.ldap_group_mapping.hint=Map an Active Directory group to a XWiki group. E.g.: XWiki.XWikiAdminGroup-&gt;cn=marketing,ou=groups,dc=example.
-activeDirectory.ldap_groupcache_expiration.label=Active Directory groups cache expiration
-activeDirectory.ldap_groupcache_expiration.hint=Time in seconds after which the list of members in a group is refreshed from Active Directory. The default is 21600 (6 hours).
-activeDirectory.ldap_mode_group_sync.label=When to synchronize the Active Directory groups
-activeDirectory.ldap_mode_group_sync.hint=The groups will be syncronized by default on every authentication of a user.
-activeDirectory.ldap_mode_group_sync_always=At each authentication of a user
-activeDirectory.ldap_mode_group_sync_create=Upon creation of a user</content>
+XWiki.XWikiPreferences_ldap=Enable the Active Directory authentification
+XWiki.XWikiPreferences_ldap.hint=Enable the Active Directory authentication for this wiki. If enabled and configured properly, a local user will be created whenever an Active Directory user visit this wiki for the first time. The default is 'yes'.
+XWiki.XWikiPreferences_ldap_server=Active Directory server address
+XWiki.XWikiPreferences_ldap_server.hint=The default is '127.0.0.1'.
+XWiki.XWikiPreferences_ldap_port=Active Directory server port
+XWiki.XWikiPreferences_ldap_port.hint=The default is '389'.
+XWiki.XWikiPreferences_ldap_bind_DN=Active Directory login matching
+XWiki.XWikiPreferences_ldap_bind_DN.hint=Leave empty for anonymous access, otherwise specify full dn. E.g. cn=admin,dc=example,dc=com.
+XWiki.XWikiPreferences_ldap_bind_pass=Active Directory password matching
+XWiki.XWikiPreferences_ldap_bind_pass.hint=The password used in combination with Active Directory login matching.
+XWiki.XWikiPreferences_ldap_user_group=Restrict to group
+XWiki.XWikiPreferences_ldap_user_group.hint=Only the members of the following Active Directory group can authenticate. If you leave empty, all the users from the Base DN will be verified. E.g. cn=developers,ou=groups,o=XWiki,c=FR.
+XWiki.XWikiPreferences_ldap_exclude_group=Active Directory group to exclude
+XWiki.XWikiPreferences_ldap_exclude_group.hint=The users that are member of the following group can't authenticate. E.g. cn=designers,ou=groups,o=XWiki,c=FR.
+XWiki.XWikiPreferences_ldap_base_DN=Active Directory Base DN
+XWiki.XWikiPreferences_ldap_base_DN.hint=The Base DN is the root of the tree where the server performs the search. E.g. dc=example,dc=com.
+XWiki.XWikiPreferences_ldap_UID_attr=Active Directory UID attribute name
+XWiki.XWikiPreferences_ldap_UID_attr.hint=Specifies the Active Directory attribute containing the identifier to be used as the XWiki user name. The default is 'cn'.
+XWiki.XWikiPreferences_ldap_trylocal=Try local login
+XWiki.XWikiPreferences_ldap_trylocal.hint=If Active Directory authentication fails for any reason, try XWiki DB authentication with the same credentials. The default is 'yes'.
+XWiki.XWikiPreferences_ldap_update_user=Update user from Active Directory after login
+XWiki.XWikiPreferences_ldap_update_user.hint=If 'Yes', update the mapped attributes from Active Directory to XWiki on every login, else the mapping will be updated only when the user is created. The default is 'yes'.
+XWiki.XWikiPreferences_ldap_update_photo=Update user photo from LDAP
+XWiki.XWikiPreferences_ldap_update_photo.hint=If 'Yes', the XWiki avatar will be synchronized with the Active Directory on every login, else the photo will not be updated. The default in 'no'.
+XWiki.XWikiPreferences_ldap_photo_attachment_name=Attachment name used to save the Active Directory photo
+XWiki.XWikiPreferences_ldap_photo_attachment_name.hint=The Active Directory photo name that will be used in XWiki profile.
+XWiki.XWikiPreferences_ldap_photo_attribute=Active Directory photo attribute name
+XWiki.XWikiPreferences_ldap_photo_attribute.hint=Specifies the Active Directory attribute that contains the photo image.
+XWiki.XWikiPreferences_ldap_fields_mapping=Active Directory user fields mapping
+XWiki.XWikiPreferences_ldap_fields_mapping.hint=Map an Active Directory user field to a XWiki user property. E.g. first_name-&gt;givenName.
+XWiki.XWikiPreferences_ldap_group_mapping=Active Directory groups mapping
+XWiki.XWikiPreferences_ldap_group_mapping.hint=Map an Active Directory group to a XWiki group. E.g. XWiki.XWikiAdminGroup-&gt;cn=marketing,ou=groups,dc=example.
+XWiki.XWikiPreferences_ldap_groupcache_expiration=Active Directory groups cache expiration
+XWiki.XWikiPreferences_ldap_groupcache_expiration.hint=Time in seconds after which the list of members in a group is refreshed from Active Directory. The default is 21600 (6 hours).
+XWiki.XWikiPreferences_ldap_mode_group_sync=When to synchronize the Active Directory groups
+XWiki.XWikiPreferences_ldap_mode_group_sync.hint=The groups will be syncronized by default on every authentication of a user.
+XWiki.XWikiPreferences_ldap_mode_group_sync_always=At each authentication of a user
+XWiki.XWikiPreferences_ldap_mode_group_sync_create=Upon creation of a user</content>
   <object>
     <name>ActiveDirectory.Code.MainTranslations</name>
     <number>0</number>

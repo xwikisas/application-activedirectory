@@ -37,11 +37,22 @@
     <system>xwiki-network</system>
     <url>https://network.xwiki.com</url>
   </issueManagement>
+  <properties>
+    <ldap.version>9.1.1-SNAPSHOT</ldap.version>
+  </properties>
   <modules>
     <module>application-activedirectory-api</module>
     <module>application-activedirectory-entry</module>
     <module>application-activedirectory-main</module>
   </modules>
+  <profiles>
+    <profile>
+      <id>integration-tests</id>
+      <modules>
+        <module>application-activedirectory-test</module>
+      </modules>
+    </profile>
+  </profiles>
   <!-- Even though this repository is already declared in the parent POM, we still explicitly redeclare it for
        convenience. This makes it simpler to build this project without having to declare this repository in one's own
        Maven settings.xml file. In the future We may decide to remove this in the future and make it a rule to have the

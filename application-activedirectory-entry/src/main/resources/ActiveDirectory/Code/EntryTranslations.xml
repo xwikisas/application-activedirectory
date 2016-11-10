@@ -39,7 +39,9 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>activeDirectory.error.noValidLicense=There is no valid license for the Active Directory application. To get one, please visit the {0}Licenses section{1}.</content>
+  <content>admin.activedirectory=Active Directory
+admin.activedirectory.description=Configuration options to authenticate users against an Active Directory server.
+activeDirectory.error.noValidLicense=There is no valid license for the Active Directory application. To get one, please visit the {0}Licenses section{1}.</content>
   <object>
     <name>ActiveDirectory.Code.EntryTranslations</name>
     <number>0</number>

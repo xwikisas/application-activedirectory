@@ -250,7 +250,7 @@
       <displayInCategory/>
     </property>
     <property>
-      <displayInSection>Active Directory</displayInSection>
+      <displayInSection>activeDirectory</displayInSection>
     </property>
     <property>
       <heading/>

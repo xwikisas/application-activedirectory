@@ -41,44 +41,23 @@
   <hidden>true</hidden>
   <content>{{velocity}}
 #macro (displayMainForm)
-  #set ($paramsMap = {'connectionSettings': ['ldap_server', 'ldap_port', 'ldap_bind_DN', 'ldap_bind_pass'],
-                      'configuration'     : ['ldap', 'ldap_base_DN', 'ldap_user_group', 'ldap_exclude_group', 'ldap_UID_attr', 'ldap_trylocal', 'ldap_update_user', 'ldap_update_photo', 'ldap_photo_attachment_name', 'ldap_photo_attribute', 'ldap_fields_mapping', 'ldap_group_mapping', 'ldap_groupcache_expiration', 'ldap_mode_group_sync']})
+  #set ($discard = $xwiki.jsx.use('ActiveDirectory.WebHome'))
+  #set ($discard = $xwiki.ssx.use('ActiveDirectory.WebHome'))
   #set ($configClassName = 'XWiki.XWikiPreferences')
-  #set ($obj = $doc.getObject($configClassName))
-  #if ($obj)
-    #set ($discard = $xwiki.jsx.use('ActiveDirectory.WebHome'))
-    #set ($discard = $xwiki.ssx.use('ActiveDirectory.WebHome'))
-    {{html clean="false"}}
-    &lt;form id="$section.toLowerCase()" method="post" action="$xwiki.getURL($doc, 'saveandcontinue')" class="xform half"&gt;
-      &lt;dl&gt;
-        #foreach ($paramEntry in $paramsMap.entrySet())
-          &lt;h1&gt;$services.localization.render("activeDirectory.${paramEntry.key}.title")&lt;/h1&gt;
-          #foreach ($param in $paramEntry.value)
-            &lt;dt&gt;
-              &lt;label for="${configClassName}_${obj.number}_${param}" class="$param"&gt;
-                $services.localization.render("activeDirectory.${param}.label")
-              &lt;/label&gt;
-              &lt;span class="xHint"&gt;
-                #set ($hintKey = "activeDirectory.${param}.hint")
-                #set ($hint = $services.localization.render($hintKey))
-                #if ($hint != $hintKey) $hint #end
-              &lt;/span&gt;
-            &lt;/dt&gt;
-            &lt;dd&gt;$obj.display($param, 'edit').replaceAll('(^..html.*?}})|(../html..$)', '')&lt;/dd&gt;
-          #end
-        #end
-      &lt;/dl&gt;
-      #set ($currentURL = $xwiki.getURL($doc, 'admin', "editor=$escapetool.url($editor)&amp;section=$escapetool.url($section)&amp;space=$escapetool.url($currentSpace)"))
-      &lt;div class="hidden"&gt;
-        &lt;input type="hidden" name="form_token" value="${escapetool.xml($services.csrf.getToken())}" /&gt;
-        &lt;input type="hidden" name="xcontinue" value="${escapetool.xml($currentURL)}" /&gt;
-        &lt;input type="hidden" name="xredirect" value="${escapetool.xml($currentURL)}" /&gt;
-        &lt;input type="hidden" name="classname" value="${escapetool.xml($configClassName)}" /&gt;
-      &lt;/div&gt;
-      &lt;input class="button" type="submit" name="formactionsac" value="${escapetool.xml($services.localization.render('activeDirectory.save.submit'))}" /&gt;
-    &lt;/form&gt;
-    {{/html}}
+  #set ($configDoc = $xwiki.getDocument('ActiveDirectory.Code.ActiveDirectoryConfig'))
+  ## Create the config doc if it doesn't exist
+  #if ($configDoc.isNew())
+    #set ($discard = $configDoc.newObject($configClassName))
+    #set ($discard = $configDoc.setHidden(true))
+    #set ($discard = $configDoc.save($services.localization.render('activeDirecfory.config.initializationComment'), 'true'))
   #end
+  #set ($params = {
+    'activeDirectoryConnection': ['ldap_server', 'ldap_port', 'ldap_bind_DN', 'ldap_bind_pass'],
+    'activeDirectoryConfiguration' : ['ldap', 'ldap_base_DN', 'ldap_user_group', 'ldap_exclude_group', 'ldap_UID_attr', 'ldap_trylocal', 'ldap_update_user', 'ldap_update_photo', 'ldap_photo_attachment_name', 'ldap_photo_attribute', 'ldap_fields_mapping', 'ldap_group_mapping', 'ldap_groupcache_expiration', 'ldap_mode_group_sync']
+  })
+  #set ($paramDoc = $configDoc)
+  #set ($paramClass = $configClassName)
+  {{include reference="XWiki.AdminFieldsDisplaySheet" /}}
 #end
 ##
 #if ($services.ldap)
@@ -88,10 +67,12 @@
       {{success}}$services.localization.render('activeDirectory.success.resetGroupCache'){{/success}}
     #end
     #displayMainForm($configClassName)
-    = $services.localization.render('activeDirectory.miscellaneous.title') =
     {{html clean="false"}}
       &lt;form method="post" action="${escapetool.xml($xwiki.requestURL)}" enctype="multipart/form-data"&gt;
-      &lt;input name="action_resetGroupCache" value="${escapetool.xml($services.localization.render('activeDirectory.resetGroupCache.submit'))}" class="button" type="submit"&gt;
+        &lt;fieldset class='activeDirectoryMiscellaneous'&gt;
+          &lt;legend&gt;$services.localization.render('admin.activeDirectoryMiscellaneous')&lt;/legend&gt;
+        &lt;/fieldset&gt;
+        &lt;input name="action_resetGroupCache" value="${escapetool.xml($services.localization.render('activeDirectory.resetGroupCache.submit'))}" class="button" type="submit"&gt;
       &lt;/form&gt;
     {{/html}}
   #else
