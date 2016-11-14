@@ -40,6 +40,8 @@
     <xwikiExtensionRepositories>maven-local:maven:file://${sys:user.home}/.m2/repository</xwikiExtensionRepositories>
     <!-- Functional tests are allowed to output content to the console -->
     <xwiki.surefire.captureconsole.skip>true</xwiki.surefire.captureconsole.skip>
+    <!-- Need to see the instance id in the License UI -->
+    <xwikiDbHbmCommonExtraMappings>instance.hbm.xml</xwikiDbHbmCommonExtraMappings>
   </properties>
   <dependencies>
     <dependency>
@@ -108,6 +110,17 @@
         <groupId>org.xwiki.platform</groupId>
         <artifactId>xwiki-platform-tool-packager-plugin</artifactId>
         <version>${platform.version}</version>
+        <dependencies>
+          <!-- TODO: remove the need for this dependency in the future. The reason we need it right now is because
+               the Packager Mojo will use the Import Mojo to import XARs but since we've defined the
+               xwikiDbHbmCommonExtraMappings property up there, it's using it and thus we need the mapping file to be
+               in the classpath. -->
+          <dependency>
+            <groupId>org.xwiki.platform</groupId>
+            <artifactId>xwiki-platform-instance</artifactId>
+            <version>${platform.version}</version>
+          </dependency>
+        </dependencies>
         <executions>
           <execution>
             <phase>generate-test-resources</phase>
