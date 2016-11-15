@@ -68,7 +68,7 @@
     #end
     #displayMainForm($configClassName)
     {{html clean="false"}}
-      &lt;form method="post" action="${escapetool.xml($xwiki.requestURL)}" enctype="multipart/form-data"&gt;
+      &lt;form method="post" class="xform half" action="${escapetool.xml($xwiki.requestURL)}" enctype="multipart/form-data"&gt;
         &lt;fieldset class='activeDirectoryMiscellaneous'&gt;
           &lt;legend&gt;$services.localization.render('admin.activeDirectoryMiscellaneous')&lt;/legend&gt;
         &lt;/fieldset&gt;
