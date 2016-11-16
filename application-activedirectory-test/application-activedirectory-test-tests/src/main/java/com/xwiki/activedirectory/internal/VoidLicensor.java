@@ -17,44 +17,59 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.contrib.activedirectory.internal;
+package com.xwiki.activedirectory.internal;
 
-import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.configuration.internal.AbstractXWikiPreferencesConfigurationSource;
-import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.SpaceReference;
+import org.xwiki.extension.ExtensionId;
+import org.xwiki.model.reference.EntityReference;
+
+import com.xwiki.licensing.License;
+import com.xwiki.licensing.Licensor;
 
 /**
- * Active Directory LDAP configuration is stored in {@code ActiveDirectory.Code.ActiveDirectoryConfig}.
+ * Bypass the Licensing module so that we can test the AD module without a license.
  *
  * @version $Id$
- * @since 1.1
  */
 @Component
-@Named("activedirectory")
 @Singleton
-public class ActiveDirectoryConfigurationSource extends AbstractXWikiPreferencesConfigurationSource
+public class VoidLicensor implements Licensor
 {
     @Override
-    protected String getCacheId()
+    public License getLicense()
     {
-        return "configuration.activedirectory.wiki";
+        return null;
     }
 
     @Override
-    protected String getCacheKeyPrefix()
+    public License getLicense(ExtensionId extensionId)
     {
-        return this.wikiManager.getCurrentWikiId();
+        return null;
     }
 
     @Override
-    protected DocumentReference getDocumentReference()
+    public License getLicense(EntityReference entityReference)
     {
-        return new DocumentReference("ActiveDirectoryConfig", new SpaceReference("Code",
-            new SpaceReference("ActiveDirectory", getCurrentWikiReference())));
+        return null;
+    }
+
+    @Override
+    public boolean hasLicensure()
+    {
+        return true;
+    }
+
+    @Override
+    public boolean hasLicensure(EntityReference entityReference)
+    {
+        return true;
+    }
+
+    @Override
+    public boolean hasLicensure(ExtensionId extensionId)
+    {
+        return true;
     }
 }
-

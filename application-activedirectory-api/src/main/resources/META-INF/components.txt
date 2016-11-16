@@ -1,2 +1,2 @@
-org.xwiki.contrib.activedirectory.internal.ActiveDirectorySetupListener
-org.xwiki.contrib.activedirectory.internal.ActiveDirectoryConfigurationSource
+com.xwiki.activedirectory.internal.ActiveDirectorySetupListener
+com.xwiki.activedirectory.internal.ActiveDirectoryConfigurationSource
