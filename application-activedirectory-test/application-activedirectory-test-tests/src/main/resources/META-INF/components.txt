@@ -1,2 +1,0 @@
-500:com.xwiki.activedirectory.internal.VoidLicensor
-500:com.xwiki.activedirectory.internal.VoidLicensorScriptService
