@@ -30,7 +30,7 @@
   <artifactId>application-activedirectory-main</artifactId>
   <packaging>xar</packaging>
   <name>Active Directory - Main</name>
-  <description>UI Application that makes it easier to configure and connect to Active Directory.</description>
+  <description>Authenticate users against an Active Directory server (LDAP). Note that this a paying application.</description>
   <properties>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Active Directory Application (Paying)</xwiki.extension.name>
