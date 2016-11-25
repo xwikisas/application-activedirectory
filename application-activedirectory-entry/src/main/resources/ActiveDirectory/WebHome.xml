@@ -41,7 +41,7 @@
   <hidden>true</hidden>
   <content>{{velocity}}
 #set ($mainPageReference = $services.model.createDocumentReference('', ['ActiveDirectory', 'Code'], 'Main'))
-#if ($services.licensor.hasLicensureForEntity($mainPageReference))
+#if ($services.licensing.licensor.hasLicensureForEntity($mainPageReference))
   {{include reference="ActiveDirectory.Code.Main"/}}
 #else
   {{error}}
