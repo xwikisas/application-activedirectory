@@ -98,6 +98,7 @@ public class ActiveDirectoryAuthServiceImpl extends XWikiLDAPAuthServiceImpl
 
         // The Licensor expects a version so we need to discover the installed version for now. Hopefully in the future
         // the Licensor could find it how automatically.
+        // Note: The AD authenticator is installed in the root namespace, hence the passing of "null" in the call below.
         InstalledExtension mainExtension = this.repository.getInstalledExtension(EXTENSION_ID, null);
         if (mainExtension != null) {
             isLicensed = this.licensor.hasLicensure(mainExtension.getId());

@@ -19,10 +19,12 @@
  */
 package com.xwiki.activedirectory.internal;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.configuration.internal.AbstractXWikiPreferencesConfigurationSource;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.SpaceReference;
@@ -38,6 +40,12 @@ import org.xwiki.model.reference.SpaceReference;
 @Singleton
 public class ActiveDirectoryConfigurationSource extends AbstractXWikiPreferencesConfigurationSource
 {
+    private static final String TRYLOCAL_KEY = "ldap_trylocal";
+
+    @Inject
+    @Named("xwikicfg")
+    private ConfigurationSource xwikicfgSource;
+
     @Override
     protected String getCacheId()
     {
@@ -55,6 +63,21 @@ public class ActiveDirectoryConfigurationSource extends AbstractXWikiPreferences
     {
         return new DocumentReference("ActiveDirectoryConfig", new SpaceReference("Code",
             new SpaceReference("ActiveDirectory", getCurrentWikiReference())));
+    }
+
+    @Override
+    protected <T> T getPropertyValue(String key, Class<T> valueClass)
+    {
+        T result = super.getPropertyValue(key, valueClass);
+
+        // If the user has not set the trylocal property in the wiki and it's not defined in xwiki.cfg either
+        // then set it to true by default (so that when AD license is active, if the user logs out, he can still log
+        // in!)
+        if (TRYLOCAL_KEY.equals(key) && result == null && this.xwikicfgSource.getProperty(TRYLOCAL_KEY) == null) {
+            return (T) "1";
+        }
+
+        return result;
     }
 }
 

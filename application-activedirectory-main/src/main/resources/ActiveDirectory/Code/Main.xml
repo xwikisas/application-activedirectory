@@ -48,9 +48,6 @@
   ## Create the config doc if it doesn't exist
   #if ($configDoc.isNew())
     #set ($object = $configDoc.newObject($configClassName))
-    ## Set trylocal to true by defaut initially, so that when AD license is active, if the user logs out, he can still
-    ## log in!
-    #set ($discard = $object.set('ldap_trylocal', '1'))
     #set ($discard = $configDoc.setHidden(true))
     #set ($discard = $configDoc.save($services.localization.render('activeDirecfory.config.initializationComment'), 'true'))
   #end
