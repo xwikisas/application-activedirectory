@@ -52,6 +52,9 @@ activeDirectory.resetGroupCache.submit=Reset group cache
 activeDirectory.save.submit=Save
 activeDirectory.resetGroupCacheSuccess=Groups cache has been reset.
 activeDirectory.newEntry.title=New Entry
+activeDirectory.checkConnection=Check connection
+activeDirectory.checkConnection.error=Failed to connect to the Active Directory server! Please contact sales@xwiki.com.
+activeDirectory.checkConnection.success=Test connection succedeed!
 
 XWiki.XWikiPreferences_ldap=Enable the Active Directory authentification
 XWiki.XWikiPreferences_ldap.hint=Enable the Active Directory authentication for this wiki. If enabled and configured properly, a local user will be created whenever an Active Directory user visit this wiki for the first time. The default is 'yes'.
