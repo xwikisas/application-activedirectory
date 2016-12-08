@@ -53,7 +53,7 @@ activeDirectory.save.submit=Save
 activeDirectory.resetGroupCacheSuccess=Groups cache has been reset.
 activeDirectory.newEntry.title=New Entry
 activeDirectory.checkConnection=Check connection
-activeDirectory.checkConnection.error=Failed to connect to the Active Directory server! Please contact sales@xwiki.com.
+activeDirectory.checkConnection.error=Failed to connect to the Active Directory server! Click on this message for details and contact sales@xwiki.com.
 activeDirectory.checkConnection.success=Test connection succedeed!
 
 XWiki.XWikiPreferences_ldap=Enable the Active Directory authentification

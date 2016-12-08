@@ -40,14 +40,23 @@
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
   <content>{{velocity}}
+#macro (displayError $text)
+  {{html clean="false"}}
+    &lt;div class="xwikirenderingerror" title="Click to get more details about the error"&gt;
+      $services.localization.render('activeDirectory.checkConnection.error')
+    &lt;/div&gt;
+    &lt;div class="xwikirenderingerrordescription hidden"&gt;
+      &lt;pre&gt;$text&lt;/pre&gt;
+    &lt;/div&gt;
+  {{/html}}
+#end
 #if ($request.checkConnection)
-  #set ($connected = $services.ldap.checkConnection($request.server, $request.port, $request.bind_DN, $request.bind_pass, '', false, $xcontext.context))
+  #set ($connected = $services.ldap.checkConnection($request.server, $request.port, $request.bind_DN, $request.bind_pass, '', false))
   #if ($connected)
     {{success}}$services.localization.render('activeDirectory.checkConnection.success'){{/success}}
   #else
-    {{error}}$services.localization.render('activeDirectory.checkConnection.error'){{/error}}
+    #displayError($exceptiontool.getStackTrace($services.ldap.error))
   #end
 #end
-{{/velocity}}
-</content>
+{{/velocity}}</content>
 </xwikidoc>
