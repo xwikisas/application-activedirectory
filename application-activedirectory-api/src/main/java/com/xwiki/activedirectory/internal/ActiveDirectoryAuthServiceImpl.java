@@ -58,7 +58,9 @@ public class ActiveDirectoryAuthServiceImpl extends XWikiLDAPAuthServiceImpl
     @Override
     protected XWikiLDAPConfig createXWikiLDAPConfig(String authInput)
     {
-        return new XWikiLDAPConfig(authInput, this.configurationSource);
+        XWikiLDAPConfig xWikiLDAPConfig = new XWikiLDAPConfig(authInput, this.configurationSource);
+        xWikiLDAPConfig.setFinalProperty("ldap_UID_attr", "sAMAccountName");
+        return xWikiLDAPConfig;
     }
 
     @Override
