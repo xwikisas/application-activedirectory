@@ -60,6 +60,10 @@ public class ActiveDirectoryAuthServiceImpl extends XWikiLDAPAuthServiceImpl
     {
         XWikiLDAPConfig xWikiLDAPConfig = new XWikiLDAPConfig(authInput, this.configurationSource);
         xWikiLDAPConfig.setFinalProperty("ldap_UID_attr", "sAMAccountName");
+        xWikiLDAPConfig.setFinalProperty("ldap", "1");
+        xWikiLDAPConfig.setFinalProperty("ldap_trylocal", "1");
+        xWikiLDAPConfig.setFinalProperty("ldap_update_user", "1");
+
         return xWikiLDAPConfig;
     }
 

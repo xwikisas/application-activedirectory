@@ -70,7 +70,7 @@ XWiki.XWikiPreferences_ldap_exclude_group.hint=Les utilisateurs membres du group
 XWiki.XWikiPreferences_ldap_base_DN=Base DN Active Directory
 XWiki.XWikiPreferences_ldap_base_DN.hint=La Base DN est à la racine de l'arbre où le serveur effectue ses recherches. E.g. dc=example,dc=com.
 XWiki.XWikiPreferences_ldap_UID_attr=Nom de l'attribut UID Active Directory
-XWiki.XWikiPreferences_ldap_UID_attr.hint=Spécifier l'attribut Active Directory contenant l'identifiant à utiliser comme nom d'utilisateur XWiki. Par défaut 'cn'.
+XWiki.XWikiPreferences_ldap_UID_attr.hint=Spécifier l'attribut Active Directory contenant l'identifiant à utiliser comme nom d'utilisateur XWiki. Par défaut 'sAMAccountName'.
 XWiki.XWikiPreferences_ldap_trylocal=Essayez l'identifiant local
 XWiki.XWikiPreferences_ldap_trylocal.hint=Si l'authentification Active Directory échoue pour n'importe quelle raison, essayez l'authentification de la Base de Données XWiki avec les mêmes données d'accès. Par défaut 'oui'.
 XWiki.XWikiPreferences_ldap_update_user=Mettre à jour l'utilisateur de l'Active Directory après s'être connecté
