@@ -19,12 +19,10 @@
  */
 package com.xwiki.activedirectory.internal;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.configuration.internal.AbstractXWikiPreferencesConfigurationSource;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.SpaceReference;
@@ -40,11 +38,6 @@ import org.xwiki.model.reference.SpaceReference;
 @Singleton
 public class ActiveDirectoryConfigurationSource extends AbstractXWikiPreferencesConfigurationSource
 {
-    private static final String TRYLOCAL_KEY = "ldap_trylocal";
-
-    @Inject
-    @Named("xwikicfg")
-    private ConfigurationSource xwikicfgSource;
 
     @Override
     protected String getCacheId()
