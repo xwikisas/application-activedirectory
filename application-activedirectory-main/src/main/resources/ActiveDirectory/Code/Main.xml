@@ -40,24 +40,115 @@
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
   <content>{{velocity}}
+#macro(displaySelectField $prop $default)
+  #set ($value = $configDoc.getValue($prop.name))
+  #set ($options = [])
+  #if ($prop.classType == 'String' || $prop.classType == 'TextArea')
+    $configDoc.display($prop.name, 'edit', $configObj).replaceAll('(^..html.*?}})|(../html..$)', '')
+  #else
+    #if ($prop.classType == 'Boolean')
+      #set ($discard = $options.add({'value': 1, 'label': 'yes'}))
+      #set ($discard = $options.add({'value': 0, 'label': 'no'}))
+    #else
+      #foreach($v in $prop.listValues)
+        #set ($discard = $options.add({'value': $v, 'label': "XWiki.XWikiPreferences_${prop.name}_${v}"}))
+      #end
+    #end
+    &lt;select name="XWiki.XWikiPreferences_0_${prop.name}" id="XWiki.XWikiPreferences_0_${prop.name}"&gt;
+      #if ("$!default" != '')
+        &lt;option value=""&gt;---&lt;/option&gt;
+      #end
+      #foreach ($option in $options)
+        #if ($option.value != '---')
+          &lt;option value="$option.value" #if($value == $option.value)selected="selected"#end&gt;
+            $services.localization.render($option.label)
+            #if ($default == $option.value)
+              $services.localization.render('activeDirectory.default')
+            #end
+          &lt;/option&gt;
+        #end
+      #end
+    &lt;/select&gt;
+  #end
+#end
 #macro (displayMainForm)
   #set ($discard = $xwiki.jsx.use('ActiveDirectory.WebHome'))
   #set ($discard = $xwiki.ssx.use('ActiveDirectory.WebHome'))
   #set ($configClassName = 'XWiki.XWikiPreferences')
+  #set ($configClass = $xwiki.getClass($configClassName))
   #set ($configDoc = $xwiki.getDocument('ActiveDirectory.Code.ActiveDirectoryConfig'))
   ## Create the config doc if it doesn't exist
   #if ($configDoc.isNew())
-    #set ($object = $configDoc.newObject($configClassName))
+    #set ($discard = $configDoc.newObject($configClassName))
     #set ($discard = $configDoc.setHidden(true))
     #set ($discard = $configDoc.save($services.localization.render('activeDirecfory.config.initializationComment'), 'true'))
   #end
+  #set ($configObj = $configDoc.getObject($configClassName))
   #set ($params = {
-    'activeDirectoryConnection': ['ldap_server', 'ldap_port', 'ldap_bind_DN', 'ldap_bind_pass'],
-    'activeDirectoryConfiguration' : ['ldap', 'ldap_base_DN', 'ldap_user_group', 'ldap_exclude_group', 'ldap_UID_attr', 'ldap_trylocal', 'ldap_update_user', 'ldap_update_photo', 'ldap_photo_attachment_name', 'ldap_photo_attribute', 'ldap_fields_mapping', 'ldap_group_mapping', 'ldap_groupcache_expiration', 'ldap_mode_group_sync']
+    'activeDirectoryConnection': {'ldap_server'    : '127.0.0.1',
+                                  'ldap_port'      : 389,
+                                  'ldap_bind_DN'   : '',
+                                  'ldap_bind_pass' : ''},
+    'activeDirectoryConfiguration' : {'ldap'                       : '1',
+                                      'ldap_base_DN'               : '',
+                                      'ldap_user_group'            : '',
+                                      'ldap_exclude_group'         : '',
+                                      'ldap_UID_attr'              : 'sAMAccountName',
+                                      'ldap_trylocal'              : '1',
+                                      'ldap_update_user'           : '0',
+                                      'ldap_update_photo'          : '0',
+                                      'ldap_photo_attachment_name' : 'ldapPhoto',
+                                      'ldap_photo_attribute'       : 'thumbnailPhoto',
+                                      'ldap_fields_mapping'        : '',
+                                      'ldap_group_mapping'         : '',
+                                      'ldap_groupcache_expiration' : 21600,
+                                      'ldap_mode_group_sync'       : 'always'}
   })
-  #set ($paramDoc = $configDoc)
-  #set ($paramClass = $configClassName)
-  {{include reference="XWiki.AdminFieldsDisplaySheet" /}}
+  ## TODO: Transform 'activeDirectoryConnection' and 'activeDirectoryConfiguration' in arrays holding
+  ## only property names when https://jira.xwikisas.com/browse/ADAPP-30 is implemented
+   #if ("$!section" != '')
+    {{html clean="false"}}
+      #set($formId = "${section.toLowerCase()}_${configClassName}")
+      &lt;form id="$formId" method="post" action="$xwiki.getURL($configDoc, 'saveandcontinue')" onsubmit="cancelCancelEdit()" class="xform half"&gt;
+        #foreach ($entry in $params.entrySet())
+          #set ($fields = $entry.value)
+          &lt;fieldset class="$entry.key"&gt;
+          ## If there is only one section, don't display the legend
+          #if ($params.size() &gt; 1)
+            &lt;legend&gt;$services.localization.render("admin.$entry.key")&lt;/legend&gt;
+          #end
+          &lt;dl&gt;
+            #foreach ($field in $fields.entrySet())
+              #set ($prop = $configClass.get($field.key))
+              #set ($title = $services.localization.render("${configObj.xWikiClass.name}_${prop.name}"))
+              #set ($hint = $services.localization.render("${configObj.xWikiClass.name}_${prop.name}.hint"))
+              &lt;dt&gt;
+                &lt;label for="${configClassName}_${configObj.number}_${prop.name}" class="$prop.name"&gt;$title&lt;/label&gt;
+                #if ($hint)&lt;span class="xHint"&gt;$hint&lt;/span&gt;#end
+              &lt;/dt&gt;
+              &lt;dd&gt;
+                #displaySelectField($prop $field.value)
+                ## TODO: when https://jira.xwikisas.com/browse/ADAPP-30 is implemented, replace $field.value
+                ## with the default taken from the script service
+              &lt;dt&gt;
+            #end
+          &lt;/dl&gt;
+          &lt;/fieldset&gt;
+        #end
+        &lt;div class="hidden"&gt;
+          &lt;input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" /&gt;
+          &lt;input type="hidden" name="xcontinue" value="$xwiki.getURL($currentDoc, 'admin', "editor=${escapetool.url(${editor})}&amp;section=${escapetool.url(${section})}&amp;space=${escapetool.url(${currentSpace})}")" /&gt;
+          &lt;input type="hidden" name="xredirect" value="$xwiki.getURL($currentDoc, 'admin', "editor=${escapetool.url(${editor})}&amp;section=${escapetool.url(${section})}&amp;a;space=${escapetool.url(${currentSpace})}")" /&gt;
+          &lt;input type="hidden" name="classname" value="$configClassName" /&gt;
+        &lt;/div&gt;
+        &lt;div class="bottombuttons"&gt;
+          &lt;p class="admin-buttons"&gt;
+            &lt;span class="buttonwrapper"&gt;&lt;input class="button" type="submit" name="formactionsac" value="$services.localization.render('admin.save')" /&gt;&lt;/span&gt;
+          &lt;/p&gt;
+        &lt;/div&gt; ## bottombuttons
+      &lt;/form&gt;
+    {{/html}}
+  #end
 #end
 ##
 #if ($services.ldap)

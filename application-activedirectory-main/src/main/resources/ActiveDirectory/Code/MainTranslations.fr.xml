@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.2" reference="ActiveDirectory.Code.MainTranslations" locale="">
+<xwikidoc version="1.2" reference="ActiveDirectory.Code.MainTranslations" locale="fr">
   <web>ActiveDirectory.Code</web>
   <name>MainTranslations</name>
   <language>fr</language>
@@ -42,6 +42,7 @@
   <content>admin.activeDirectoryMiscellaneous=Divers
 activeDirectory.error.missingLdapService=Le service Active Directory n'est pas disponible. Merci de vérifier votre installation.
 activeDirectory.warning.ldapAuthenticationIsNotEnabled=Le système n'a pas pu se connecter au serveur Active Directory car le service d'authenfication LDAP n'est pas activé. Editez le fichier ##{0}##, ajoutez les lignes suivantes et redémarrez le wiki :
+activeDirectory.default=(Défaut)
 activeDirectory.aDGroup.placehoder=Groupe Active Directory
 activeDirectory.xWikiGroup.placeholder=Groupe XWiki
 activeDirectory.aDUserField.placeholder=Champ utilisateur Active Directory
