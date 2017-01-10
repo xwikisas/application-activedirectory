@@ -519,6 +519,22 @@ require(['jquery'], function($) {
         }
       })
     });
+    // Toggle Show/Hide advanced configuration buttons
+    var show = $('#advancedConfigShow');
+    var hide = $('#advancedConfigHide');
+    var dl = $('.activeDirectoryConfigurationAdvanced dl');
+    show.click(function(event) {
+      event.preventDefault();
+      dl.show();
+      $(this).hide();
+      hide.show();
+    });
+    hide.click(function(event) {
+      event.preventDefault();
+      dl.hide();
+      $(this).hide();
+      show.show();
+    });
   });
 });</code>
     </property>
@@ -647,6 +663,24 @@ span.new-entry {
   margin-top:5px;
   cursor:pointer;
 }
+
+.activeDirectoryConfigurationAdvanced dl {
+  display: none;
+}
+
+#advancedConfigShow, #advancedConfigHide {
+  margin-left: 20px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+#advancedConfigHide {
+  display: none;
+}
+.activeDirectoryConfigurationAdvanced {
+  padding-bottom: 20px;
+}
+
 
 </code>
     </property>

@@ -89,22 +89,20 @@
                                   'ldap_port'      : 389,
                                   'ldap_bind_DN'   : '',
                                   'ldap_bind_pass' : ''},
-    'activeDirectoryConfiguration' : {'ldap'                       : '1',
-                                      'ldap_base_DN'               : '',
-                                      'ldap_user_group'            : '',
-                                      'ldap_exclude_group'         : '',
-                                      'ldap_UID_attr'              : 'sAMAccountName',
-                                      'ldap_trylocal'              : '1',
-                                      'ldap_update_user'           : '0',
-                                      'ldap_update_photo'          : '0',
-                                      'ldap_photo_attachment_name' : 'ldapPhoto',
-                                      'ldap_photo_attribute'       : 'thumbnailPhoto',
-                                      'ldap_fields_mapping'        : '',
-                                      'ldap_group_mapping'         : '',
-                                      'ldap_groupcache_expiration' : 21600,
-                                      'ldap_mode_group_sync'       : 'always'}
+    'activeDirectoryConfiguration' : {'ldap_base_DN'        : ''},
+    'activeDirectoryConfigurationAdvanced' : {'ldap'                       : '1',
+                                              'ldap_UID_attr'              : 'sAMAccountName',
+                                              'ldap_fields_mapping'        : '',
+                                              'ldap_group_mapping'         : '',
+                                              'ldap_user_group'            : '',
+                                              'ldap_exclude_group'         : '',
+                                              'ldap_trylocal'              : '1',
+                                              'ldap_update_user'           : '0',
+                                              'ldap_update_photo'          : '0',
+                                              'ldap_groupcache_expiration' : 21600,
+                                              'ldap_mode_group_sync'       : 'always'}
   })
-  ## TODO: Transform 'activeDirectoryConnection' and 'activeDirectoryConfiguration' in arrays holding
+  ## TODO: Transform the maps from $params in arrays holding
   ## only property names when https://jira.xwikisas.com/browse/ADAPP-30 is implemented
    #if ("$!section" != '')
     {{html clean="false"}}
@@ -115,7 +113,12 @@
           &lt;fieldset class="$entry.key"&gt;
           ## If there is only one section, don't display the legend
           #if ($params.size() &gt; 1)
-            &lt;legend&gt;$services.localization.render("admin.$entry.key")&lt;/legend&gt;
+            &lt;legend&gt;$services.localization.render("admin.$entry.key")
+              #if ($entry.key == 'activeDirectoryConfigurationAdvanced')
+                &lt;a id="advancedConfigShow"&gt;$services.localization.render('admin.activeDirectoryConfigurationAdvanced.show')&lt;/a&gt;
+                &lt;a id="advancedConfigHide"&gt;$services.localization.render('admin.activeDirectoryConfigurationAdvanced.hide')&lt;/a&gt;
+              #end
+            &lt;/legend&gt;
           #end
           &lt;dl&gt;
             #foreach ($field in $fields.entrySet())
@@ -141,11 +144,7 @@
           &lt;input type="hidden" name="xredirect" value="$xwiki.getURL($currentDoc, 'admin', "editor=${escapetool.url(${editor})}&amp;section=${escapetool.url(${section})}&amp;a;space=${escapetool.url(${currentSpace})}")" /&gt;
           &lt;input type="hidden" name="classname" value="$configClassName" /&gt;
         &lt;/div&gt;
-        &lt;div class="bottombuttons"&gt;
-          &lt;p class="admin-buttons"&gt;
-            &lt;span class="buttonwrapper"&gt;&lt;input class="button" type="submit" name="formactionsac" value="$services.localization.render('admin.save')" /&gt;&lt;/span&gt;
-          &lt;/p&gt;
-        &lt;/div&gt; ## bottombuttons
+        &lt;input class="button" type="submit" name="formactionsac" value="$services.localization.render('admin.save')" /&gt;
       &lt;/form&gt;
     {{/html}}
   #end

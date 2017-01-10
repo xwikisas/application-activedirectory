@@ -41,6 +41,9 @@
   <hidden>true</hidden>
   <content>admin.activeDirectoryConnection=Connection Settings
 admin.activeDirectoryConfiguration=Configuration
+admin.activeDirectoryConfigurationAdvanced=Advanced
+admin.activeDirectoryConfigurationAdvanced.show=Show Advanced Configuration
+admin.activeDirectoryConfigurationAdvanced.hide=Hide Advanced Configuration
 admin.activeDirectoryMiscellaneous=Miscellaneous
 activeDirectory.error.missingLdapService=Active Directory service is not available. Please verify your installation.
 activeDirectory.warning.ldapAuthenticationIsNotEnabled=The system could not connect to Active Directory server because the LDAP authentication service is not enabled. Edit the ##{0}## file, add the following lines and restart the wiki:
