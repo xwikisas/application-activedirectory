@@ -61,13 +61,13 @@ activeDirectory.checkConnection.error=Failed to connect to the Active Directory 
 activeDirectory.checkConnection.success=Test connection succedeed!
 
 XWiki.XWikiPreferences_ldap=Enable the Active Directory authentification
-XWiki.XWikiPreferences_ldap.hint=Enable the Active Directory authentication for this wiki. If enabled and configured properly, a local user will be created whenever an Active Directory user visit this wiki for the first time. The default is 'yes'.
+XWiki.XWikiPreferences_ldap.hint=Enable the Active Directory authentication for this wiki. If enabled and configured properly, a local user will be created whenever an Active Directory user visit this wiki for the first time.
 XWiki.XWikiPreferences_ldap_server=Active Directory server address
 XWiki.XWikiPreferences_ldap_server.hint=The default is '127.0.0.1'.
 XWiki.XWikiPreferences_ldap_port=Active Directory server port
 XWiki.XWikiPreferences_ldap_port.hint=The default is '389'.
 XWiki.XWikiPreferences_ldap_bind_DN=Active Directory login matching
-XWiki.XWikiPreferences_ldap_bind_DN.hint=Leave empty for anonymous access, otherwise specify full dn. E.g. cn=admin,dc=example,dc=com.
+XWiki.XWikiPreferences_ldap_bind_DN.hint=Specify the full dn. E.g. cn=admin,dc=example,dc=com.
 XWiki.XWikiPreferences_ldap_bind_pass=Active Directory password matching
 XWiki.XWikiPreferences_ldap_bind_pass.hint=The password used in combination with Active Directory login matching.
 XWiki.XWikiPreferences_ldap_user_group=Restrict to group
@@ -79,11 +79,11 @@ XWiki.XWikiPreferences_ldap_base_DN.hint=The Base DN is the root of the tree whe
 XWiki.XWikiPreferences_ldap_UID_attr=Active Directory UID attribute name
 XWiki.XWikiPreferences_ldap_UID_attr.hint=Specifies the Active Directory attribute containing the identifier to be used as the XWiki user name. The default is 'sAMAccountName'.
 XWiki.XWikiPreferences_ldap_trylocal=Try local login
-XWiki.XWikiPreferences_ldap_trylocal.hint=If Active Directory authentication fails for any reason, try XWiki DB authentication with the same credentials. The default is 'yes'.
+XWiki.XWikiPreferences_ldap_trylocal.hint=If Active Directory authentication fails for any reason, try XWiki DB authentication with the same credentials.
 XWiki.XWikiPreferences_ldap_update_user=Update user from Active Directory after login
-XWiki.XWikiPreferences_ldap_update_user.hint=If 'Yes', update the mapped attributes from Active Directory to XWiki on every login, else the mapping will be updated only when the user is created. The default is 'yes'.
+XWiki.XWikiPreferences_ldap_update_user.hint=If 'Yes', update the mapped attributes from Active Directory to XWiki on every login, else the mapping will be updated only when the user is created.
 XWiki.XWikiPreferences_ldap_update_photo=Update user photo from LDAP
-XWiki.XWikiPreferences_ldap_update_photo.hint=If 'Yes', the XWiki avatar will be synchronized with the Active Directory on every login, else the photo will not be updated. The default in 'no'.
+XWiki.XWikiPreferences_ldap_update_photo.hint=If 'Yes', the XWiki avatar will be synchronized with the Active Directory on every login, else the photo will not be updated.
 XWiki.XWikiPreferences_ldap_photo_attachment_name=Attachment name used to save the Active Directory photo
 XWiki.XWikiPreferences_ldap_photo_attachment_name.hint=The Active Directory photo name that will be used in XWiki profile.
 XWiki.XWikiPreferences_ldap_photo_attribute=Active Directory photo attribute name
