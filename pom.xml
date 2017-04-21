@@ -38,7 +38,7 @@
     <url>https://network.xwiki.com</url>
   </issueManagement>
   <properties>
-    <ldap.version>9.2</ldap.version>
+    <ldap.version>9.2.4</ldap.version>
     <licensing.version>1.4.1</licensing.version>
   </properties>
   <modules>
