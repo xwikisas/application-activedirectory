@@ -39,7 +39,7 @@
   </issueManagement>
   <properties>
     <ldap.version>9.2.4</ldap.version>
-    <licensing.version>1.4.3</licensing.version>
+    <licensing.version>1.4.4</licensing.version>
   </properties>
   <modules>
     <module>application-activedirectory-api</module>
