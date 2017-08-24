@@ -30,7 +30,7 @@
   <artifactId>application-activedirectory-entry</artifactId>
   <packaging>xar</packaging>
   <name>Active Directory - Entry</name>
-  <description>Authenticate users against an Active Directory server (LDAP). Note that this a paying application.</description>
+  <description>Authenticate users against an Active Directory server (LDAP). Note that this is a paying application.</description>
   <properties>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Active Directory Application</xwiki.extension.name>
