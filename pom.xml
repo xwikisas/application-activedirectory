@@ -25,7 +25,7 @@
   <parent>
     <groupId>com.xwiki.parent</groupId>
     <artifactId>xwikisas-parent-platform</artifactId>
-    <version>8.4</version>
+    <version>8.5</version>
   </parent>
   <groupId>com.xwiki.activedirectory</groupId>
   <artifactId>application-activedirectory</artifactId>
@@ -38,8 +38,9 @@
     <url>https://network.xwiki.com</url>
   </issueManagement>
   <properties>
-    <ldap.version>9.2.4</ldap.version>
-    <licensing.version>1.4.4</licensing.version>
+    <ldap.version>9.2.5</ldap.version>
+    <licensing.version>1.5.4</licensing.version>
+    <xwiki.issueManagement.jira.id>ADAPP</xwiki.issueManagement.jira.id>
   </properties>
   <modules>
     <module>application-activedirectory-api</module>
