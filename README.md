@@ -1,6 +1,6 @@
 # Active Directory Application
 
-* Project Lead: [Alexandru Nicolae Cotiugă](http://www.xwikisas.com/xwiki/bin/view/XWiki/acotiuga) 
+* Project Lead: [Alexandru Nicolae Cotiugă](https://github.com/acotiuga) 
 * [Issue Tracker](https://jira.xwikisas.com/projects/ADAPP) 
 * [Development Practices](http://dev.xwiki.org/xwiki/bin/view/Community/DevelopmentPractices) (as much as you can !)
 * Minimal XWiki version supported: XWiki 8.4
