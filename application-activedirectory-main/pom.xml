@@ -25,7 +25,7 @@
   <parent>
     <groupId>com.xwiki.activedirectory</groupId>
     <artifactId>application-activedirectory</artifactId>
-    <version>1.3-SNAPSHOT</version>
+    <version>1.2.6-milestone-1</version>
   </parent>
   <artifactId>application-activedirectory-main</artifactId>
   <packaging>xar</packaging>
