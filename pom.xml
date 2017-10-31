@@ -34,13 +34,12 @@
   <name>Active Directory - Parent POM</name>
   <description>Application to manipulate Active Directory in XWiki.</description>
   <issueManagement>
-    <system>xwiki-network</system>
-    <url>https://network.xwiki.com</url>
+    <system>GitHub</system>
+    <url>https://github.com/xwikisas/application-activedirectory/issues</url>
   </issueManagement>
   <properties>
     <ldap.version>9.2.5</ldap.version>
     <licensing.version>1.5.4</licensing.version>
-    <xwiki.issueManagement.jira.id>ADAPP</xwiki.issueManagement.jira.id>
   </properties>
   <modules>
     <module>application-activedirectory-api</module>
@@ -73,9 +72,9 @@
     </repository>
   </repositories>
   <scm>
-    <connection>scm:git:https://git.xwikisas.com/xwiki-sas-products/application-activedirectory.git</connection>
-    <developerConnection>scm:git:https://git.xwikisas.com/xwiki-sas-products/application-activedirectory.git</developerConnection>
-    <url>https://git.xwikisas.com/xwiki-sas-products/application-activedirectory/</url>
+    <connection>scm:git:https://github.com/xwikisas/application-activedirectory.git</connection>
+    <developerConnection>scm:git:https://github.com/xwikisas/application-activedirectory.git</developerConnection>
+    <url>https://github.com/xwikisas/application-activedirectory/</url>
     <tag>HEAD</tag>
   </scm>
 </project>

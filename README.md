@@ -1,7 +1,7 @@
 # Active Directory Application
 
 * Project Lead: [Alexandru Nicolae Cotiugă](https://github.com/acotiuga) 
-* [Issue Tracker](https://jira.xwikisas.com/projects/ADAPP) 
+* [JIRA Issue Tracker (Deprecated)](https://jira.xwikisas.com/projects/ADAPP), [GitHub Issue Tracker](https://github.com/xwikisas/application-activedirectory/issues)
 * [Development Practices](http://dev.xwiki.org/xwiki/bin/view/Community/DevelopmentPractices) (as much as you can !)
 * Minimal XWiki version supported: XWiki 8.4
 * License: LGPL 2.1
