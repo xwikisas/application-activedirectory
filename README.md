@@ -7,4 +7,4 @@
 * License: LGPL 2.1
 * Translations: N/A 
 * Sonar Dashboard: N/A 
-* Continuous Integration Status: [![Build Status](http://ci.xwikisas.com/view/All/job/xwikisas/job/application-activedirectory/job/master/badge/icon)] (http://ci.xwikisas.com/view/All/job/xwikisas/job/application-activedirectory/job/master/)
+* Continuous Integration Status: [![Build Status](http://ci.xwikisas.com/view/All/job/xwikisas/job/application-activedirectory/job/master/badge/icon)](http://ci.xwikisas.com/view/All/job/xwikisas/job/application-activedirectory/job/master/)
