@@ -20,9 +20,9 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.2" reference="ActiveDirectory.Code.MainTranslations" locale="fr">
+<xwikidoc version="1.2" reference="ActiveDirectory.Code.Translations" locale="fr">
   <web>ActiveDirectory.Code</web>
-  <name>MainTranslations</name>
+  <name>Translations</name>
   <language>fr</language>
   <defaultLanguage>en</defaultLanguage>
   <translation>1</translation>
@@ -96,5 +96,10 @@ XWiki.XWikiPreferences_ldap_groupcache_expiration.hint=Temps en secondes après 
 XWiki.XWikiPreferences_ldap_mode_group_sync=Quand synchroniser les groupes de l'Active Directory.
 XWiki.XWikiPreferences_ldap_mode_group_sync.hint=Les groupes seront synchronisés par défaut à chaque authentification de l'utilisateur.
 XWiki.XWikiPreferences_ldap_mode_group_sync_always=A chaque authentication de l'utilisateur
-XWiki.XWikiPreferences_ldap_mode_group_sync_create=A la création de l'utilisateur</content>
+XWiki.XWikiPreferences_ldap_mode_group_sync_create=A la création de l'utilisateur
+
+## FREE LICENSE
+admin.activedirectory=Active Directory        
+admin.activedirectory.description=Options de configuration pour authentifier les utilisateurs dans un serveur Active Directory.       
+activeDirectory.error.noValidLicense=Il n'y a pas de licence valide pour l'application Active Directory. Pour en obtenir une, merci de visiter {0}Licenses section{1}.</content>
 </xwikidoc>

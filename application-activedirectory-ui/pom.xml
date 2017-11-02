@@ -27,15 +27,42 @@
     <artifactId>application-activedirectory</artifactId>
     <version>1.3-SNAPSHOT</version>
   </parent>
-  <artifactId>application-activedirectory-main</artifactId>
+  <artifactId>application-activedirectory-ui</artifactId>
   <packaging>xar</packaging>
-  <name>Active Directory - Main</name>
-  <description>Authenticate users against an Active Directory server (LDAP). Note that this a paying application.</description>
+  <name>Active Directory - UI</name>
+  <description>Authenticate users against an Active Directory server (LDAP). Note that this is a paying application.</description>
   <properties>
     <!-- Name to display by the Extension Manager -->
-    <xwiki.extension.name>Active Directory Application (Paying)</xwiki.extension.name>
+    <xwiki.extension.name>Active Directory Application</xwiki.extension.name>
+    <!-- Old names of this module used for retro compatibility when resolving dependencies of old extensions -->
+    <xwiki.extension.features>
+      com.xwiki.activedirectory:application-activedirectory-entry,
+      com.xwiki.activedirectory:application-activedirectory-main
+    </xwiki.extension.features>
+    <!-- The list of documents the user can access without a license. -->
+    <xwiki.extension.licensing.excludedDocuments>
+      ActiveDirectory.WebHome
+    </xwiki.extension.licensing.excludedDocuments>
   </properties>
   <dependencies>
+    <dependency>
+      <groupId>org.xwiki.rendering</groupId>
+      <artifactId>xwiki-rendering-macro-message</artifactId>
+      <version>${rendering.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-rendering-macro-include</artifactId>
+      <version>${platform.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-rendering-macro-velocity</artifactId>
+      <version>${platform.version}</version>
+      <scope>runtime</scope>
+    </dependency>
     <dependency>
       <groupId>org.xwiki.contrib.ldap</groupId>
       <artifactId>ldap-api</artifactId>
@@ -56,18 +83,6 @@
     <dependency>
       <groupId>org.xwiki.rendering</groupId>
       <artifactId>xwiki-rendering-macro-html</artifactId>
-      <version>${rendering.version}</version>
-      <scope>runtime</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-rendering-macro-velocity</artifactId>
-      <version>${platform.version}</version>
-      <scope>runtime</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.rendering</groupId>
-      <artifactId>xwiki-rendering-macro-message</artifactId>
       <version>${rendering.version}</version>
       <scope>runtime</scope>
     </dependency>

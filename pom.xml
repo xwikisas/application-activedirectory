@@ -39,12 +39,11 @@
   </issueManagement>
   <properties>
     <ldap.version>9.2.5</ldap.version>
-    <licensing.version>1.5.4-milestone-4</licensing.version>
+    <licensing.version>1.6-SNAPSHOT</licensing.version>
   </properties>
   <modules>
     <module>application-activedirectory-api</module>
-    <module>application-activedirectory-entry</module>
-    <module>application-activedirectory-main</module>
+    <module>application-activedirectory-ui</module>
   </modules>
   <profiles>
     <profile>
