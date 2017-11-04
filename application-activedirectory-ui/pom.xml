@@ -39,7 +39,8 @@
       com.xwiki.activedirectory:application-activedirectory-entry,
       com.xwiki.activedirectory:application-activedirectory-main
     </xwiki.extension.features>
-    <!-- The list of documents the user can access without a license. -->
+    <!-- The list of documents that are not covered by the extension license. The user that installs the extension has
+      full access to these documents (view, edit, delete) without having a license, so use this property wisely. -->
     <xwiki.extension.licensing.excludedDocuments>
       ActiveDirectory.WebHome
     </xwiki.extension.licensing.excludedDocuments>
