@@ -419,12 +419,10 @@ require(['jquery'], function($) {
     $('.activeDirectoryConnection').after("&lt;div id='checkConnection'&gt;&lt;button class='btn btn-primary'&gt;$services.localization.render('activeDirectory.checkConnection')&lt;/button&gt;&lt;br&gt;&lt;br&gt;&lt;div&gt;&lt;/div&gt;&lt;/div&gt;&lt;br&gt;")
     $('#checkConnection button').click(function(event) {
       event.preventDefault();
-      var queryString = 'checkConnection=true';
-      $('.activeDirectoryConnection input').each(function() {
-        queryString += '&amp;' + this.id.split('ldap_')[1] + '=' + encodeURI($(this).val());
-      });
-      $.get({
-        url : "$xwiki.getURL('ActiveDirectory.Code.Actions', 'get', '" + queryString + "')",
+      var connectionData = $('.activeDirectoryConnection input').serializeArray();
+      $.post({
+        url : new XWiki.Document('Actions', 'ActiveDirectory.Code').getURL('get', 'checkConnection=true'),
+        data: $.param(connectionData),
         success: function(data) {
           $('#checkConnection button').siblings('div').html(data);
         }
