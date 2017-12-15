@@ -102,7 +102,7 @@ XWiki.XWikiPreferences_ldap_mode_group_sync_create=Upon creation of a user
 ## FREE LICENSE
 admin.activedirectory=Active Directory
 admin.activedirectory.description=Configuration options to authenticate users against an Active Directory server.
-activeDirectory.error.noValidLicense=There is no valid license for the Active Directory application. To get one, please visit the {0}Licenses section{1}.</content>
+activeDirectory.extension.name=Active Directory Application</content>
   <object>
     <name>ActiveDirectory.Code.Translations</name>
     <number>0</number>
