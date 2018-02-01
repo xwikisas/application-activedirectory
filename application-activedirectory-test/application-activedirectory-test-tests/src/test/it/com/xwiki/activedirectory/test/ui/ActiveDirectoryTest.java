@@ -29,7 +29,7 @@ import static junit.framework.TestCase.assertEquals;
 
 public class ActiveDirectoryTest extends AbstractTest
 {
-    private static final String ID = "com.xwiki.activedirectory:application-activedirectory-entry";
+    private static final String ID = "com.xwiki.activedirectory:application-activedirectory-ui";
 
     private static final String VERSION = System.getProperty("activedirectory.version");
 
@@ -50,7 +50,7 @@ public class ActiveDirectoryTest extends AbstractTest
             + "installed: $services.extension.installed.getInstalledExtension('" + ID + "', 'wiki:xwiki').id\n"
             + "{{/velocity}}";
         ViewPage vp = getUtil().createPage(getTestClassName(), "InstallADExtension", content, "AD Test");
-        assertEquals("installed: com.xwiki.activedirectory:application-activedirectory-entry-" + VERSION,
+        assertEquals("installed: com.xwiki.activedirectory:application-activedirectory-ui-" + VERSION,
             vp.getContent());
 
         // Register fake Licensor components to avoid checking for licenses and be able to focus the test on the
