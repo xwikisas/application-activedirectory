@@ -46,7 +46,7 @@
   <dependencies>
     <dependency>
       <groupId>com.xwiki.activedirectory</groupId>
-      <artifactId>application-activedirectory-entry</artifactId>
+      <artifactId>application-activedirectory-ui</artifactId>
       <type>xar</type>
       <!-- Make sure we don't include it in the generated distribution. However we want to depend on it so that this
            module is built before that dependency in the maven reactor -->
