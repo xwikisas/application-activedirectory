@@ -43,7 +43,7 @@
 #macro(displaySelectField $prop $default)
   #set ($value = $configDoc.getValue($prop.name))
   #set ($options = [])
-  #if ($prop.classType == 'String' || $prop.classType == 'TextArea')
+  #if ($prop.classType == 'String' || $prop.classType == 'TextArea' || $prop.classType == 'Password')
     $configDoc.display($prop.name, 'edit', $configObj).replaceAll('(^..html.*?}})|(../html..$)', '')
   #else
     #if ($prop.classType == 'Boolean')
