@@ -425,6 +425,9 @@ require(['jquery'], function($) {
         data: $.param(connectionData),
         success: function(data) {
           $('#checkConnection button').siblings('div').html(data);
+          $('#checkConnection .xwikirenderingerror').click(function() {
+              $(this).siblings('.xwikirenderingerrordescription').toggleClass('hidden');
+          });
         }
       })
     });
@@ -589,6 +592,9 @@ span.new-entry {
 }
 .activeDirectoryConfigurationAdvanced {
   padding-bottom: 20px;
+}
+#checkConnection .xwikirenderingerror {
+  cursor: pointer;
 }</code>
     </property>
     <property>
