@@ -159,7 +159,7 @@
     #displayMainForm($configClassName)
     #if ("$!section" != '')
       {{html clean="false"}}
-        &lt;form method="post" class="xform half" action="${escapetool.xml($xwiki.requestURL)}" enctype="multipart/form-data"&gt;
+        &lt;form method="post" class="xform" action="${escapetool.xml($xwiki.requestURL)}" enctype="multipart/form-data"&gt;
           &lt;fieldset class='activeDirectoryMiscellaneous'&gt;
             &lt;legend&gt;$services.localization.render('admin.activeDirectoryMiscellaneous')&lt;/legend&gt;
           &lt;/fieldset&gt;
@@ -595,6 +595,11 @@ span.new-entry {
 }
 #checkConnection .xwikirenderingerror {
   cursor: pointer;
+}
+/* Use the full content to display the configuration (https://github.com/xwikisas/application-activedirectory/issues/8)
+   Remove this code when Active Directory will use XWiki 9.2 or greater. */
+#activedirectory_XWiki\.XWikiPreferences.half {
+  width: 100%
 }</code>
     </property>
     <property>
