@@ -76,17 +76,9 @@
   #set ($discard = $xwiki.ssx.use('ActiveDirectory.Code.Main'))
   #set ($configClassName = 'XWiki.XWikiPreferences')
   #set ($configClass = $xwiki.getClass($configClassName))
-  #set ($configDoc = $xwiki.getDocument('ActiveDirectory.Code.ActiveDirectoryConfig'))
-  ## Create the config doc if it doesn't exist
-  #if ($configDoc.isNew())
-    #set ($discard = $configDoc.newObject($configClassName))
-    #set ($discard = $configDoc.setHidden(true))
-    #set ($discard = $configDoc.save($services.localization.render('activeDirecfory.config.initializationComment'), 'true'))
-  #end
-  #set ($configObj = $configDoc.getObject($configClassName))
   #set ($params = {
     'activeDirectoryConnection': {'ldap_server'    : '127.0.0.1',
-                                  'ldap_port'      : 389,
+                                  'ldap_port'      : '389',
                                   'ldap_bind_DN'   : '',
                                   'ldap_bind_pass' : ''},
     'activeDirectoryConfiguration' : {'ldap_base_DN'        : ''},
@@ -99,22 +91,38 @@
                                               'ldap_trylocal'              : '1',
                                               'ldap_update_user'           : '1',
                                               'ldap_update_photo'          : '0',
-                                              'ldap_groupcache_expiration' : 21600,
+                                              'ldap_groupcache_expiration' : '21600',
                                               'ldap_mode_group_sync'       : 'always'}
   })
   ## TODO: Transform the maps from $params in arrays holding
   ## only property names when https://jira.xwikisas.com/browse/ADAPP-30 is implemented
+  #set ($configDoc = $xwiki.getDocument('ActiveDirectory.Code.ActiveDirectoryConfig'))
+  ## Create the config doc if it doesn't exist and set the default values defined above.
+  #if ($configDoc.isNew())
+    #set ($newConfigObj = $configDoc.newObject($configClassName))
+    #foreach ($paramsSection in $params.entrySet())
+      #foreach ($field in $paramsSection.value.entrySet())
+        #if ("$!field.value" != '')
+          #set ($discard = $newConfigObj.set($field.key, $field.value))
+        #end
+      #end
+    #end
+    #set ($discard = $configDoc.setHidden(true))
+    #set ($discard = $configDoc.save($services.localization.render('activeDirecfory.config.initializationComment'), 'true'))
+  #end
+  #set ($configObj = $configDoc.getObject($configClassName))
    #if ("$!section" != '')
     {{html clean="false"}}
       #set($formId = "${section.toLowerCase()}_${configClassName}")
       &lt;form id="$formId" method="post" action="$xwiki.getURL($configDoc, 'saveandcontinue')" onsubmit="cancelCancelEdit()" class="xform half"&gt;
-        #foreach ($entry in $params.entrySet())
-          #set ($fields = $entry.value)
-          &lt;fieldset class="$entry.key"&gt;
+        #foreach ($paramsSection in $params.entrySet())
+          #set ($fields = $paramsSection.value)
+          #set ($sectionName = $paramsSection.key)
+          &lt;fieldset class="$sectionName"&gt;
           ## If there is only one section, don't display the legend
           #if ($params.size() &gt; 1)
-            &lt;legend&gt;$services.localization.render("admin.$entry.key")
-              #if ($entry.key == 'activeDirectoryConfigurationAdvanced')
+            &lt;legend&gt;$services.localization.render("admin.$sectionName")
+              #if ($sectionName == 'activeDirectoryConfigurationAdvanced')
                 &lt;a id="advancedConfigShow"&gt;$services.localization.render('admin.activeDirectoryConfigurationAdvanced.show')&lt;/a&gt;
                 &lt;a id="advancedConfigHide"&gt;$services.localization.render('admin.activeDirectoryConfigurationAdvanced.hide')&lt;/a&gt;
               #end
@@ -599,7 +607,7 @@ span.new-entry {
 /* Use the full content to display the configuration (https://github.com/xwikisas/application-activedirectory/issues/8)
    Remove this code when Active Directory will use XWiki 9.2 or greater. */
 #activedirectory_XWiki\.XWikiPreferences.half {
-  width: 100%
+  width: 100%;
 }</code>
     </property>
     <property>

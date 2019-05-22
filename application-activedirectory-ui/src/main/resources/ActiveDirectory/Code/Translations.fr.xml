@@ -59,6 +59,8 @@ activeDirectory.newEntry.title=Nouvelle entrée
 activeDirectory.checkConnection=Vérifier connexion
 activeDirectory.checkConnection.error=Echec de la connexion au serveur Active Directory ! Cliquez sur ce message pour plus de détails et contactez sales@xwiki.com.
 activeDirectory.checkConnection.success=Réussite du test de connexion !
+activeDirecfory.config.initializationComment=Configuration initialisée avec les valeurs par défaut.
+
 XWiki.XWikiPreferences_ldap=Activer l'authentification à l'Active Directory
 XWiki.XWikiPreferences_ldap.hint=Activer l'authentification Active Directory pour ce wiki. Si activé et configuré correctement, un utilisateur local sera créé à chaque fois qu'un utilisateur visitera ce wiki pour la première fois.
 XWiki.XWikiPreferences_ldap_server=Adresse du serveur Active Directory
