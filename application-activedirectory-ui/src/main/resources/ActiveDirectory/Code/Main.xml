@@ -55,9 +55,6 @@
       #end
     #end
     &lt;select name="XWiki.XWikiPreferences_0_${prop.name}" id="XWiki.XWikiPreferences_0_${prop.name}"&gt;
-      #if ("$!default" != '')
-        &lt;option value=""&gt;---&lt;/option&gt;
-      #end
       #foreach ($option in $options)
         #if ($option.value != '---')
           &lt;option value="$option.value" #if($value == $option.value)selected="selected"#end&gt;
