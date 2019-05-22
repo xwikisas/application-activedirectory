@@ -56,14 +56,12 @@
     #end
     &lt;select name="XWiki.XWikiPreferences_0_${prop.name}" id="XWiki.XWikiPreferences_0_${prop.name}"&gt;
       #foreach ($option in $options)
-        #if ($option.value != '---')
-          &lt;option value="$option.value" #if($value == $option.value)selected="selected"#end&gt;
-            $services.localization.render($option.label)
-            #if ($default == $option.value)
-              $services.localization.render('activeDirectory.default')
-            #end
-          &lt;/option&gt;
-        #end
+        &lt;option value="$option.value" #if($value == $option.value)selected="selected"#end&gt;
+          $services.localization.render($option.label)
+          #if ($default == $option.value)
+            $services.localization.render('activeDirectory.default')
+          #end
+        &lt;/option&gt;
       #end
     &lt;/select&gt;
   #end
