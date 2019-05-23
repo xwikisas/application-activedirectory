@@ -39,12 +39,14 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>admin.activeDirectoryConnection=Paramètres de connexion
+  <content>admin.activeDirectory.info=Afin de configurer et commencer à utiliser l'Active Directory dans XWiki, veuillez vous assurer que vous comprenez son mode de fonctionnement et comment obtenir des données depuis cette application. Dans le cas contraire, demandez de l'aide d'un admin système. La configuration est initialisée avec quelques valeurs par défaut qui fonctionnent habituellement. Toutefois, des petites adaptations sont nécessaires en fonction de chaque configuration de serveur afin d'obtenir la bonne correspondance.
+admin.activeDirectoryConnection=Paramètres de connexion
 admin.activeDirectoryConfiguration=Configuration
-admin.activeDirectoryConfigurationAdvanced=Avancée
-admin.activeDirectoryConfigurationAdvanced.show=Afficher la configuration avancée
-admin.activeDirectoryConfigurationAdvanced.hide=Masquer la configuration avancée
+admin.activeDirectoryConfigurationAdvanced=Advancé
+admin.activeDirectoryConfigurationAdvanced.show=Montrer la configuration avancée
+admin.activeDirectoryConfigurationAdvanced.hide=Cacher la configuration avancée
 admin.activeDirectoryMiscellaneous=Divers
+admin.activeDirectoryMiscellaneous.hint=Forcer la suppression du cache contenant les groupes Active Directory.
 activeDirectory.error.missingLdapService=Le service Active Directory n'est pas disponible. Merci de vérifier votre installation.
 activeDirectory.warning.ldapAuthenticationIsNotEnabled=Le système n'a pas pu se connecter au serveur Active Directory car le service d'authenfication LDAP n'est pas activé. Editez le fichier ##{0}##, ajoutez les lignes suivantes et redémarrez le wiki :
 activeDirectory.default=(Défaut)
@@ -64,44 +66,44 @@ activeDirecfory.config.initializationComment=Configuration initialisée avec les
 XWiki.XWikiPreferences_ldap=Activer l'authentification à l'Active Directory
 XWiki.XWikiPreferences_ldap.hint=Activer l'authentification Active Directory pour ce wiki. Si activé et configuré correctement, un utilisateur local sera créé à chaque fois qu'un utilisateur visitera ce wiki pour la première fois.
 XWiki.XWikiPreferences_ldap_server=Adresse du serveur Active Directory
-XWiki.XWikiPreferences_ldap_server.hint=Par défaut est '127.0.0.1'.
+XWiki.XWikiPreferences_ldap_server.hint=L'adresse (IP ou nom du domaine) du serveur auquel se connecter. Par exemple, 127.0.0.1 serait utilisée pour un serveur localisé sur la même machine sur laquelle XWiki est installée.
 XWiki.XWikiPreferences_ldap_port=Port du serveur Active Directory
-XWiki.XWikiPreferences_ldap_port.hint=Par défaut est '389'.
-XWiki.XWikiPreferences_ldap_bind_DN=Correspondance du login Active Directory
-XWiki.XWikiPreferences_ldap_bind_DN.hint=Spécifier le dn complet. Exemple: cn=admin,dc=example,dc=com.
-XWiki.XWikiPreferences_ldap_bind_pass=Correspondance du mot de passe Active Directory
-XWiki.XWikiPreferences_ldap_bind_pass.hint=Correspondance entre le mot de passe et le login Active Directory.
-XWiki.XWikiPreferences_ldap_user_group=Restreindre au groupe
-XWiki.XWikiPreferences_ldap_user_group.hint=Seuls les membres du groupe Active Directory suivant peuvent s'authentifier. Si laissé vide, tous les utilisateurs de la Base DN seront vérifiés. Exemple:  cn=developers,ou=groups,o=XWiki,c=FR.
+XWiki.XWikiPreferences_ldap_port.hint=Le port auquel se connecter. Par exemple, 389 serait utilisé si le serveur fonctionne sur le port LDAP standard.
+XWiki.XWikiPreferences_ldap_bind_DN=DN utilisateur Active Directory
+XWiki.XWikiPreferences_ldap_bind_DN.hint=L'authentification bind (nom d'utilisateur distingué) avec lequel se connecter au serveur. Ce champ peut être laissé vide pour un accès anonyme au serveur. Si le serveur n'est pas configuré à accepter des accès anonymes, alors le DN complet d'un utilisateur avec un niveau d'accès approprié doit être fourni. Par exemple, le DN d'utilisateur devrait être sous forme de cn=admin,dc=example,dc=com.
+XWiki.XWikiPreferences_ldap_bind_pass=Mot de passe Active Directory
+XWiki.XWikiPreferences_ldap_bind_pass.hint=Ce champ peut être laissé vide pour un accès anonyme au serveur. Cela est le mot de passe pour le user DN précedemment établi et doivent être utilisés ensemble.
+XWiki.XWikiPreferences_ldap_user_group=Permettre l'authentification Active Directory seulement à un certain groupe
+XWiki.XWikiPreferences_ldap_user_group.hint=Ce champ peut être utilisé pour fournir des droits d'authentification seulement aux membres d'un groupe Active Directory. Si laissé vide, aucune restriction ne sera appliquée et tous les utilisateurs dans la Base DN auront la possibilité de s'authentifier. Pour le configurer, utilisez le DN complet du groupe: cn=developers,ou=groups,o=XWiki,c=FR.
 XWiki.XWikiPreferences_ldap_exclude_group=Groupe Active Directory à exclure
-XWiki.XWikiPreferences_ldap_exclude_group.hint=Les utilisateurs membres du groupe suivant ne peuvent pas s'authentifier. Exemple cn=designers,ou=groups,o=XWiki,c=FR.
+XWiki.XWikiPreferences_ldap_exclude_group.hint=Ce champ peut être utilisé pour interdire les droits d'authentification à des membres d'un groupe Active Directory. Les utilisateurs membres du groupe suivant ne peuvent pas s'authentifier. Pour configurer l'usage du DN complet du groupe: cn=designers,ou=groups,o=XWiki,c=FR.
 XWiki.XWikiPreferences_ldap_base_DN=Base DN Active Directory
-XWiki.XWikiPreferences_ldap_base_DN.hint=La Base DN est à la racine de l'arbre où le serveur effectue ses recherches. E.g. dc=example,dc=com.
+XWiki.XWikiPreferences_ldap_base_DN.hint=La Base DN est à la racine de l'arbre où le serveur effectue ses recherches. Exemple: dc=example,dc=com.
 XWiki.XWikiPreferences_ldap_UID_attr=Nom de l'attribut UID Active Directory
 XWiki.XWikiPreferences_ldap_UID_attr.hint=Spécifier l'attribut Active Directory contenant l'identifiant à utiliser comme nom d'utilisateur XWiki. Par défaut 'sAMAccountName'.
-XWiki.XWikiPreferences_ldap_trylocal=Essayez l'identifiant local
-XWiki.XWikiPreferences_ldap_trylocal.hint=Si l'authentification Active Directory échoue pour n'importe quelle raison, essayez l'authentification de la Base de Données XWiki avec les mêmes données d'accès.
+XWiki.XWikiPreferences_ldap_trylocal=Permettre l'authentification XWiki
+XWiki.XWikiPreferences_ldap_trylocal.hint=Permettre l'authentification XWiki pour ce wiki, comme solution de restauration. Sans ce paramètrage, il ne vous sera pas permis de se connecter à XWiki avec des comptes en local. De même, si l'authentification Active Directory échoue pour n'importe quelle raison, essayez l'authentification de la Base de Données XWiki avec les mêmes données d'accès.
 XWiki.XWikiPreferences_ldap_update_user=Mettre à jour l'utilisateur de l'Active Directory après s'être connecté
-XWiki.XWikiPreferences_ldap_update_user.hint=Si 'oui', mettez à jour les attributs liés de l'Active Directory à XWiki à chaque connexion, autrement le mapping ne sera mis à jour qu'à la création de l'utilisateur.
-XWiki.XWikiPreferences_ldap_update_photo=Mettre à jour la photo de l'utilisateur depuis le LDAP
-XWiki.XWikiPreferences_ldap_update_photo.hint=Si 'Oui', l'avatar XWiki sera synchronisé avec l'Active Directory à chaque connexion, sinon la photo ne sera pas mise à jour.
+XWiki.XWikiPreferences_ldap_update_user.hint=Si cette propriété est activée, les données de l'utilisateur XWiki seront mis à jour depuis l'Active Directory à chaque connection de l'utilisateur, autrement le mapping ne sera mis à jour qu'à la création de l'utilisateur.
+XWiki.XWikiPreferences_ldap_update_photo=Mettre à jour la photo de l'utilisateur depuis l'Active Directory
+XWiki.XWikiPreferences_ldap_update_photo.hint=Si cette propriété est activée, l'avatar XWiki sera synchronisé avec l'Active Directory à chaque connexion, sinon la photo ne sera pas mise à jour.
 XWiki.XWikiPreferences_ldap_photo_attachment_name=Nom de la pièce jointe utilisée pour sauvegarder la photo de l'Active Directory
 XWiki.XWikiPreferences_ldap_photo_attachment_name.hint=Le nom de la photo de l'Active Directory qui sera utilisée comme photo dans XWiki
 XWiki.XWikiPreferences_ldap_photo_attribute=Nom de l'attribut de la photo de l'Active Directory
 XWiki.XWikiPreferences_ldap_photo_attribute.hint=Spécifie l'attribut de l'Active Directory contenant la photo.
 XWiki.XWikiPreferences_ldap_fields_mapping=Mapping des champs utilisateur de l'Active Directory
-XWiki.XWikiPreferences_ldap_fields_mapping.hint=Relie le champ utilisateur de l'Active Directory à une propriété utilisateur XWiki. Exemple : first_name-&amp;gt;givenName.
+XWiki.XWikiPreferences_ldap_fields_mapping.hint=Relie le champ utilisateur de l'Active Directory à une propriété utilisateur XWiki. Exemple : first_name-&amp;gt;givenName (first_name appartient à la classe XWiki.XWikiUsers et givenName au profile d'utilisateur Active Directory)
 XWiki.XWikiPreferences_ldap_group_mapping=Mapping de groupes Active Directory
-XWiki.XWikiPreferences_ldap_group_mapping.hint=Relie un groupe Active Directory à un groupe XWiki. Exemple : XWiki.XWikiAdminGroup-&amp;gt;cn=marketing,ou=groups,dc=example.
+XWiki.XWikiPreferences_ldap_group_mapping.hint=Relie un groupe XWiki qui a besoin de garder, comme membres, leurs utilisateurs appartenant à un groupe Active Directory. Par exemple, XWiki.XWikiAdminGroup-&gt;cn=marketing,ou=groups,dc=example. Par défaut, tous les utilisateurs sont ajoutés dans XWiki.XWikiAllGroup.
 XWiki.XWikiPreferences_ldap_groupcache_expiration=Expiration du cache des groupes Active Directory
 XWiki.XWikiPreferences_ldap_groupcache_expiration.hint=Temps en secondes après lequel la liste des membres d'un groupe est rafraichie depuis l'Active Directory. Par défaut 21600 (6 heures).
 XWiki.XWikiPreferences_ldap_mode_group_sync=Quand synchroniser les groupes de l'Active Directory.
-XWiki.XWikiPreferences_ldap_mode_group_sync.hint=Les groupes seront synchronisés par défaut à chaque authentification de l'utilisateur.
-XWiki.XWikiPreferences_ldap_mode_group_sync_always=A chaque authentication de l'utilisateur
+XWiki.XWikiPreferences_ldap_mode_group_sync.hint=Les groupes seront synchronisés par défaut à chaque authentification de l'utilisateur. Par exemple, si un utilisateur Active Directory est déplacé dans un groupe différent, à la prochaine authentification il sera déplacé dans le bon groupe XWiki.
+XWiki.XWikiPreferences_ldap_mode_group_sync_always=A chaque authentification de l'utilisateur
 XWiki.XWikiPreferences_ldap_mode_group_sync_create=A la création de l'utilisateur
 
 ## FREE LICENSE
-admin.activedirectory=Active Directory        
-admin.activedirectory.description=Options de configuration pour authentifier les utilisateurs dans un serveur Active Directory.       
-activeDirectory.error.noValidLicense=Il n'y a pas de licence valide pour l'application Active Directory. Pour en obtenir une, merci de visiter {0}Licenses section{1}.</content>
+admin.activedirectory=Active Directory
+admin.activedirectory.description=Options de configuration pour authentifier les utilisateurs dans un serveur Active Directory.
+activeDirectory.extension.name=Application Active Directory</content>
 </xwikidoc>
