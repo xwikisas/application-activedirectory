@@ -157,20 +157,15 @@
 ##
 #if ($services.ldap)
   #if ($services.ldap.isXWikiLDAPAuthenticator())
-    #if ($request.action_resetGroupCache)
-      #set ($discard = $services.ldap.resetGroupCache())
-      {{success}}$services.localization.render('activeDirectory.success.resetGroupCache'){{/success}}
-    #end
     #displayMainForm($configClassName)
     #if ("$!section" != '')
       {{html clean="false"}}
-        &lt;form method="post" class="xform" action="${escapetool.xml($xwiki.requestURL)}" enctype="multipart/form-data"&gt;
-          &lt;fieldset class='activeDirectoryMiscellaneous'&gt;
-            &lt;legend&gt;$services.localization.render('admin.activeDirectoryMiscellaneous')&lt;/legend&gt;
-            &lt;span class="xHint"&gt;$services.localization.render('admin.activeDirectoryMiscellaneous.hint')&lt;/span&gt;
-          &lt;/fieldset&gt;
-          &lt;input name="action_resetGroupCache" value="${escapetool.xml($services.localization.render('activeDirectory.resetGroupCache.submit'))}" class="button" type="submit"&gt;
-        &lt;/form&gt;
+        &lt;fieldset class='activeDirectoryMiscellaneous'&gt;
+          &lt;legend&gt;$services.localization.render('admin.activeDirectoryMiscellaneous')&lt;/legend&gt;
+          &lt;span class="xHint"&gt;$services.localization.render('admin.activeDirectoryMiscellaneous.hint')&lt;/span&gt;
+        &lt;/fieldset&gt;
+        &lt;div id='resetGroupCache'&gt;&lt;button class='btn btn-primary'&gt;$services.localization.render('activeDirectory.resetGroupCache.submit')&lt;/button&gt;&lt;/div&gt;
+        &lt;div class="box successmessage hidden"&gt;&lt;/div&gt;
       {{/html}}
     #end
   #else
@@ -180,7 +175,7 @@
       xwiki.authentication.ldap.trylocal=1
     {{/warning}}
   #end
-#else 
+#else
   {{error}}$services.localization.render('activeDirectory.error.missingLdapService'){{/error}}
 #end
 {{/velocity}}</content>
@@ -435,7 +430,7 @@ require(['jquery'], function($) {
               $(this).siblings('.xwikirenderingerrordescription').toggleClass('hidden');
           });
         }
-      })
+      });
     });
     // Toggle Show/Hide advanced configuration buttons
     var show = $('#advancedConfigShow');
@@ -452,6 +447,19 @@ require(['jquery'], function($) {
       dl.hide();
       $(this).hide();
       show.show();
+    });
+
+    // Reset Group Cache.
+    var resetGroupCache = $('#resetGroupCache');
+    var resetGroupCacheSuccess = resetGroupCache.siblings('.successmessage');
+    resetGroupCache.click(function() {
+      $.post({
+        url : new XWiki.Document('Actions', 'ActiveDirectory.Code').getURL('get', 'outputSyntax=plain&amp;resetGroupCache=true'),
+        success: function(data) {
+          resetGroupCacheSuccess.html(data.message);
+          resetGroupCacheSuccess.removeClass('hidden');
+        }
+      })
     });
   });
 });</code>

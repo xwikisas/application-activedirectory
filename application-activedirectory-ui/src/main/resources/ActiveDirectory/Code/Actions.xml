@@ -63,5 +63,12 @@
     #displayError($exceptiontool.getStackTrace($services.ldap.error))
   #end
 #end
+{{/velocity}}
+{{velocity wiki="false"}}
+#if ($request.resetGroupCache)
+  #set ($discard = $response.setContentType('application/json'))
+  #set ($discard = $services.ldap.resetGroupCache())
+  $jsontool.serialize({'message': $services.localization.render('activeDirectory.resetGroupCacheSuccess')})
+#end
 {{/velocity}}</content>
 </xwikidoc>
