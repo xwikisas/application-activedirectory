@@ -44,7 +44,11 @@
   #set ($value = $configDoc.getValue($prop.name))
   #set ($options = [])
   #if ($prop.classType == 'String' || $prop.classType == 'TextArea' || $prop.classType == 'Password')
-    $configDoc.display($prop.name, 'edit', $configObj).replaceAll('(^..html.*?}})|(../html..$)', '')
+    #set ($display = $configDoc.display($prop.name, 'edit', $configObj).replaceAll('(^..html.*?}})|(../html..$)', ''))
+    #if ($mandatoryFields.contains($prop.name))
+      #set ($display = $display.replace('&lt;input', '&lt;input required'))
+    #end
+    $display
   #else
     #if ($prop.classType == 'Boolean')
       #set ($discard = $options.add({'value': 1, 'label': 'yes'}))
@@ -71,6 +75,7 @@
   #set ($discard = $xwiki.ssx.use('ActiveDirectory.Code.Main'))
   #set ($configClassName = 'XWiki.XWikiPreferences')
   #set ($configClass = $xwiki.getClass($configClassName))
+  #set ($mandatoryFields = ['ldap_server', 'ldap_port', 'ldap_bind_DN', 'ldap_bind_pass', 'ldap_base_DN'])
   #set ($params = {
     'activeDirectoryConnection': {'ldap_server'    : '127.0.0.1',
                                   'ldap_port'      : '389',
