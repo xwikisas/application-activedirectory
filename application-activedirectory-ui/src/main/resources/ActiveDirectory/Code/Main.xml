@@ -71,8 +71,6 @@
   #end
 #end
 #macro (displayMainForm)
-  #set ($discard = $xwiki.jsx.use('ActiveDirectory.Code.Main'))
-  #set ($discard = $xwiki.ssx.use('ActiveDirectory.Code.Main'))
   #set ($configClassName = 'XWiki.XWikiPreferences')
   #set ($configClass = $xwiki.getClass($configClassName))
   #set ($mandatoryFields = ['ldap_server', 'ldap_port', 'ldap_bind_DN', 'ldap_bind_pass', 'ldap_base_DN'])
@@ -112,6 +110,8 @@
   #end
   #set ($configObj = $configDoc.getObject($configClassName))
   #if ("$!section" != '')
+    #set ($discard = $xwiki.jsx.use('ActiveDirectory.Code.Main'))
+    #set ($discard = $xwiki.ssx.use('ActiveDirectory.Code.Main'))
     {{info}}$services.localization.render('admin.activeDirectory.info'){{/info}}
 
     #set($formId = "${section.toLowerCase()}_${configClassName}")
