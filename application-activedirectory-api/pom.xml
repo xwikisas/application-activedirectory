@@ -43,6 +43,12 @@
       <artifactId>xwiki-platform-configuration-default</artifactId>
       <version>${platform.version}</version>
     </dependency>
+      <!-- Declare this dependency to prevent RequireUpperBoundDeps error caused by lower versions declared in Ldap authenticator -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-oldcore</artifactId>
+      <version>${platform.version}</version>
+    </dependency>
     <dependency>
       <groupId>org.xwiki.contrib.ldap</groupId>
       <artifactId>ldap-authenticator</artifactId>

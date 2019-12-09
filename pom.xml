@@ -25,7 +25,7 @@
   <parent>
     <groupId>com.xwiki.parent</groupId>
     <artifactId>xwikisas-parent-platform</artifactId>
-    <version>8.4-12</version>
+    <version>9.11-5</version>
   </parent>
   <groupId>com.xwiki.activedirectory</groupId>
   <artifactId>application-activedirectory</artifactId>
@@ -38,8 +38,8 @@
     <url>https://github.com/xwikisas/application-activedirectory/issues</url>
   </issueManagement>
   <properties>
-    <ldap.version>9.4</ldap.version>
-    <licensing.version>1.14.4</licensing.version>
+    <ldap.version>9.4.1</ldap.version>
+    <licensing.version>1.15</licensing.version>
   </properties>
   <modules>
     <module>application-activedirectory-api</module>
