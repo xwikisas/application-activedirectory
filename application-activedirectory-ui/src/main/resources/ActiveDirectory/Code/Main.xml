@@ -42,7 +42,6 @@
   <content>{{velocity}}
 #macro(displaySelectField $prop $default)
   #set ($value = $configDoc.getValue($prop.name))
-  #set ($options = [])
   #if ($prop.classType == 'String' || $prop.classType == 'TextArea' || $prop.classType == 'Password')
     #set ($display = $configDoc.display($prop.name, 'edit', $configObj).replaceAll('(^..html.*?}})|(../html..$)', ''))
     #if ($mandatoryFields.contains($prop.name))
@@ -50,6 +49,7 @@
     #end
     $display
   #else
+    #set ($options = [])
     #if ($prop.classType == 'Boolean')
       #set ($discard = $options.add({'value': 1, 'label': 'yes'}))
       #set ($discard = $options.add({'value': 0, 'label': 'no'}))
@@ -335,14 +335,14 @@
       var keyInput = new Element('input', {
                       'type'  : 'text',
                       'class' : 'key',
-                      'value' : this.input[0].dataset.keyTip || '',
+                      'placeholder' : this.input[0].dataset.keyTip || '',
                       'style' : 'width:45%' // Somewhat magic number to make the 2 fields + separator and red cross fit.
                                               // FIXME need to refactor this to use flexible box model when available.
                     });
       var valueInput = new Element('input', {
                       'type'  : 'text',
                       'class' : 'value',
-                      'value' : this.input[0].dataset.valueTip || '',
+                      'placeholder' : this.input[0].dataset.valueTip || '',
                       'style' : 'width:45%'
                     });
       var result = new Element(this.input.parent('dd') ? 'dd' : 'div', {
@@ -353,19 +353,6 @@
                     .insert(new Element('span', {
                       'class':'remove'
                     }).observe('click', this.onRemoveProperty.bindAsEventListener(this)));
-
-      keyInput.value = key || this.input[0].dataset.keyTip || '';
-      valueInput.value = value || this.input[0].dataset.valueTip || '';
-
-      // If there are tips defined for the key and/or the value, hook their input the "withTip" behavior
-      if (key === '' &amp;&amp; this.input[0].dataset.keyTip) {
-        result.down('input.key').value = this.input[0].dataset.keyTip || '';
-        document.fire('xwiki:addBehavior:withTip', {'element' : result.down('input.key').addClassName('withTip')});
-      }
-      if (value === '' &amp;&amp; this.input[0].dataset.valueTip) {
-        result.down('input.value').value = this.input[0].dataset.valueTip || '';
-        document.fire('xwiki:addBehavior:withTip', {'element' : result.down('input.value').addClassName('withTip')});
-      }
       return result;
     },
 
