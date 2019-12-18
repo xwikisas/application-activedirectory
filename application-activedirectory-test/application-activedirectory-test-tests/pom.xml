@@ -52,25 +52,19 @@
            module is built before that dependency in the maven reactor -->
       <scope>provided</scope>
       <version>${project.version}</version>
+      <exclusions>
+        <!-- Run the functional tests without a license. -->
+        <exclusion>
+          <groupId>com.xwiki.licensing</groupId>
+          <artifactId>application-licensing-licensor-api</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
-    <!-- Needed for registering the fake licensing components in groovy in the the test -->
+    <!-- Use a fake licensor script service while running the functional tests. -->
     <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-component-script</artifactId>
-      <version>${platform.version}</version>
-      <scope>runtime</scope>
-    </dependency>
-    <!-- Needed for registering the fake licensing components in groovy in the the test -->
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-rendering-macro-groovy</artifactId>
-      <version>${platform.version}</version>
-      <scope>runtime</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-instance</artifactId>
-      <version>${platform.version}</version>
+      <groupId>com.xwiki.licensing</groupId>
+      <artifactId>application-licensing-test-script</artifactId>
+      <version>${licensing.version}</version>
       <scope>runtime</scope>
     </dependency>
     <dependency>

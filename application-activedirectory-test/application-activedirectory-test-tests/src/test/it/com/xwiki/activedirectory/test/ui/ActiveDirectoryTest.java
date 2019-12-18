@@ -50,59 +50,7 @@ public class ActiveDirectoryTest extends AbstractTest
             + "installed: $services.extension.installed.getInstalledExtension('" + ID + "', 'wiki:xwiki').id\n"
             + "{{/velocity}}";
         ViewPage vp = getUtil().createPage(getTestClassName(), "InstallADExtension", content, "AD Test");
-        assertEquals("installed: com.xwiki.activedirectory:application-activedirectory-ui-" + VERSION,
+        assertEquals("installed: com.xwiki.activedirectory:application-activedirectory-ui/" + VERSION,
             vp.getContent());
-
-        // Register fake Licensor components to avoid checking for licenses and be able to focus the test on the
-        // Active Directory feature.
-        content = "{{groovy}}\n"
-            + "import javax.inject.*\n"
-            + "import org.xwiki.component.annotation.*\n"
-            + "import org.xwiki.extension.*\n"
-            + "import org.xwiki.model.reference.*\n"
-            + "import com.xwiki.licensing.*\n"
-            + "import org.xwiki.component.descriptor.*\n"
-            + "import org.xwiki.script.service.*\n"
-            + "\n"
-            + "class VoidLicensor implements Licensor\n"
-            + "{\n"
-            + "    License getLicense() { return null }\n"
-            + "    License getLicense(ExtensionId extensionId) { return null }\n"
-            + "    License getLicense(EntityReference entityReference) { return null }\n"
-            + "    boolean hasLicensure() { return true }\n"
-            + "    boolean hasLicensure(EntityReference entityReference) { return true }\n"
-            + "    boolean hasLicensure(ExtensionId extensionId) { return true }\n"
-            + "}\n"
-            + "\n"
-            + "class VoidLicensorScriptService implements ScriptService\n"
-            + "{\n"
-            + "    License getLicense() { return null }\n"
-            + "    License getLicenseForExtension(ExtensionId extensionId) { return null }\n"
-            + "    License getLicenseForEntity(EntityReference reference) { return null }\n"
-            + "    boolean hasLicensure() { return true }\n"
-            + "    boolean hasLicensureForExtension(ExtensionId extensionId) { return true }\n"
-            + "    boolean hasLicensureForEntity(EntityReference reference) { return true }\n"
-            + "    Licensor getLicensor() { return null }\n"
-            + "    LicenseManager getLicenseManager() { return null }\n"
-            + "    boolean addLicense(String license) { return true }\n"
-            + "    boolean addLicense(byte[] license) { return true }\n"
-            + "    void checkLicense() { }\n"
-            + "}\n"
-            + "\n"
-            + "// Register them!\n"
-            + "\n"
-            + "def DefaultComponentDescriptor cd = new DefaultComponentDescriptor()\n"
-            + "cd.setRoleType(Licensor.class)\n"
-            + "cd.setInstantiationStrategy(ComponentInstantiationStrategy.SINGLETON)\n"
-            + "services.component.getRootComponentManager().registerComponent(cd, new VoidLicensor())\n"
-            + "\n"
-            + "cd = new DefaultComponentDescriptor()\n"
-            + "cd.setRoleType(ScriptService.class)\n"
-            + "cd.setRoleHint(\"licensor\")\n"
-            + "cd.setInstantiationStrategy(ComponentInstantiationStrategy.SINGLETON)\n"
-            + "services.component.getRootComponentManager().registerComponent(cd, new VoidLicensorScriptService())\n"
-            + "{{/groovy}}";
-        vp = getUtil().createPage(getTestClassName(), "FakeLicensing", content, "Fake Licensing");
-        assertEquals("", vp.getContent());
     }
 }
