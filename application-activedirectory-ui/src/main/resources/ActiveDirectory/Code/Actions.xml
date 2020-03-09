@@ -40,28 +40,29 @@
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
   <content>{{velocity}}
-#macro (displayError $text)
-  {{html clean="false"}}
-    &lt;div class="xwikirenderingerror" title="Click to get more details about the error"&gt;
-      $services.localization.render('activeDirectory.checkConnection.error')
-    &lt;/div&gt;
-    &lt;div class="xwikirenderingerrordescription hidden"&gt;
-      &lt;pre&gt;$text&lt;/pre&gt;
-    &lt;/div&gt;
-  {{/html}}
-#end
 #if ($request.checkConnection)
+  #set ($discard = $response.setStatus(400))
   #set ($ldapKeyPrefix = 'XWiki.XWikiPreferences_0_ldap_')
   #set ($server = $request.get("${ldapKeyPrefix}server"))
   #set ($port = $request.get("${ldapKeyPrefix}port"))
   #set ($bind_DN = $request.get("${ldapKeyPrefix}bind_DN"))
   #set ($bind_pass = $request.get("${ldapKeyPrefix}bind_pass"))
   #set ($connected = $services.ldap.checkConnection($server, $port, $bind_DN, $bind_pass, '', false))
-  #if ($connected)
-    {{success}}$services.localization.render('activeDirectory.checkConnection.success'){{/success}}
-  #else
-    #displayError($exceptiontool.getStackTrace($services.ldap.error))
-  #end
+  {{html clean="false"}}
+    #if ($connected)
+      #set ($discard = $response.setStatus(200))
+      &lt;div class="box successmessage"&gt;
+        $services.localization.render('activeDirectory.checkConnection.success')
+      &lt;/div&gt;
+    #else
+      &lt;div class="xwikirenderingerror" title="Click to get more details about the error"&gt;
+        $services.localization.render('activeDirectory.checkConnection.error')
+      &lt;/div&gt;
+      &lt;div class="xwikirenderingerrordescription hidden"&gt;
+        &lt;pre&gt;$exceptiontool.getStackTrace($services.ldap.error)&lt;/pre&gt;
+      &lt;/div&gt;
+    #end
+  {{/html}}
 #end
 {{/velocity}}
 {{velocity wiki="false"}}

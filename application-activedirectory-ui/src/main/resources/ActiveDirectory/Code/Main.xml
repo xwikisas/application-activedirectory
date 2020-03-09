@@ -400,7 +400,7 @@ require(['jquery'], function($) {
       'data-value-tip': "${escapetool.javascript($services.localization.render('activeDirectory.aDGroup.placehoder'))}",
       'data-separator': '|'
     });
-    $.each([fieldMapping, groupMapping], function(){
+    $.each([fieldMapping, groupMapping], function() {
       var options = {};
       var separator = this.attr('data-separator');
       if (separator) {
@@ -415,13 +415,21 @@ require(['jquery'], function($) {
       var connectionData = $('.activeDirectoryConnection input').serializeArray();
       $.post({
         url : new XWiki.Document('Actions', 'ActiveDirectory.Code').getURL('get', 'checkConnection=true'),
-        data: $.param(connectionData),
-        success: function(data) {
-          $('#checkConnection button').siblings('div').html(data);
-          $('#checkConnection .xwikirenderingerror').click(function() {
-              $(this).siblings('.xwikirenderingerrordescription').toggleClass('hidden');
-          });
-        }
+        data: $.param(connectionData)
+      }).done(function(data) {
+        $('#checkConnection button').siblings('div').html(data);
+      }).fail(function(data) {
+        $('#checkConnection button').siblings('div').html(data.responseText);
+        $('#checkConnection .xwikirenderingerror').click(function() {
+          $(this).siblings('.xwikirenderingerrordescription').toggleClass('hidden');
+        });
+      }).always(function() {
+        // Save the form data introduced by the user upon the Check connection step.
+        var adForm = $('#activedirectory_XWiki\\.XWikiPreferences');
+        $.post({
+          url: adForm.attr('action'),
+          data: adForm.serializeArray()
+        });
       });
     });
     // Toggle Show/Hide advanced configuration buttons
