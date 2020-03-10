@@ -41,18 +41,26 @@
   <hidden>true</hidden>
   <content>{{velocity}}
 #set ($discard = $response.setContentType('application/json'))
+#set ($map = {})
+#set ($array = [])
 #if ($request.list.equals('xwiki-field'))
   #set ($xWikiClass = $xwiki.getDocument('XWiki.XWikiUsers').xWikiClass)
   #set ($classProperties = $xWikiClass.properties)
-  #set ($map = {})
-  #set ($array = [])
   #foreach ($property in $classProperties)
-    #if ($property.name.contains($request.q))
+    #if ($property.name.toLowerCase().contains($request.q.toLowerCase()))
       #set ($discard = $array.add({'value': $property.name}))
     #end
   #end
-  #set ($discard = $map.put('results', $array))
-  $jsontool.serialize($map)
+#elseif ($request.list.equals('xwiki-group'))
+  #set ($statement = "from doc.object(XWiki.XWikiGroups) as xwikiGroup where doc.fullName &lt;&gt; 'XWiki.XWikiGroupTemplate'")
+  #set ($results = $services.query.xwql($statement).addFilter('unique').execute())
+  #foreach ($result in $results)
+    #if ($result.toLowerCase().contains($request.q.toLowerCase()))
+      #set ($discard = $array.add({'value': $result}))
+    #end
+  #end
 #end
+#set ($discard = $map.put('results', $array))
+$jsontool.serialize($map)
 {{/velocity}}</content>
 </xwikidoc>

@@ -408,7 +408,8 @@ require(['jquery'], function($) {
     groupMapping.attr({
       'data-key-tip'  : "${escapetool.javascript($services.localization.render('activeDirectory.xWikiGroup.placeholder'))}",
       'data-value-tip': "${escapetool.javascript($services.localization.render('activeDirectory.aDGroup.placehoder'))}",
-      'data-separator': '|'
+      'data-separator': '|',
+      'data-mapping-tip' : 'group'
     });
     $.each([fieldMapping, groupMapping], function() {
       var options = {};
