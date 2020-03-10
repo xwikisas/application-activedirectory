@@ -267,7 +267,6 @@
     </property>
     <property>
       <code>var XWiki = function(XWiki) {
-
   // Get a hold on the widgets namespace.
   var widgets = XWiki.widgets = XWiki.widgets || {};
 
@@ -332,17 +331,27 @@
      * Creates and returns the DOM fragment for an property entry for this widget
      */
     createPropertyEntry: function(key, value) {
+      var inputDataset = this.input[0].dataset;
       var keyInput = new Element('input', {
                       'type'  : 'text',
                       'class' : 'key',
-                      'placeholder' : this.input[0].dataset.keyTip || '',
+                      'placeholder' : inputDataset.keyTip || '',
                       'style' : 'width:45%' // Somewhat magic number to make the 2 fields + separator and red cross fit.
                                               // FIXME need to refactor this to use flexible box model when available.
                     });
+      var suggestQueryString = 'outputSyntax=plain&amp;list=xwiki-' + inputDataset.mappingTip;
+      var keyInputSuggest = new XWiki.widgets.Suggest(keyInput, {
+        script: new XWiki.Document('SuggestLists', 'ActiveDirectory.Code').getURL('get', suggestQueryString),
+        varname: 'q',
+        noresults: "No results",
+        json: true,
+        resultsParameter : 'results',
+        resultValue : 'value',
+      });
       var valueInput = new Element('input', {
                       'type'  : 'text',
                       'class' : 'value',
-                      'placeholder' : this.input[0].dataset.valueTip || '',
+                      'placeholder' : inputDataset.valueTip || '',
                       'style' : 'width:45%'
                     });
       var result = new Element(this.input.parent('dd') ? 'dd' : 'div', {
@@ -392,7 +401,8 @@ require(['jquery'], function($) {
     var fieldMapping = $('#XWiki\\.XWikiPreferences_0_ldap_fields_mapping');
     fieldMapping.attr({
       'data-key-tip'  : "${escapetool.javascript($services.localization.render('activeDirectory.xWikiUserProperty.placeholder'))}",
-      'data-value-tip': "${escapetool.javascript($services.localization.render('activeDirectory.aDUserField.placeholder'))}"
+      'data-value-tip': "${escapetool.javascript($services.localization.render('activeDirectory.aDUserField.placeholder'))}",
+      'data-mapping-tip' : 'field'
     });
     var groupMapping = $('#XWiki\\.XWikiPreferences_0_ldap_group_mapping');
     groupMapping.attr({
