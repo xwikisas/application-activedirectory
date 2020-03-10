@@ -274,6 +274,7 @@
    * A properties editor widget that can replace textareas with key/value input properties.
    */
   widgets.PropertiesEditor = Class.create({
+
     options: {
       separator: ',',
       newEntryMessage: "${escapetool.javascript($services.localization.render('activeDirectory.newEntry.title'))}"
@@ -329,18 +330,17 @@
     /**
      * Creates and returns the DOM fragment for an property entry for this widget
      */
-    createPropertyEntry: function(xwikiProperty, adProperty) {
+    createPropertyEntry: function(key, value) {
       var inputDataset = this.input[0].dataset;
-      var xwikiPropertyInput = new Element('input', {
+      var keyInput = new Element('input', {
                       'type'  : 'text',
-                      'value' : xwikiProperty,
                       'class' : 'key',
                       'placeholder' : inputDataset.keyTip || '',
                       'style' : 'width:45%' // Somewhat magic number to make the 2 fields + separator and red cross fit.
                                               // FIXME need to refactor this to use flexible box model when available.
                     });
       var suggestQueryString = 'outputSyntax=plain&amp;list=xwiki-' + inputDataset.mappingTip;
-      var xwikiPropertyInputSuggest = new XWiki.widgets.Suggest(xwikiPropertyInput, {
+      var keyInputSuggest = new XWiki.widgets.Suggest(keyInput, {
         script: new XWiki.Document('SuggestLists', 'ActiveDirectory.Code').getURL('get', suggestQueryString),
         varname: 'q',
         noresults: "No results",
@@ -348,18 +348,17 @@
         resultsParameter : 'results',
         resultValue : 'value',
       });
-      var adPropertyInput = new Element('input', {
+      var valueInput = new Element('input', {
                       'type'  : 'text',
-                      'value' : adProperty,
                       'class' : 'value',
                       'placeholder' : inputDataset.valueTip || '',
                       'style' : 'width:45%'
                     });
       var result = new Element(this.input.parent('dd') ? 'dd' : 'div', {
                       'class' : 'property ' + this.id})
-                    .insert(xwikiPropertyInput).observe('change', this.updateValue.bind(this))
+                    .insert(keyInput).observe('change', this.updateValue.bind(this))
                     .insert(' \u2192 ')
-                    .insert(adPropertyInput).observe('change', this.updateValue.bind(this))
+                    .insert(valueInput).observe('change', this.updateValue.bind(this))
                     .insert(new Element('span', {
                       'class':'remove'
                     }).observe('click', this.onRemoveProperty.bindAsEventListener(this)));
