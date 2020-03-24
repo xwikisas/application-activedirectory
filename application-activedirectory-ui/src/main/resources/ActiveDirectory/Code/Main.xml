@@ -116,7 +116,7 @@
 
     #set($formId = "${section.toLowerCase()}_${configClassName}")
     {{html clean="false"}}
-      &lt;form id="$formId" method="post" action="$xwiki.getURL($configDoc, 'saveandcontinue')" onsubmit="cancelCancelEdit()" class="xform half"&gt;
+      &lt;form id="$formId" method="post" action="$xwiki.getURL($configDoc, 'saveandcontinue')" onsubmit="cancelCancelEdit()" class="xform"&gt;
         #foreach ($paramsSection in $params.entrySet())
           #set ($fields = $paramsSection.value)
           #set ($sectionName = $paramsSection.key)
@@ -266,144 +266,122 @@
       <cache>long</cache>
     </property>
     <property>
-      <code>var XWiki = function(XWiki) {
-  // Get a hold on the widgets namespace.
-  var widgets = XWiki.widgets = XWiki.widgets || {};
-
-  /**
-   * A properties editor widget that can replace textareas with key/value input properties.
-   */
-  widgets.PropertiesEditor = Class.create({
-
-    options: {
-      separator: ',',
-      newEntryMessage: "${escapetool.javascript($services.localization.render('activeDirectory.newEntry.title'))}"
-    },
-
-    /**
-     * @param {String | NSIDomElement} input the input element selector or element that this properties editor will replace.
-     * @param {Object options} this selector options. Optional. See the default options above.
-     */
-    initialize:function(input, options) {
-      this.input = $(input);
-      this.options = Object.extend(Object.clone(this.options), options || {});
-      this.inputParent = this.input.parent('dd') || this.input;
-      this.inputParent.addClass('hidden');
-      this.inputContainer = this.inputParent.parent();
-      this.value = this.input.val() || '';
-      this.id = Math.random() * Math.pow(10, 17);
-      this.inputParent.after(
-        new Element('span', {
-          'class' : 'new-entry'
-        }).update(this.options.newEntryMessage).observe('click',
-          this.onNewEntry.bindAsEventListener(this))
-      );
-      this.inputParent.after(this.createPropertyEntry('', ''));
-      this.properties = [];
-      this.initializeAndDisplayExistingProperties();
-    },
-
-    /**
-     * Callback when the new entry button has been clicked.
-     *
-     * @param {Event} the original click event leading to this callback
-     */
-    onNewEntry: function(event) {
-      (this.inputContainer.find('.' + this.id).last() || this.inputParent).after(this.createPropertyEntry('', ''));
-    },
-
-    /**
-     * Initializes a collection of existing properties based on the original input value, and displays them as a pair of two input elements.
-     */
-    initializeAndDisplayExistingProperties: function() {
-      var props = this.value == '' ? [] : this.value.split(this.options.separator);
-      for (var i = 0; i &lt; props.length; i++) {
-        var key = props[i].substring(0, props[i].indexOf('='));
-        var value = props[i].substring(props[i].indexOf('=') + 1) || '';
-        this.properties.push( [key, value] );
-      }
-      for (var i = this.properties.length-1; i &gt;= 0; i--) {
-        this.inputParent.after(this.createPropertyEntry(this.properties[i][0], this.properties[i][1]));
-      }
-    },
-
-    /**
-     * Creates and returns the DOM fragment for an property entry for this widget
-     */
-    createPropertyEntry: function(key, value) {
-      var inputDataset = this.input[0].dataset;
-      var keyInput = new Element('input', {
-                      'type'  : 'text',
-                      'class' : 'key',
-                      'placeholder' : inputDataset.keyTip || '',
-                      'style' : 'width:45%' // Somewhat magic number to make the 2 fields + separator and red cross fit.
-                                              // FIXME need to refactor this to use flexible box model when available.
-                    });
-      var suggestQueryString = 'outputSyntax=plain&amp;list=xwiki-' + inputDataset.mappingTip;
-      var keyInputSuggest = new XWiki.widgets.Suggest(keyInput, {
-        script: new XWiki.Document('SuggestLists', 'ActiveDirectory.Code').getURL('get', suggestQueryString),
-        varname: 'q',
-        noresults: "No results",
-        json: true,
-        resultsParameter : 'results',
-        resultValue : 'value',
-      });
-      var valueInput = new Element('input', {
-                      'type'  : 'text',
-                      'class' : 'value',
-                      'placeholder' : inputDataset.valueTip || '',
-                      'style' : 'width:45%'
-                    });
-      var result = new Element(this.input.parent('dd') ? 'dd' : 'div', {
-                      'class' : 'property ' + this.id})
-                    .insert(keyInput).observe('focusout', this.updateValue.bind(this))
-                    .insert(' \u2192 ')
-                    .insert(valueInput).observe('focusout', this.updateValue.bind(this))
-                    .insert(new Element('span', {
-                      'class':'remove'
-                    }).observe('click', this.onRemoveProperty.bindAsEventListener(this)));
-      return result;
-    },
-
-    /**
-     * Callback when user removed a property entry.
-     *
-     * @param {Event} the original click event that led to this callback
-     */
-    onRemoveProperty: function(event) {
-      event.element().up('dd').remove();
-      this.updateValue();
-    },
-
-    /**
-     * Computes the new value for the original underlaying input element (textarea or input text), and updates its value with the result.
-     */
-    updateValue: function() {
-      var value = this.inputContainer.find('.' + this.id + " .key[value!='']").map(function(key, value){
-        if (value.value == value.defaultValue) {
-          return '';
-        }
-        return value.value + '=' + value.next('input').value;
-      }).get().join(this.options.separator);
-      if (this.input.prop('tagName').toLowerCase() === 'textarea') {
-        this.input.text(value);
-      }
-      else {
-        this.input.attr('value', value);
-      }
-    }
-  });
-  return XWiki;
-}(XWiki || {});
-
-require(['jquery'], function($) {
+      <code>require(['jquery'], function($) {
   $(document).ready(function() {
     var feature = (function () {
+      var textareaToInputList = function(textarea) {
+        var content = textarea.val();
+        var dataset = textarea.data();
+        var separator = dataset.separator;
+        var properties = content.split(separator);
+        var textareaParent = textarea.parent();
+        var propertiesParent = new Element('div', {'class': 'properties'});
+        textareaParent.append(propertiesParent);
+        $.each(properties, function(key, value) {
+          createPropertyEntry(value, dataset, propertiesParent);
+        });
+        textareaParent.append(new Element('span', {'class': 'addProperty'})
+          .update("${escapetool.javascript($services.localization.render('activeDirectory.newEntry.title'))}"));
+      };
+
+      var createPropertyEntry = function(property, dataset, parent) {
+        var propertyValues = property.split('=');
+        var xWikiValue = propertyValues[0] || '';
+        var aDValue = propertyValues[1] || '';
+        var xWikiInput = new Element(
+          'input', {
+            'type': 'text',
+            'class': 'key',
+            'value': xWikiValue,
+            'placeholder': dataset.keyTip,
+            'style': 'width:45%' // Somewhat magic number to make the 2 fields + separator and red cross fit.
+                                 // FIXME need to refactor this to use flexible box model when available.
+        });
+        var suggestQueryString = 'outputSyntax=plain&amp;list=xwiki-' + dataset.mappingTip;
+        var xWikiInputSuggest = new XWiki.widgets.Suggest(xWikiInput, {
+          'script': new XWiki.Document('SuggestLists', 'ActiveDirectory.Code').getURL('get', suggestQueryString),
+          'varname': 'q',
+          'noresults': 'No results',
+          'json': true,
+          'resultsParameter': 'results',
+          'resultValue': 'value'
+        });
+        var aDInput = new Element(
+          'input', {
+            'type': 'text',
+            'class': 'value',
+            'value': aDValue,
+            'placeholder': dataset.valueTip,
+            'style': 'width:45%'
+          });
+        var inputsWrapper = new Element('div', {'class': 'property'})
+          .insert(xWikiInput)
+          .insert(' \u2192 ')
+          .insert(aDInput)
+          .insert(new Element('span', {'class': 'removeProperty'}));
+        parent.append(inputsWrapper);
+      };
+
+      var bindPropertyEvents = function() {
+        $('.activeDirectoryConfigurationAdvanced').on('click', '.removeProperty', function() {
+          var property = $(this).parent();
+          removeValueFromTextarea(property);
+          property.remove();
+        });
+        $('.activeDirectoryConfigurationAdvanced').on('click', '.addProperty', function() {
+          var textarea = $(this).siblings('textarea');
+          var dataset = textarea.data();
+          var propertiesParent = textarea.siblings('.properties');
+          createPropertyEntry('', dataset, propertiesParent);
+        });
+        $('.activeDirectoryConfigurationAdvanced').on('focus', '.properties input', function() {
+          var oldValue = $(this).val();
+          $(this).data('oldValue', oldValue);
+        }).on('change', '.properties input', function() {
+          updateValueInTextarea($(this));
+        });
+      };
+
+      var updateValueInTextarea = function(input) {
+        var textarea = input.parent().parent().siblings('textarea');
+        var content = textarea.val();
+        var oldValue = input.data('oldValue');
+        var newValue = input.val();
+        var propertyPairValue = input.siblings('input').val();
+        var oldContentToUpdate = '';
+        var newContentToUpdate = '';
+        if (input.hasClass('key')) {
+          oldContentToUpdate = oldValue + '=' + propertyPairValue;
+          newContentToUpdate = newValue + '=' + propertyPairValue;
+        } else {
+          oldContentToUpdate = propertyPairValue + '=' + oldValue;
+          newContentToUpdate = propertyPairValue + '=' + newValue;
+        }
+        content = content.replace(oldContentToUpdate, newContentToUpdate);
+        textarea.text(content);
+      };
+
+      var removeValueFromTextarea = function(property) {
+        var propertiesParent = property.parent();
+        var textarea = propertiesParent.siblings('textarea');
+        var content = textarea.val();
+        var separator = textarea.data().separator;
+        var contentToRemove = property.children('.key').val() + '=' + property.children('.value').val();
+        if (content.startsWith(contentToRemove)) {
+          contentToRemove = contentToRemove + separator;
+        } else {
+          contentToRemove = separator + contentToRemove;
+        }
+        content = content.replace(contentToRemove, '');
+        textarea.text(content);
+      };
+
       var loadPropertiesEditor = function() {
         var fieldMapping = $('#XWiki\\.XWikiPreferences_0_ldap_fields_mapping');
         fieldMapping.attr({
           'data-key-tip'  : "${escapetool.javascript($services.localization.render('activeDirectory.xWikiUserProperty.placeholder'))}",
           'data-value-tip': "${escapetool.javascript($services.localization.render('activeDirectory.aDUserField.placeholder'))}",
+          'data-separator': ',',
           'data-mapping-tip' : 'field'
         });
         var groupMapping = $('#XWiki\\.XWikiPreferences_0_ldap_group_mapping');
@@ -419,9 +397,11 @@ require(['jquery'], function($) {
           if (separator) {
             options.separator = separator;
           }
-          new XWiki.widgets.PropertiesEditor(this, options);
+          textareaToInputList(this);
         });
+        bindPropertyEvents();
       };
+
       var checkConnection = function() {
         // inject a button to check in real time the connection to AD server
         $('.activeDirectoryConnection').after("&lt;div id='checkConnection'&gt;&lt;button class='btn btn-primary'&gt;$services.localization.render('activeDirectory.checkConnection')&lt;/button&gt;&lt;br&gt;&lt;br&gt;&lt;div&gt;&lt;/div&gt;&lt;/div&gt;&lt;br&gt;")
@@ -448,6 +428,7 @@ require(['jquery'], function($) {
           });
         });
       };
+
       var toggleAdvancedConfiguration = function() {
         // Toggle Show/Hide advanced configuration buttons
         var show = $('#advancedConfigShow');
@@ -466,6 +447,7 @@ require(['jquery'], function($) {
           show.show();
         });
       };
+
       var resetGroupCache = function() {
         // Reset Group Cache.
         var resetGroupCache = $('#resetGroupCache');
@@ -487,9 +469,10 @@ require(['jquery'], function($) {
         resetGroupCache: resetGroupCache
       };
     })();
-    feature.loadPropertiesEditor();
+
     feature.checkConnection();
     feature.toggleAdvancedConfiguration();
+    feature.loadPropertiesEditor();
     feature.resetGroupCache();
   });
 });</code>
@@ -602,7 +585,7 @@ require(['jquery'], function($) {
       <cache>long</cache>
     </property>
     <property>
-      <code>dd.property span.remove {
+      <code>div.property span.removeProperty {
   display: inline-block;
   min-height: 30px;
   min-width: 20px;
@@ -610,7 +593,7 @@ require(['jquery'], function($) {
   cursor:pointer;
 }
 
-span.new-entry {
+span.addProperty {
   font-size: 0.8em;
   background:url($xwiki.getSkinFile('icons/silk/add.png')) no-repeat scroll 0 0 transparent;
   padding-left:20px;
@@ -622,6 +605,10 @@ span.new-entry {
 }
 
 .activeDirectoryConfigurationAdvanced dl {
+  display: none;
+}
+#XWiki\.XWikiPreferences_0_ldap_group_mapping,
+#XWiki\.XWikiPreferences_0_ldap_fields_mapping {
   display: none;
 }
 
@@ -639,11 +626,6 @@ span.new-entry {
 }
 #checkConnection .xwikirenderingerror {
   cursor: pointer;
-}
-/* Use the full content to display the configuration (https://github.com/xwikisas/application-activedirectory/issues/8)
-   Remove this code when Active Directory will use XWiki 9.2 or greater. */
-#activedirectory_XWiki\.XWikiPreferences.half {
-  width: 100%;
 }</code>
     </property>
     <property>
