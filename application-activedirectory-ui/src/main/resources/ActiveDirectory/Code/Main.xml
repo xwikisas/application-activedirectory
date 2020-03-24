@@ -402,7 +402,6 @@
             options.separator = separator;
           }
           textareaToInputList(this);
-          //new XWiki.widgets.PropertiesEditor(this, options);
         });
         bindPropertyEvents();
       };
