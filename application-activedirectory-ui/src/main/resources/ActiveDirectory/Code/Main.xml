@@ -398,80 +398,99 @@
 
 require(['jquery'], function($) {
   $(document).ready(function() {
-    var fieldMapping = $('#XWiki\\.XWikiPreferences_0_ldap_fields_mapping');
-    fieldMapping.attr({
-      'data-key-tip'  : "${escapetool.javascript($services.localization.render('activeDirectory.xWikiUserProperty.placeholder'))}",
-      'data-value-tip': "${escapetool.javascript($services.localization.render('activeDirectory.aDUserField.placeholder'))}",
-      'data-mapping-tip' : 'field'
-    });
-    var groupMapping = $('#XWiki\\.XWikiPreferences_0_ldap_group_mapping');
-    groupMapping.attr({
-      'data-key-tip'  : "${escapetool.javascript($services.localization.render('activeDirectory.xWikiGroup.placeholder'))}",
-      'data-value-tip': "${escapetool.javascript($services.localization.render('activeDirectory.aDGroup.placehoder'))}",
-      'data-separator': '|',
-      'data-mapping-tip' : 'group'
-    });
-    $.each([fieldMapping, groupMapping], function() {
-      var options = {};
-      var separator = this.attr('data-separator');
-      if (separator) {
-        options.separator = separator;
-      }
-      new XWiki.widgets.PropertiesEditor(this, options);
-    });
-    // inject a button to check in real time the connection to AD server
-    $('.activeDirectoryConnection').after("&lt;div id='checkConnection'&gt;&lt;button class='btn btn-primary'&gt;$services.localization.render('activeDirectory.checkConnection')&lt;/button&gt;&lt;br&gt;&lt;br&gt;&lt;div&gt;&lt;/div&gt;&lt;/div&gt;&lt;br&gt;")
-    $('#checkConnection button').click(function(event) {
-      event.preventDefault();
-      var connectionData = $('.activeDirectoryConnection input').serializeArray();
-      $.post({
-        url : new XWiki.Document('Actions', 'ActiveDirectory.Code').getURL('get', 'checkConnection=true'),
-        data: $.param(connectionData)
-      }).done(function(data) {
-        $('#checkConnection button').siblings('div').html(data);
-      }).fail(function(data) {
-        $('#checkConnection button').siblings('div').html(data.responseText);
-        $('#checkConnection .xwikirenderingerror').click(function() {
-          $(this).siblings('.xwikirenderingerrordescription').toggleClass('hidden');
+    var feature = (function () {
+      var loadPropertiesEditor = function() {
+        var fieldMapping = $('#XWiki\\.XWikiPreferences_0_ldap_fields_mapping');
+        fieldMapping.attr({
+          'data-key-tip'  : "${escapetool.javascript($services.localization.render('activeDirectory.xWikiUserProperty.placeholder'))}",
+          'data-value-tip': "${escapetool.javascript($services.localization.render('activeDirectory.aDUserField.placeholder'))}",
+          'data-mapping-tip' : 'field'
         });
-      }).always(function() {
-        // Save the form data introduced by the user upon the Check connection step.
-        var adForm = $('#activedirectory_XWiki\\.XWikiPreferences');
-        $.post({
-          url: adForm.attr('action'),
-          data: adForm.serializeArray()
+        var groupMapping = $('#XWiki\\.XWikiPreferences_0_ldap_group_mapping');
+        groupMapping.attr({
+          'data-key-tip'  : "${escapetool.javascript($services.localization.render('activeDirectory.xWikiGroup.placeholder'))}",
+          'data-value-tip': "${escapetool.javascript($services.localization.render('activeDirectory.aDGroup.placehoder'))}",
+          'data-separator': '|',
+          'data-mapping-tip' : 'group'
         });
-      });
-    });
-    // Toggle Show/Hide advanced configuration buttons
-    var show = $('#advancedConfigShow');
-    var hide = $('#advancedConfigHide');
-    var dl = $('.activeDirectoryConfigurationAdvanced dl');
-    show.click(function(event) {
-      event.preventDefault();
-      dl.show();
-      $(this).hide();
-      hide.show();
-    });
-    hide.click(function(event) {
-      event.preventDefault();
-      dl.hide();
-      $(this).hide();
-      show.show();
-    });
-
-    // Reset Group Cache.
-    var resetGroupCache = $('#resetGroupCache');
-    var resetGroupCacheSuccess = resetGroupCache.siblings('.successmessage');
-    resetGroupCache.click(function() {
-      $.post({
-        url : new XWiki.Document('Actions', 'ActiveDirectory.Code').getURL('get', 'outputSyntax=plain&amp;resetGroupCache=true'),
-        success: function(data) {
-          resetGroupCacheSuccess.html(data.message);
-          resetGroupCacheSuccess.removeClass('hidden');
-        }
-      })
-    });
+        $.each([fieldMapping, groupMapping], function() {
+          var options = {};
+          var separator = this.attr('data-separator');
+          if (separator) {
+            options.separator = separator;
+          }
+          new XWiki.widgets.PropertiesEditor(this, options);
+        });
+      };
+      var checkConnection = function() {
+        // inject a button to check in real time the connection to AD server
+        $('.activeDirectoryConnection').after("&lt;div id='checkConnection'&gt;&lt;button class='btn btn-primary'&gt;$services.localization.render('activeDirectory.checkConnection')&lt;/button&gt;&lt;br&gt;&lt;br&gt;&lt;div&gt;&lt;/div&gt;&lt;/div&gt;&lt;br&gt;")
+        $('#checkConnection button').click(function(event) {
+          event.preventDefault();
+          var connectionData = $('.activeDirectoryConnection input').serializeArray();
+          $.post({
+            url : new XWiki.Document('Actions', 'ActiveDirectory.Code').getURL('get', 'checkConnection=true'),
+            data: $.param(connectionData)
+          }).done(function(data) {
+            $('#checkConnection button').siblings('div').html(data);
+          }).fail(function(data) {
+            $('#checkConnection button').siblings('div').html(data.responseText);
+            $('#checkConnection .xwikirenderingerror').click(function() {
+              $(this).siblings('.xwikirenderingerrordescription').toggleClass('hidden');
+            });
+          }).always(function() {
+            // Save the form data introduced by the user upon the Check connection step.
+            var adForm = $('#activedirectory_XWiki\\.XWikiPreferences');
+            $.post({
+              url: adForm.attr('action'),
+              data: adForm.serializeArray()
+            });
+          });
+        });
+      };
+      var toggleAdvancedConfiguration = function() {
+        // Toggle Show/Hide advanced configuration buttons
+        var show = $('#advancedConfigShow');
+        var hide = $('#advancedConfigHide');
+        var dl = $('.activeDirectoryConfigurationAdvanced dl');
+        show.click(function(event) {
+          event.preventDefault();
+          dl.show();
+          $(this).hide();
+          hide.show();
+        });
+        hide.click(function(event) {
+          event.preventDefault();
+          dl.hide();
+          $(this).hide();
+          show.show();
+        });
+      };
+      var resetGroupCache = function() {
+        // Reset Group Cache.
+        var resetGroupCache = $('#resetGroupCache');
+        var resetGroupCacheSuccess = resetGroupCache.siblings('.successmessage');
+        resetGroupCache.click(function() {
+          $.post({
+            url : new XWiki.Document('Actions', 'ActiveDirectory.Code').getURL('get', 'outputSyntax=plain&amp;resetGroupCache=true'),
+            success: function(data) {
+              resetGroupCacheSuccess.html(data.message);
+              resetGroupCacheSuccess.removeClass('hidden');
+            }
+          });
+        });
+      };
+      return {
+        loadPropertiesEditor: loadPropertiesEditor,
+        checkConnection: checkConnection,
+        toggleAdvancedConfiguration: toggleAdvancedConfiguration,
+        resetGroupCache: resetGroupCache
+      };
+    })();
+    feature.loadPropertiesEditor();
+    feature.checkConnection();
+    feature.toggleAdvancedConfiguration();
+    feature.resetGroupCache();
   });
 });</code>
     </property>
