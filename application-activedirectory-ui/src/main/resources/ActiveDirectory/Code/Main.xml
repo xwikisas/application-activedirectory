@@ -121,31 +121,38 @@
           #set ($fields = $paramsSection.value)
           #set ($sectionName = $paramsSection.key)
           &lt;fieldset class="$sectionName"&gt;
-          ## If there is only one section, don't display the legend
-          #if ($params.size() &gt; 1)
-            &lt;legend&gt;$services.localization.render("admin.$sectionName")
-              #if ($sectionName == 'activeDirectoryConfigurationAdvanced')
-                &lt;a id="advancedConfigShow"&gt;$services.localization.render('admin.activeDirectoryConfigurationAdvanced.show')&lt;/a&gt;
-                &lt;a id="advancedConfigHide"&gt;$services.localization.render('admin.activeDirectoryConfigurationAdvanced.hide')&lt;/a&gt;
-              #end
-            &lt;/legend&gt;
-          #end
-          &lt;dl&gt;
-            #foreach ($field in $fields.entrySet())
-              #set ($prop = $configClass.get($field.key))
-              #set ($title = $services.localization.render("${configObj.xWikiClass.name}_${prop.name}"))
-              #set ($hint = $services.localization.render("${configObj.xWikiClass.name}_${prop.name}.hint"))
-              &lt;dt&gt;
-                &lt;label for="${configClassName}_${configObj.number}_${prop.name}" class="$prop.name"&gt;$title&lt;/label&gt;
-                #if ($hint)&lt;span class="xHint"&gt;$hint&lt;/span&gt;#end
-              &lt;/dt&gt;
-              &lt;dd&gt;
-                #displaySelectField($prop $field.value)
-                ## TODO: when https://jira.xwikisas.com/browse/ADAPP-30 is implemented, replace $field.value
-                ## with the default taken from the script service
-              &lt;dt&gt;
+            ## If there is only one section, don't display the legend
+            #if ($params.size() &gt; 1)
+              &lt;legend&gt;$services.localization.render("admin.$sectionName")
+                #if ($sectionName == 'activeDirectoryConfigurationAdvanced')
+                  &lt;a id="advancedConfigShow"&gt;$services.localization.render('admin.activeDirectoryConfigurationAdvanced.show')&lt;/a&gt;
+                  &lt;a id="advancedConfigHide"&gt;$services.localization.render('admin.activeDirectoryConfigurationAdvanced.hide')&lt;/a&gt;
+                #end
+              &lt;/legend&gt;
             #end
-          &lt;/dl&gt;
+            &lt;dl&gt;
+              #foreach ($field in $fields.entrySet())
+                #set ($prop = $configClass.get($field.key))
+                #set ($title = $services.localization.render("${configObj.xWikiClass.name}_${prop.name}"))
+                #set ($hint = $services.localization.render("${configObj.xWikiClass.name}_${prop.name}.hint"))
+                &lt;dt&gt;
+                  &lt;label for="${configClassName}_${configObj.number}_${prop.name}" class="$prop.name"&gt;$title&lt;/label&gt;
+                  #if ($hint)&lt;span class="xHint"&gt;$hint&lt;/span&gt;#end
+                &lt;/dt&gt;
+                &lt;dd&gt;
+                  #displaySelectField($prop $field.value)
+                  ## TODO: when https://jira.xwikisas.com/browse/ADAPP-30 is implemented, replace $field.value
+                  ## with the default taken from the script service
+                &lt;dt&gt;
+              #end
+            &lt;/dl&gt;
+            #if ($paramsSection.key.equals('activeDirectoryConnection'))
+              &lt;div id='checkConnection'&gt;
+                &lt;button class='btn btn-primary'&gt;
+                  $services.localization.render('activeDirectory.checkConnection')
+                &lt;/button&gt;
+              &lt;/div&gt;
+            #end
           &lt;/fieldset&gt;
         #end
         &lt;div class="hidden"&gt;
@@ -293,9 +300,7 @@
             'type': 'text',
             'class': 'key',
             'value': xWikiValue,
-            'placeholder': dataset.keyTip,
-            'style': 'width:45%' // Somewhat magic number to make the 2 fields + separator and red cross fit.
-                                 // FIXME need to refactor this to use flexible box model when available.
+            'placeholder': dataset.keyTip
         });
         var suggestQueryString = 'outputSyntax=plain&amp;list=xwiki-' + dataset.mappingTip;
         var xWikiInputSuggest = new XWiki.widgets.Suggest(xWikiInput, {
@@ -311,8 +316,7 @@
             'type': 'text',
             'class': 'value',
             'value': aDValue,
-            'placeholder': dataset.valueTip,
-            'style': 'width:45%'
+            'placeholder': dataset.valueTip
           });
         var inputsWrapper = new Element('div', {'class': 'property'})
           .insert(xWikiInput)
@@ -398,13 +402,12 @@
             options.separator = separator;
           }
           textareaToInputList(this);
+          //new XWiki.widgets.PropertiesEditor(this, options);
         });
         bindPropertyEvents();
       };
 
       var checkConnection = function() {
-        // inject a button to check in real time the connection to AD server
-        $('.activeDirectoryConnection').after("&lt;div id='checkConnection'&gt;&lt;button class='btn btn-primary'&gt;$services.localization.render('activeDirectory.checkConnection')&lt;/button&gt;&lt;br&gt;&lt;br&gt;&lt;div&gt;&lt;/div&gt;&lt;/div&gt;&lt;br&gt;")
         $('#checkConnection button').click(function(event) {
           event.preventDefault();
           var connectionData = $('.activeDirectoryConnection input').serializeArray();
@@ -412,9 +415,9 @@
             url : new XWiki.Document('Actions', 'ActiveDirectory.Code').getURL('get', 'checkConnection=true'),
             data: $.param(connectionData)
           }).done(function(data) {
-            $('#checkConnection button').siblings('div').html(data);
+            $('#checkConnection').append(data);
           }).fail(function(data) {
-            $('#checkConnection button').siblings('div').html(data.responseText);
+            $('#checkConnection').append(data.responseText);
             $('#checkConnection .xwikirenderingerror').click(function() {
               $(this).siblings('.xwikirenderingerrordescription').toggleClass('hidden');
             });
@@ -602,6 +605,10 @@ span.addProperty {
   min-height:20px;
   margin-top:5px;
   cursor:pointer;
+}
+
+.property input[type='text'] {
+  width: 45%;
 }
 
 .activeDirectoryConfigurationAdvanced dl {
