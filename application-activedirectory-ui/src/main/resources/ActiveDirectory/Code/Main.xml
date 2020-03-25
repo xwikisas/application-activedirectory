@@ -364,7 +364,11 @@
         }
         if (oldValue === '' &amp;&amp; propertyPairValue === '') {
           // Create new property.
-          content = content + separator + newValue + '=';
+          if (input.hasClass('key')) {
+            content = content + separator + newValue + '=';
+          } else {
+            content = content + separator + '=' + newValue;
+          }
         } else {
           content = content.replace(oldContentToUpdate, newContentToUpdate);
         }
