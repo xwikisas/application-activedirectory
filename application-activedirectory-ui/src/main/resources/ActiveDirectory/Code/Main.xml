@@ -348,6 +348,7 @@
 
       var updateValueInTextarea = function(input) {
         var textarea = input.parent().parent().siblings('textarea');
+        var separator = textarea.data().separator;
         var content = textarea.val();
         var oldValue = input.data('oldValue');
         var newValue = input.val();
@@ -361,7 +362,12 @@
           oldContentToUpdate = propertyPairValue + '=' + oldValue;
           newContentToUpdate = propertyPairValue + '=' + newValue;
         }
-        content = content.replace(oldContentToUpdate, newContentToUpdate);
+        if (oldValue === '' &amp;&amp; propertyPairValue === '') {
+          // Create new property.
+          content = content + separator + newValue + '=';
+        } else {
+          content = content.replace(oldContentToUpdate, newContentToUpdate);
+        }
         textarea.text(content);
       };
 
