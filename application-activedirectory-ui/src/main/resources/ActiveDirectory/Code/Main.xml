@@ -340,36 +340,43 @@
         });
         $('.activeDirectoryConfigurationAdvanced').on('focus', '.properties input', function() {
           var oldValue = $(this).val();
-          $(this).data('oldValue', oldValue);
-        }).on('change', '.properties input', function() {
+          // Make sure the old value is stored on the first focus on input.
+          // In the case of suggestions, the focus on input can occur twice.
+          if (typeof $(this).data('oldValue') == 'undefined') {
+            $(this).data('oldValue', oldValue);
+          }
+        }).on('focusout', '.properties input', function() {
           updateValueInTextarea($(this));
         });
       };
 
       var updateValueInTextarea = function(input) {
         var textarea = input.parent().parent().siblings('textarea');
-        var separator = textarea.data().separator;
         var content = textarea.val();
         var oldValue = input.data('oldValue');
         var newValue = input.val();
+        // Update the oldValue data with the newValue, for the suggest inputs.
+        input.data('oldValue', newValue);
         var propertyPairValue = input.siblings('input').val();
-        var oldContentToUpdate = '';
-        var newContentToUpdate = '';
-        if (input.hasClass('key')) {
-          oldContentToUpdate = oldValue + '=' + propertyPairValue;
-          newContentToUpdate = newValue + '=' + propertyPairValue;
-        } else {
-          oldContentToUpdate = propertyPairValue + '=' + oldValue;
-          newContentToUpdate = propertyPairValue + '=' + newValue;
-        }
         if (oldValue === '' &amp;&amp; propertyPairValue === '') {
           // Create new property.
+          var separator = textarea.data().separator;
           if (input.hasClass('key')) {
             content = content + separator + newValue + '=';
           } else {
             content = content + separator + '=' + newValue;
           }
         } else {
+          // Update existing property.
+          var oldContentToUpdate = '';
+          var newContentToUpdate = '';
+          if (input.hasClass('key')) {
+            oldContentToUpdate = oldValue + '=' + propertyPairValue;
+            newContentToUpdate = newValue + '=' + propertyPairValue;
+          } else {
+            oldContentToUpdate = propertyPairValue + '=' + oldValue;
+            newContentToUpdate = propertyPairValue + '=' + newValue;
+          }
           content = content.replace(oldContentToUpdate, newContentToUpdate);
         }
         textarea.text(content);
@@ -406,11 +413,6 @@
           'data-mapping-tip' : 'group'
         });
         $.each([fieldMapping, groupMapping], function() {
-          var options = {};
-          var separator = this.attr('data-separator');
-          if (separator) {
-            options.separator = separator;
-          }
           textareaToInputList(this);
         });
         bindPropertyEvents();
