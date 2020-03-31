@@ -294,7 +294,9 @@
       var createPropertyEntry = function(property, dataset, parent) {
         var propertyValues = property.split('=');
         var xWikiValue = propertyValues[0] || '';
-        var aDValue = propertyValues[1] || '';
+        // The AD group value contains '=' so, in order to preserve it, replace the xWikiValue from the initial
+        // property value.
+        var aDValue = property.replace(xWikiValue + '=', '') || '';
         var xWikiInput = new Element(
           'input', {
             'type': 'text',
