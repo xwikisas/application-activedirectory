@@ -281,13 +281,13 @@
         var dataset = textarea.data();
         var separator = dataset.separator;
         var properties = content.split(separator);
-        var textareaParent = textarea.parent();
+        var textareaParent = textarea.parent().get(0);
         var propertiesParent = new Element('div', {'class': 'properties'});
-        textareaParent.append(propertiesParent);
+        textareaParent.appendChild(propertiesParent);
         $.each(properties, function(key, value) {
           createPropertyEntry(value, dataset, propertiesParent);
         });
-        textareaParent.append(new Element('span', {'class': 'addProperty'})
+        textareaParent.appendChild(new Element('span', {'class': 'addProperty'})
           .update("${escapetool.javascript($services.localization.render('activeDirectory.newEntry.title'))}"));
       };
 
@@ -325,7 +325,7 @@
           .insert(' \u2192 ')
           .insert(aDInput)
           .insert(new Element('span', {'class': 'removeProperty'}));
-        parent.append(inputsWrapper);
+        parent.appendChild(inputsWrapper);
       };
 
       var bindPropertyEvents = function() {
@@ -428,9 +428,13 @@
             url : new XWiki.Document('Actions', 'ActiveDirectory.Code').getURL('get', 'checkConnection=true'),
             data: $.param(connectionData)
           }).done(function(data) {
-            $('#checkConnection').append(data);
+            var div = new Element('div');
+            div.innerHTML = data;
+            $('#checkConnection').get(0).appendChild(div);
           }).fail(function(data) {
-            $('#checkConnection').append(data.responseText);
+            var div = new Element('div');
+            div.innerHTML = data.responseText;
+            $('#checkConnection').get(0).appendChild(div);
             $('#checkConnection .xwikirenderingerror').click(function() {
               $(this).siblings('.xwikirenderingerrordescription').toggleClass('hidden');
             });
