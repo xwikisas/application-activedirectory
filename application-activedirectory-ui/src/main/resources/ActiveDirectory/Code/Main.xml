@@ -281,14 +281,16 @@
         var dataset = textarea.data();
         var separator = dataset.separator;
         var properties = content.split(separator);
-        var textareaParent = textarea.parent().get(0);
-        var propertiesParent = new Element('div', {'class': 'properties'});
-        textareaParent.appendChild(propertiesParent);
+        var textareaParent = textarea.parent();
+        var propertiesParent = $('&lt;div class="properties"/&gt;');
+        textareaParent.append(propertiesParent);
         $.each(properties, function(key, value) {
           createPropertyEntry(value, dataset, propertiesParent);
         });
-        textareaParent.appendChild(new Element('span', {'class': 'addProperty'})
-          .update("${escapetool.javascript($services.localization.render('activeDirectory.newEntry.title'))}"));
+        var addPropertyButton = $('&lt;span class="addProperty"/&gt;');
+        addPropertyButton
+          .html("${escapetool.javascript($services.localization.render('activeDirectory.newEntry.title'))}");
+        textareaParent.append(addPropertyButton);
       };
 
       var createPropertyEntry = function(property, dataset, parent) {
@@ -297,15 +299,10 @@
         // The AD group value contains '=' so, in order to preserve it, replace the xWikiValue from the initial
         // property value.
         var aDValue = property.replace(xWikiValue + '=', '') || '';
-        var xWikiInput = new Element(
-          'input', {
-            'type': 'text',
-            'class': 'key',
-            'value': xWikiValue,
-            'placeholder': dataset.keyTip
-        });
+        var xWikiInput = $('&lt;input type="text" class="key" value="'
+                           + xWikiValue + '" placeholder="' + dataset.keyTip + '"/&gt;');
         var suggestQueryString = 'outputSyntax=plain&amp;list=xwiki-' + dataset.mappingTip;
-        var xWikiInputSuggest = new XWiki.widgets.Suggest(xWikiInput, {
+        var xWikiInputSuggest = new XWiki.widgets.Suggest(xWikiInput.get(0), {
           'script': new XWiki.Document('SuggestLists', 'ActiveDirectory.Code').getURL('get', suggestQueryString),
           'varname': 'q',
           'noresults': 'No results',
@@ -313,19 +310,16 @@
           'resultsParameter': 'results',
           'resultValue': 'value'
         });
-        var aDInput = new Element(
-          'input', {
-            'type': 'text',
-            'class': 'value',
-            'value': aDValue,
-            'placeholder': dataset.valueTip
-          });
-        var inputsWrapper = new Element('div', {'class': 'property'})
-          .insert(xWikiInput)
-          .insert(' \u2192 ')
-          .insert(aDInput)
-          .insert(new Element('span', {'class': 'removeProperty'}));
-        parent.appendChild(inputsWrapper);
+        var aDInput = $('&lt;input type="text" class="value" value="'
+                        + aDValue + '" placeholder="' + dataset.valueTip + '"/&gt;');
+        var inputsWrapper = $('&lt;div class="property"/&gt;');
+        var removePropertyButton = $('&lt;span class="removeProperty"/&gt;');
+        inputsWrapper
+          .append(xWikiInput)
+          .append(' \u2192 ')
+          .append(aDInput)
+          .append(removePropertyButton);
+        parent.append(inputsWrapper);
       };
 
       var bindPropertyEvents = function() {
@@ -428,13 +422,9 @@
             url : new XWiki.Document('Actions', 'ActiveDirectory.Code').getURL('get', 'checkConnection=true'),
             data: $.param(connectionData)
           }).done(function(data) {
-            var div = new Element('div');
-            div.innerHTML = data;
-            $('#checkConnection').get(0).appendChild(div);
+            $('#checkConnection').append(data);
           }).fail(function(data) {
-            var div = new Element('div');
-            div.innerHTML = data.responseText;
-            $('#checkConnection').get(0).appendChild(div);
+            $('#checkConnection').append(data.responseText);
             $('#checkConnection .xwikirenderingerror').click(function() {
               $(this).siblings('.xwikirenderingerrordescription').toggleClass('hidden');
             });
