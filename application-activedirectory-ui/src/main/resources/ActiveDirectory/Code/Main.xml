@@ -299,8 +299,12 @@
         // The AD group value contains '=' so, in order to preserve it, replace the xWikiValue from the initial
         // property value.
         var aDValue = property.replace(xWikiValue + '=', '') || '';
-        var xWikiInput = $('&lt;input type="text" class="key" value="'
-                           + xWikiValue + '" placeholder="' + dataset.keyTip + '"/&gt;');
+        var xWikiInput = $('&lt;input/&gt;').attr({
+          'type': 'text',
+          'class': 'key',
+          'value': xWikiValue,
+          'placeholder': dataset.keyTip
+        });
         var suggestQueryString = 'outputSyntax=plain&amp;list=xwiki-' + dataset.mappingTip;
         var xWikiInputSuggest = new XWiki.widgets.Suggest(xWikiInput.get(0), {
           'script': new XWiki.Document('SuggestLists', 'ActiveDirectory.Code').getURL('get', suggestQueryString),
@@ -310,8 +314,12 @@
           'resultsParameter': 'results',
           'resultValue': 'value'
         });
-        var aDInput = $('&lt;input type="text" class="value" value="'
-                        + aDValue + '" placeholder="' + dataset.valueTip + '"/&gt;');
+         var aDInput = $('&lt;input/&gt;').attr({
+          'type': 'text',
+          'class': 'value',
+          'value': aDValue,
+          'placeholder': dataset.valueTip
+        });
         var inputsWrapper = $('&lt;div class="property"/&gt;');
         var removePropertyButton = $('&lt;span class="removeProperty"/&gt;');
         inputsWrapper
