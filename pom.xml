@@ -29,7 +29,7 @@
   </parent>
   <groupId>com.xwiki.activedirectory</groupId>
   <artifactId>application-activedirectory</artifactId>
-  <version>1.8.2</version>
+  <version>1.8.3-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>Active Directory - Parent POM</name>
   <description>Application to manipulate Active Directory in XWiki.</description>
@@ -74,6 +74,6 @@
     <connection>scm:git:git://github.com/xwikisas/application-activedirectory.git</connection>
     <developerConnection>scm:git:git@github.com:xwikisas/application-activedirectory.git</developerConnection>
     <url>https://github.com/xwikisas/application-activedirectory/tree/master</url>
-    <tag>application-activedirectory-1.8.2</tag>
+    <tag>HEAD</tag>
   </scm>
 </project>
