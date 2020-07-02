@@ -151,6 +151,7 @@
                 &lt;button class='btn btn-primary'&gt;
                   $services.localization.render('activeDirectory.checkConnection')
                 &lt;/button&gt;
+                &lt;span class="xHint"&gt;$services.localization.render('activeDirectory.checkConnection.hint')&lt;/span&gt;
                 &lt;div id="checkConnectionResponse"&gt;&lt;/div&gt;
               &lt;/div&gt;
             #end

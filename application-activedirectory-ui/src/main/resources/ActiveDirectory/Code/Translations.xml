@@ -60,6 +60,7 @@ activeDirectory.resetGroupCacheSuccess=Groups cache has been reset.
 activeDirectory.newEntry.title=New Entry
 activeDirectory.checkConnection=Check connection
 activeDirectory.checkConnection.error=Failed to connect to the Active Directory server! Click on this message for details and contact sales@xwiki.com.
+activeDirectory.checkConnection.hint=To check the connection for the current setup, the data needs to be saved first. This action will be handle by the "Check connection" button when clicked.
 activeDirectory.checkConnection.success=Test connection succeeded!
 activeDirecfory.config.initializationComment=Configuration initialized with the default values.
 

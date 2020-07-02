@@ -60,6 +60,7 @@ activeDirectory.resetGroupCacheSuccess=Le cache de groupe a été remis à zéro
 activeDirectory.newEntry.title=Nouvelle entrée
 activeDirectory.checkConnection=Vérifier connexion
 activeDirectory.checkConnection.error=Echec de la connexion au serveur Active Directory ! Cliquez sur ce message pour plus de détails et contactez sales@xwiki.com.
+activeDirectory.checkConnection.hint=Pour vérifier la connexion pour la configuration actuelle, les données doivent d'abord être enregistrées. Cette action sera gérée par le bouton "Vérifier connexion" lorsque vous cliquez dessus.
 activeDirectory.checkConnection.success=Réussite du test de connexion !
 activeDirecfory.config.initializationComment=Configuration initialisée avec les valeurs par défaut.
 
