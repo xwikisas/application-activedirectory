@@ -350,6 +350,12 @@
             $(this).data('oldValue', oldValue);
           }
         }).on('focusout', '.properties input', function() {
+          // Make sure that half mappings are not accepted.
+          if ($(this).val()) {
+            $(this).siblings('input').prop('required', true);
+          } else {
+            $(this).siblings('input').prop('required', false);
+          }
           updateValueInTextarea($(this));
         });
       };
@@ -357,18 +363,23 @@
       var updateValueInTextarea = function(input) {
         var textarea = input.parent().parent().siblings('textarea');
         var content = textarea.val();
+        var separator = textarea.data().separator;
         var oldValue = input.data('oldValue');
         var newValue = input.val();
         // Update the oldValue data with the newValue, for the suggest inputs.
         input.data('oldValue', newValue);
         var propertyPairValue = input.siblings('input').val();
         if (oldValue === '' &amp;&amp; propertyPairValue === '') {
-          // Create new property.
-          var separator = textarea.data().separator;
-          if (input.hasClass('key')) {
-            content = content + separator + newValue + '=';
-          } else {
-            content = content + separator + '=' + newValue;
+          if (newValue !== '') {
+            // Create new property.
+            if (content !== '') {
+              content = content + separator;
+            }
+            if (input.hasClass('key')) {
+              content = content + newValue + '=';
+            } else {
+              content = content + '=' + newValue;
+            }
           }
         } else {
           // Update existing property.
@@ -382,6 +393,14 @@
             newContentToUpdate = propertyPairValue + '=' + newValue;
           }
           content = content.replace(oldContentToUpdate, newContentToUpdate);
+        }
+        // Delete the leftover separator from a cleared mapping, from the end.
+        if(content.endsWith(separator + '=')) {
+          content = content.substr(0, content.length - 2);
+        }
+        // Delete the leftover separator from a cleared mapping, from the beginning.
+        if (content.startsWith('=' + separator)) {
+          content = content.substr(2, content.length);
         }
         textarea.text(content);
       };
