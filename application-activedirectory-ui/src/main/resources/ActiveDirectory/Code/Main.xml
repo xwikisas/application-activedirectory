@@ -151,6 +151,7 @@
                 &lt;button class='btn btn-primary'&gt;
                   $services.localization.render('activeDirectory.checkConnection')
                 &lt;/button&gt;
+                &lt;div id="checkConnectionResponse"&gt;&lt;/div&gt;
               &lt;/div&gt;
             #end
           &lt;/fieldset&gt;
@@ -443,16 +444,18 @@
 
       var checkConnection = function() {
         $('#checkConnection button').click(function(event) {
+          // For multiple checks, clear the response first.
+          $('#checkConnectionResponse').empty();
           event.preventDefault();
           var connectionData = $('.activeDirectoryConnection input').serializeArray();
           $.post({
             url : new XWiki.Document('Actions', 'ActiveDirectory.Code').getURL('get', 'checkConnection=true'),
             data: $.param(connectionData)
           }).done(function(data) {
-            $('#checkConnection').append(data);
+            $('#checkConnectionResponse').html(data);
           }).fail(function(data) {
-            $('#checkConnection').append(data.responseText);
-            $('#checkConnection .xwikirenderingerror').click(function() {
+            $('#checkConnectionResponse').html(data.responseText);
+            $('#checkConnectionResponse .xwikirenderingerror').click(function() {
               $(this).siblings('.xwikirenderingerrordescription').toggleClass('hidden');
             });
           }).always(function() {
