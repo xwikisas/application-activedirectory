@@ -51,14 +51,23 @@
   #else
     #set ($options = [])
     #if ($prop.classType == 'Boolean')
-      #set ($discard = $options.add({'value': 1, 'label': 'yes'}))
-      #set ($discard = $options.add({'value': 0, 'label': 'no'}))
+      #if ($prop.name == 'ldap_ssl')
+        #set ($discard = $options.add({'value': 0, 'label': 'no'}))
+        #set ($discard = $options.add({'value': 1, 'label': 'yes'}))
+      #else
+        #set ($discard = $options.add({'value': 1, 'label': 'yes'}))
+        #set ($discard = $options.add({'value': 0, 'label': 'no'}))
+      #end
     #else
       #foreach($v in $prop.listValues)
         #set ($discard = $options.add({'value': $v, 'label': "XWiki.XWikiPreferences_${prop.name}_${v}"}))
       #end
     #end
-    &lt;select name="XWiki.XWikiPreferences_0_${prop.name}" id="XWiki.XWikiPreferences_0_${prop.name}"&gt;
+    #if ($prop.name == 'ldap_ssl')
+      &lt;select name="${adConfigClassName}_0_${prop.name}" id="${adConfigClassName}_0_${prop.name}"&gt;
+    #else
+      &lt;select name="${configClassName}_0_${prop.name}" id="${configClassName}_0_${prop.name}"&gt;
+    #end
       #foreach ($option in $options)
         &lt;option value="$option.value" #if($value == $option.value)selected="selected"#end&gt;
           $services.localization.render($option.label)
@@ -73,6 +82,8 @@
 #macro (displayMainForm)
   #set ($configClassName = 'XWiki.XWikiPreferences')
   #set ($configClass = $xwiki.getClass($configClassName))
+  #set ($adConfigClassName = 'ActiveDirectory.Code.ActiveDirectoryConfigClass')
+  #set ($adConfigClass = $xwiki.getClass($adConfigClassName))
   #set ($mandatoryFields = ['ldap_server', 'ldap_port', 'ldap_bind_DN', 'ldap_bind_pass', 'ldap_base_DN'])
   #set ($params = {
     'activeDirectoryConnection': {'ldap_server'    : '127.0.0.1',
@@ -105,10 +116,18 @@
         #end
       #end
     #end
+    #set ($newAdConfigObj = $configDoc.newObject($adConfigClassName))
+    #set ($discard = $newAdConfigObj.set('ldap_ssl', 0))
     #set ($discard = $configDoc.setHidden(true))
     #set ($discard = $configDoc.save($services.localization.render('activeDirecfory.config.initializationComment'), 'true'))
   #end
   #set ($configObj = $configDoc.getObject($configClassName))
+  #set ($adConfigObj = $configDoc.getObject($adConfigClassName))
+  ## Backwards compatibility for versions that do not have the ActiveDirectoryConfigClass object.
+  #if (!$adConfigObj)
+    #set ($adConfigObj = $configDoc.newObject($adConfigClassName))
+    #set ($discard = $configDoc.save())
+  #end
   #if ("$!section" != '')
     #set ($discard = $xwiki.jsx.use('ActiveDirectory.Code.Main'))
     #set ($discard = $xwiki.ssx.use('ActiveDirectory.Code.Main'))
@@ -147,6 +166,18 @@
               #end
             &lt;/dl&gt;
             #if ($paramsSection.key.equals('activeDirectoryConnection'))
+              #set ($prop = $adConfigClass.get('ldap_ssl'))
+              #set ($title = $services.localization.render("ActiveDirectory.Code.ActiveDirectoryConfigClass_${prop.name}"))
+              #set ($hint = $services.localization.render("ActiveDirectory.Code.ActiveDirectoryConfigClass_${prop.name}.hint"))
+              &lt;dl&gt;
+                &lt;dt&gt;
+                  &lt;label for="${adConfigClassName}_${adConfigObj.number}_${prop.name}" class="$prop.name"&gt;$title&lt;/label&gt;
+                  #if ($hint)&lt;span class="xHint"&gt;$hint&lt;/span&gt;#end
+                &lt;/dt&gt;
+                  &lt;dd&gt;
+                    #displaySelectField($prop '0')
+                  &lt;dt&gt;
+                &lt;/dl&gt;
               &lt;div id='checkConnection'&gt;
                 &lt;button class='btn btn-primary'&gt;
                   $services.localization.render('activeDirectory.checkConnection')

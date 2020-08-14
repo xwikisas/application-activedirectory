@@ -20,15 +20,21 @@
 package com.xwiki.activedirectory.internal;
 
 import java.security.Principal;
+import java.util.Arrays;
 
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.contrib.ldap.XWikiLDAPAuthServiceImpl;
 import org.xwiki.contrib.ldap.XWikiLDAPConfig;
 import org.xwiki.extension.InstalledExtension;
 import org.xwiki.extension.repository.InstalledExtensionRepository;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.SpaceReference;
 
+import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.user.api.XWikiAuthService;
 import com.xpn.xwiki.user.api.XWikiUser;
 import com.xpn.xwiki.user.impl.xwiki.XWikiAuthServiceImpl;
@@ -45,7 +51,12 @@ import com.xwiki.licensing.Licensor;
  */
 public class ActiveDirectoryAuthServiceImpl extends XWikiLDAPAuthServiceImpl
 {
+    private static final String LDAP_SSL = "ldap_ssl";
+
     private static final String EXTENSION_ID = "com.xwiki.activedirectory:application-activedirectory-api";
+
+    private static final SpaceReference AD_CODE_SPACE_REFERENCE =
+        new SpaceReference("xwiki", Arrays.asList("ActiveDirectory", "Code"));
 
     private Licensor licensor = Utils.getComponent(Licensor.class);
 
@@ -65,6 +76,20 @@ public class ActiveDirectoryAuthServiceImpl extends XWikiLDAPAuthServiceImpl
         xWikiLDAPConfig.setFinalProperty("ldap_update_user", "1");
         xWikiLDAPConfig.setFinalProperty("ldap_fields_mapping",
             "last_name=sn,first_name=givenName,email=mail,company=company,comment=comment,phone=mobile");
+
+        DocumentReference adConfigClassRef =
+            new DocumentReference("ActiveDirectoryConfigClass", AD_CODE_SPACE_REFERENCE);
+        DocumentReference adConfigRef = new DocumentReference("ActiveDirectoryConfig", AD_CODE_SPACE_REFERENCE);
+
+        try {
+            XWikiContext context = (XWikiContext) this.getExecutionContext().getProperty("xwikicontext");
+            XWiki xwiki = context.getWiki();
+            XWikiDocument adConfigDoc = xwiki.getDocument(adConfigRef, context);
+            BaseObject adConfigObj = adConfigDoc.getXObject(adConfigClassRef);
+            xWikiLDAPConfig.setFinalProperty(LDAP_SSL, adConfigObj.getStringValue(LDAP_SSL));
+        } catch (XWikiException e) {
+            e.printStackTrace();
+        }
 
         return xWikiLDAPConfig;
     }

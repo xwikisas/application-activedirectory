@@ -103,6 +103,9 @@ XWiki.XWikiPreferences_ldap_mode_group_sync.hint=The groups will be synchronized
 XWiki.XWikiPreferences_ldap_mode_group_sync_always=At each authentication of a user
 XWiki.XWikiPreferences_ldap_mode_group_sync_create=Upon creation of a user
 
+ActiveDirectory.Code.ActiveDirectoryConfigClass_ldap_ssl=Enable SSL connection to Active Directory server
+ActiveDirectory.Code.ActiveDirectoryConfigClass_ldap_ssl.hint=This is an optional configuration.Use it only if the Active Directory server is configured to support LDAP over SSL.
+
 ## FREE LICENSE
 admin.activedirectory=Active Directory
 admin.activedirectory.description=Configuration options to authenticate users against an Active Directory server.
