@@ -32,7 +32,6 @@
   <version>1.10-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>Active Directory - Parent POM</name>
-  <description>Application to manipulate Active Directory in XWiki.</description>
   <issueManagement>
     <system>GitHub</system>
     <url>https://github.com/xwikisas/application-activedirectory/issues</url>

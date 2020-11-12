@@ -30,7 +30,7 @@
   <artifactId>application-activedirectory-ui</artifactId>
   <packaging>xar</packaging>
   <name>Active Directory - UI</name>
-  <description>Authenticate users against an Active Directory server (LDAP). Note that this is a paying application.</description>
+  <description>Authenticate users against an Active Directory server (LDAP / LDAPS) with a simple configuration user interface. The app can be purchased individually or part of the XWiki Pro package. Try it free.</description>
   <properties>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Active Directory Application</xwiki.extension.name>
