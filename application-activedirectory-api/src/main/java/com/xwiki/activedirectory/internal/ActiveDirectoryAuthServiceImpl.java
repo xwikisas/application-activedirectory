@@ -86,7 +86,9 @@ public class ActiveDirectoryAuthServiceImpl extends XWikiLDAPAuthServiceImpl
             XWiki xwiki = context.getWiki();
             XWikiDocument adConfigDoc = xwiki.getDocument(adConfigRef, context);
             BaseObject adConfigObj = adConfigDoc.getXObject(adConfigClassRef);
-            xWikiLDAPConfig.setFinalProperty(LDAP_SSL, adConfigObj.getStringValue(LDAP_SSL));
+            if (adConfigObj != null) {
+                xWikiLDAPConfig.setFinalProperty(LDAP_SSL, adConfigObj.getStringValue(LDAP_SSL));
+            }
         } catch (XWikiException e) {
             e.printStackTrace();
         }
