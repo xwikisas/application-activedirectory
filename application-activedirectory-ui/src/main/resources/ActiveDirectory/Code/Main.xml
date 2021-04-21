@@ -482,20 +482,21 @@
           var connectionData = $('.activeDirectoryConnection input').serializeArray();
           $.post({
             url : new XWiki.Document('Actions', 'ActiveDirectory.Code').getURL('get', 'checkConnection=true'),
-            data: $.param(connectionData)
+            data: $.param(connectionData),
+            beforeSend: function() {
+              // Save the form data introduced by the user upon the Check connection step.
+              var adForm = $('#activedirectory_XWiki\\.XWikiPreferences');
+              $.post({
+                url: adForm.attr('action'),
+                data: adForm.serialize()
+              });
+            }
           }).done(function(data) {
             $('#checkConnectionResponse').html(data);
           }).fail(function(data) {
             $('#checkConnectionResponse').html(data.responseText);
             $('#checkConnectionResponse .xwikirenderingerror').click(function() {
               $(this).siblings('.xwikirenderingerrordescription').toggleClass('hidden');
-            });
-          }).always(function() {
-            // Save the form data introduced by the user upon the Check connection step.
-            var adForm = $('#activedirectory_XWiki\\.XWikiPreferences');
-            $.post({
-              url: adForm.attr('action'),
-              data: adForm.serializeArray()
             });
           });
         });

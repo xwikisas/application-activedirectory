@@ -49,11 +49,11 @@
   #set ($bind_pass = $request.get("${ldapKeyPrefix}bind_pass"))
   ## If the password can't be read from request, then it is not clear in the form input and a fallback to the clear
   ## password from the configuration document is needed.
+  #set ($configDoc = $xwiki.getDocument('ActiveDirectory.Code.ActiveDirectoryConfig'))
   #if ($bind_pass.replace('*','').equals(''))
-    #set ($configDoc = $xwiki.getDocument('ActiveDirectory.Code.ActiveDirectoryConfig'))
     #set ($bind_pass = $configDoc.getValue('ldap_bind_pass'))
   #end
-  #set ($connected = $services.ldap.checkConnection($server, $port, $bind_DN, $bind_pass, '', false))
+  #set ($connected = $services.ldap.checkConnection($server, $port, $bind_DN, $bind_pass, '', $configDoc.getValue('ldap_ssl')))
   {{html clean="false"}}
     #if ($connected)
       #set ($discard = $response.setStatus(200))
