@@ -405,13 +405,10 @@
         if (oldValue === '' &amp;&amp; propertyPairValue === '') {
           if (newValue !== '') {
             // Create new property.
-            if (content !== '') {
-              content = content + separator;
-            }
             if (input.hasClass('key')) {
-              content = content + newValue + '=';
+              content = content + separator + newValue + '=' + separator;
             } else {
-              content = content + '=' + newValue;
+              content = content + separator + '=' + newValue + separator;
             }
           }
         } else {
@@ -419,13 +416,13 @@
           var oldContentToUpdate = '';
           var newContentToUpdate = '';
           if (input.hasClass('key')) {
-            oldContentToUpdate = oldValue + '=' + propertyPairValue;
-            newContentToUpdate = newValue + '=' + propertyPairValue;
+            oldContentToUpdate = separator + oldValue + '=' + propertyPairValue + separator;
+            newContentToUpdate = separator + newValue + '=' + propertyPairValue + separator;
           } else {
-            oldContentToUpdate = propertyPairValue + '=' + oldValue;
-            newContentToUpdate = propertyPairValue + '=' + newValue;
+            oldContentToUpdate = separator + propertyPairValue + '=' + oldValue + separator;
+            newContentToUpdate = separator + propertyPairValue + '=' + newValue + separator;
           }
-          content = content.replace(oldContentToUpdate, newContentToUpdate);
+          content = content.replace(oldContentToUpdate, newContentToUpdate).replace('||', '|');
         }
         // Delete the leftover separator from a cleared mapping, from the end.
         if(content.endsWith(separator + '=')) {
@@ -547,6 +544,23 @@
     feature.toggleAdvancedConfiguration();
     feature.loadPropertiesEditor();
     feature.resetGroupCache();
+
+    $('#activedirectory_XWiki\\.XWikiPreferences').submit(function(event) {
+      event.preventDefault();
+      // Remove the separators from the beginning and the end of the mapping.
+      $.each([$('#XWiki\\.XWikiPreferences_0_ldap_fields_mapping'), $('#XWiki\\.XWikiPreferences_0_ldap_group_mapping')], function() {
+        var content = this.val();
+        var separator = this.data().separator;
+        if(content.endsWith(separator)) {
+          content = content.substr(0, content.length - 1);
+        }
+        if(content.startsWith(separator)) {
+          content = content.substr(1, content.length);
+        }
+        this.text(content);
+      });
+      $(this).unbind('submit').submit();
+    });
   });
 });</code>
     </property>
