@@ -144,10 +144,9 @@
             &lt;dl&gt;
               #foreach ($field in $fields.entrySet())
                 #set ($prop = $configClass.get($field.key))
-                #set ($title = $services.localization.render("${configObj.xWikiClass.name}_${prop.name}"))
                 #set ($hint = $services.localization.render("${configObj.xWikiClass.name}_${prop.name}.hint"))
                 &lt;dt&gt;
-                  &lt;label for="${configClassName}_${configObj.number}_${prop.name}" class="$prop.name"&gt;$title&lt;/label&gt;
+                  &lt;label for="${configClassName}_${configObj.number}_${prop.name}"&gt;$prop.translatedPrettyName&lt;/label&gt;
                   #if ($hint)&lt;span class="xHint"&gt;$hint&lt;/span&gt;#end
                 &lt;/dt&gt;
                 &lt;dd&gt;
@@ -161,9 +160,10 @@
               ## Display SSL properties.
               &lt;dl&gt;
               #foreach ($prop in $adConfigClass.properties)
+                #set ($hint = $services.localization.render("${adConfigObj.xWikiClass.name}_${prop.name}.hint"))
                 &lt;dt&gt;
-                  &lt;label for="${adConfigClassName}_${adConfigObj.number}_${prop.name}" class="$prop.name"&gt;$prop.prettyName&lt;/label&gt;
-                  #if ("$prop.hint" != '')&lt;span class="xHint"&gt;$prop.hint&lt;/span&gt;#end
+                  &lt;label for="${adConfigClassName}_${adConfigObj.number}_${prop.name}"&gt;$prop.translatedPrettyName&lt;/label&gt;
+                  #if ("$!hint" != '')&lt;span class="xHint"&gt;$hint&lt;/span&gt;#end
                 &lt;/dt&gt;
                 &lt;dd&gt;
                   #displaySelectField($prop '0' $adConfigObj)
@@ -180,10 +180,11 @@
             #end
           &lt;/fieldset&gt;
         #end
+        #set ($redirectURL = $xwiki.getURL($currentDoc, 'admin', $escapetool.url({'editor': $editor, 'section': $section})))
         &lt;div class="hidden"&gt;
-          &lt;input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" /&gt;
-          &lt;input type="hidden" name="xcontinue" value="$xwiki.getURL($currentDoc, 'admin', "editor=${escapetool.url(${editor})}&amp;section=${escapetool.url(${section})}&amp;space=${escapetool.url(${currentSpace})}")" /&gt;
-          &lt;input type="hidden" name="xredirect" value="$xwiki.getURL($currentDoc, 'admin', "editor=${escapetool.url(${editor})}&amp;section=${escapetool.url(${section})}&amp;a;space=${escapetool.url(${currentSpace})}")" /&gt;
+          &lt;input type="hidden" name="form_token" value="$services.csrf.token" /&gt;
+          &lt;input type="hidden" name="xcontinue" value="$redirectURL" /&gt;
+          &lt;input type="hidden" name="xredirect" value="$redirectURL" /&gt;
           &lt;input type="hidden" name="classname" value="$configClassName" /&gt;
         &lt;/div&gt;
         &lt;input class="button" type="submit" name="formactionsac" value="$services.localization.render('admin.save')" /&gt;
