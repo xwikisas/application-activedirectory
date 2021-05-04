@@ -61,15 +61,43 @@
       <disabled>0</disabled>
       <displayFormType>select</displayFormType>
       <displayType/>
-      <hint/>
+      <hint>This is an optional configuration.Use it only if the Active Directory server is configured to support LDAP over SSL.</hint>
       <name>ldap_ssl</name>
       <number>1</number>
-      <prettyName>Enable SSL connection to LDAP server</prettyName>
+      <prettyName>Enable SSL connection to Active Directory server</prettyName>
       <unmodifiable>0</unmodifiable>
       <validationMessage/>
       <validationRegExp/>
       <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
     </ldap_ssl>
+    <ldap_ssl.keystore>
+      <customDisplay/>
+      <disabled>0</disabled>
+      <hint>Path to the keystore file to use in SSL connection.</hint>
+      <name>ldap_ssl.keystore</name>
+      <number>2</number>
+      <picker>0</picker>
+      <prettyName>Path to SSL keystore</prettyName>
+      <size>30</size>
+      <unmodifiable>0</unmodifiable>
+      <validationMessage/>
+      <validationRegExp/>
+      <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+    </ldap_ssl.keystore>
+    <ldap_ssl.secure_provider>
+      <customDisplay/>
+      <disabled>0</disabled>
+      <hint>The java secure provider used in SSL connection. The default is com.sun.net.ssl.internal.ssl.Provider.</hint>
+      <name>ldap_ssl.secure_provider</name>
+      <number>3</number>
+      <picker>0</picker>
+      <prettyName>SSL secure provider</prettyName>
+      <size>30</size>
+      <unmodifiable>0</unmodifiable>
+      <validationMessage/>
+      <validationRegExp/>
+      <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+    </ldap_ssl.secure_provider>
   </class>
   <object>
     <name>ActiveDirectory.Code.ActiveDirectoryConfigClass</name>

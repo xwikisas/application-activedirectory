@@ -53,6 +53,10 @@ public class ActiveDirectoryAuthServiceImpl extends XWikiLDAPAuthServiceImpl
 {
     private static final String LDAP_SSL = "ldap_ssl";
 
+    private static final String LDAP_SSL_KEYSTORE = "ldap_ssl.keystore";
+
+    private static final String LDAP_SSL_SECURE_PROVIDER = "ldap_ssl.secure_provider";
+
     private static final String EXTENSION_ID = "com.xwiki.activedirectory:application-activedirectory-api";
 
     private static final SpaceReference AD_CODE_SPACE_REFERENCE =
@@ -88,6 +92,9 @@ public class ActiveDirectoryAuthServiceImpl extends XWikiLDAPAuthServiceImpl
             BaseObject adConfigObj = adConfigDoc.getXObject(adConfigClassRef);
             if (adConfigObj != null) {
                 xWikiLDAPConfig.setFinalProperty(LDAP_SSL, adConfigObj.getStringValue(LDAP_SSL));
+                xWikiLDAPConfig.setFinalProperty(LDAP_SSL_KEYSTORE, adConfigObj.getStringValue(LDAP_SSL_KEYSTORE));
+                xWikiLDAPConfig.setFinalProperty(LDAP_SSL_SECURE_PROVIDER,
+                    adConfigObj.getStringValue(LDAP_SSL_SECURE_PROVIDER));
             }
         } catch (XWikiException e) {
             e.printStackTrace();

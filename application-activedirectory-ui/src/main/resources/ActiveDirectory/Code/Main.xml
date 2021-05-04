@@ -40,7 +40,8 @@
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
   <content>{{velocity}}
-#macro(displaySelectField $prop $default)
+#macro(displaySelectField $prop $default $configObj)
+  #set ($className = $configObj.xWikiClass.name)
   #set ($value = $configDoc.getValue($prop.name))
   #if ($prop.classType == 'String' || $prop.classType == 'TextArea' || $prop.classType == 'Password')
     #set ($display = $configDoc.display($prop.name, 'edit', $configObj).replaceAll('(^..html.*?}})|(../html..$)', ''))
@@ -51,23 +52,14 @@
   #else
     #set ($options = [])
     #if ($prop.classType == 'Boolean')
-      #if ($prop.name == 'ldap_ssl')
-        #set ($discard = $options.add({'value': 0, 'label': 'no'}))
-        #set ($discard = $options.add({'value': 1, 'label': 'yes'}))
-      #else
-        #set ($discard = $options.add({'value': 1, 'label': 'yes'}))
-        #set ($discard = $options.add({'value': 0, 'label': 'no'}))
-      #end
+      #set ($discard = $options.add({'value': 1, 'label': 'yes'}))
+      #set ($discard = $options.add({'value': 0, 'label': 'no'}))
     #else
       #foreach($v in $prop.listValues)
-        #set ($discard = $options.add({'value': $v, 'label': "XWiki.XWikiPreferences_${prop.name}_${v}"}))
+        #set ($discard = $options.add({'value': $v, 'label': "${className}_${prop.name}_${v}"}))
       #end
     #end
-    #if ($prop.name == 'ldap_ssl')
-      &lt;select name="${adConfigClassName}_0_${prop.name}" id="${adConfigClassName}_0_${prop.name}"&gt;
-    #else
-      &lt;select name="${configClassName}_0_${prop.name}" id="${configClassName}_0_${prop.name}"&gt;
-    #end
+    &lt;select name="${className}_0_${prop.name}" id="${className}_0_${prop.name}"&gt;
       #foreach ($option in $options)
         &lt;option value="$option.value" #if($value == $option.value)selected="selected"#end&gt;
           $services.localization.render($option.label)
@@ -159,25 +151,25 @@
                   #if ($hint)&lt;span class="xHint"&gt;$hint&lt;/span&gt;#end
                 &lt;/dt&gt;
                 &lt;dd&gt;
-                  #displaySelectField($prop $field.value)
+                  #displaySelectField($prop $field.value $configObj)
                   ## TODO: when https://jira.xwikisas.com/browse/ADAPP-30 is implemented, replace $field.value
                   ## with the default taken from the script service
                 &lt;dt&gt;
               #end
             &lt;/dl&gt;
             #if ($paramsSection.key.equals('activeDirectoryConnection'))
-              #set ($prop = $adConfigClass.get('ldap_ssl'))
-              #set ($title = $services.localization.render("ActiveDirectory.Code.ActiveDirectoryConfigClass_${prop.name}"))
-              #set ($hint = $services.localization.render("ActiveDirectory.Code.ActiveDirectoryConfigClass_${prop.name}.hint"))
+              ## Display SSL properties.
               &lt;dl&gt;
+              #foreach ($prop in $adConfigClass.properties)
                 &lt;dt&gt;
-                  &lt;label for="${adConfigClassName}_${adConfigObj.number}_${prop.name}" class="$prop.name"&gt;$title&lt;/label&gt;
-                  #if ($hint)&lt;span class="xHint"&gt;$hint&lt;/span&gt;#end
+                  &lt;label for="${adConfigClassName}_${adConfigObj.number}_${prop.name}" class="$prop.name"&gt;$prop.prettyName&lt;/label&gt;
+                  #if ("$prop.hint" != '')&lt;span class="xHint"&gt;$prop.hint&lt;/span&gt;#end
                 &lt;/dt&gt;
-                  &lt;dd&gt;
-                    #displaySelectField($prop '0')
-                  &lt;dt&gt;
-                &lt;/dl&gt;
+                &lt;dd&gt;
+                  #displaySelectField($prop '0' $adConfigObj)
+                &lt;dt&gt;
+              #end
+              &lt;/dl&gt;
               &lt;div id='checkConnection'&gt;
                 &lt;button class='btn btn-primary'&gt;
                   $services.localization.render('activeDirectory.checkConnection')
