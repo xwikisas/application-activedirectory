@@ -416,13 +416,20 @@
           var oldContentToUpdate = '';
           var newContentToUpdate = '';
           if (input.hasClass('key')) {
-            oldContentToUpdate = separator + oldValue + '=' + propertyPairValue + separator;
-            newContentToUpdate = separator + newValue + '=' + propertyPairValue + separator;
+            oldContentToUpdate = oldValue + '=' + propertyPairValue;
+            newContentToUpdate = newValue + '=' + propertyPairValue;
           } else {
-            oldContentToUpdate = separator + propertyPairValue + '=' + oldValue + separator;
-            newContentToUpdate = separator + propertyPairValue + '=' + newValue + separator;
+            oldContentToUpdate = propertyPairValue + '=' + oldValue;
+            newContentToUpdate = propertyPairValue + '=' + newValue;
           }
-          content = content.replace(oldContentToUpdate, newContentToUpdate).replace('||', '|');
+          var separatedOldContent = separator + oldContentToUpdate + separator;
+          var separatedNewContent = separator + newContentToUpdate + separator;
+          if (content.includes(separatedOldContent)) {
+            content = content.replace(separatedOldContent, separatedNewContent).replace(separator + separator, separator);
+          } else {
+            // A particular case for the pairs from the beginning and the end of the mapping.
+            content = content.replace(oldContentToUpdate, newContentToUpdate);
+          }
         }
         // Delete the leftover separator from a cleared mapping, from the end.
         if(content.endsWith(separator + '=')) {
@@ -441,12 +448,7 @@
         var content = textarea.val();
         var separator = textarea.data().separator;
         var contentToRemove = property.children('.key').val() + '=' + property.children('.value').val();
-        if (content.startsWith(contentToRemove)) {
-          contentToRemove = contentToRemove + separator;
-        } else {
-          contentToRemove = separator + contentToRemove;
-        }
-        content = content.replace(contentToRemove, '');
+        content = content.replace(contentToRemove, '').replace(separator + separator, separator);
         textarea.text(content);
       };
 
