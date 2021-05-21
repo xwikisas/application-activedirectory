@@ -25,7 +25,7 @@
   <parent>
     <groupId>com.xwiki.parent</groupId>
     <artifactId>xwikisas-parent-platform</artifactId>
-    <version>9.11-5</version>
+    <version>10.11</version>
   </parent>
   <groupId>com.xwiki.activedirectory</groupId>
   <artifactId>application-activedirectory</artifactId>
@@ -39,7 +39,7 @@
   <properties>
     <ldap.version>9.5.5</ldap.version>
     <ldapuserimport.version>1.0.5</ldapuserimport.version>
-    <licensing.version>1.17.1</licensing.version>
+    <licensing.version>1.18</licensing.version>
   </properties>
   <modules>
     <module>application-activedirectory-api</module>
@@ -76,4 +76,36 @@
     <url>https://github.com/xwikisas/application-activedirectory/tree/master</url>
     <tag>HEAD</tag>
   </scm>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.revapi</groupId>
+        <artifactId>revapi-maven-plugin</artifactId>
+        <configuration>
+          <analysisConfiguration><![CDATA[
+            {
+              "revapi": {
+                "ignore" : [
+                  {
+                    "code": "java.class.nonFinalClassInheritsFromNewClass",
+                    "old": "class org.xwiki.model.reference.DocumentReference",
+                    "new": "class org.xwiki.model.reference.DocumentReference",
+                    "superClass": "org.xwiki.model.reference.AbstractLocalizedEntityReference",
+                    "justification": "Not a breakage"
+                  },
+                  {
+                    "code": "java.class.nonFinalClassInheritsFromNewClass",
+                    "old": "class org.xwiki.model.reference.LocalDocumentReference",
+                    "new": "class org.xwiki.model.reference.LocalDocumentReference",
+                    "superClass": "org.xwiki.model.reference.AbstractLocalizedEntityReference",
+                    "justification": "Not a breakage"
+                  }
+                ]
+              }
+            }
+          ]]></analysisConfiguration>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
 </project>
