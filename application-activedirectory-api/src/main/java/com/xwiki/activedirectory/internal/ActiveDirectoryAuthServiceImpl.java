@@ -22,6 +22,7 @@ package com.xwiki.activedirectory.internal;
 import java.security.Principal;
 import java.util.Arrays;
 
+import org.apache.commons.lang3.StringUtils;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.contrib.ldap.XWikiLDAPAuthServiceImpl;
 import org.xwiki.contrib.ldap.XWikiLDAPConfig;
@@ -93,8 +94,10 @@ public class ActiveDirectoryAuthServiceImpl extends XWikiLDAPAuthServiceImpl
             if (adConfigObj != null) {
                 xWikiLDAPConfig.setFinalProperty(LDAP_SSL, adConfigObj.getStringValue(LDAP_SSL));
                 xWikiLDAPConfig.setFinalProperty(LDAP_SSL_KEYSTORE, adConfigObj.getStringValue(LDAP_SSL_KEYSTORE));
+
+                String provider = adConfigObj.getStringValue(LDAP_SSL_SECURE_PROVIDER);
                 xWikiLDAPConfig.setFinalProperty(LDAP_SSL_SECURE_PROVIDER,
-                    adConfigObj.getStringValue(LDAP_SSL_SECURE_PROVIDER));
+                    StringUtils.isNoneBlank(provider) ? provider : null);
             }
         } catch (XWikiException e) {
             e.printStackTrace();
