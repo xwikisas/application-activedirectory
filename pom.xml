@@ -37,7 +37,7 @@
     <url>https://github.com/xwikisas/application-activedirectory/issues</url>
   </issueManagement>
   <properties>
-    <ldap.version>9.5.5</ldap.version>
+    <ldap.version>9.5.6</ldap.version>
     <ldapuserimport.version>1.0.5</ldapuserimport.version>
     <licensing.version>1.18</licensing.version>
   </properties>
