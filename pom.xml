@@ -38,7 +38,7 @@
   </issueManagement>
   <properties>
     <ldap.version>9.5.6</ldap.version>
-    <ldapuserimport.version>1.0.5</ldapuserimport.version>
+    <ldapuserimport.version>1.2</ldapuserimport.version>
     <licensing.version>1.18</licensing.version>
   </properties>
   <modules>
