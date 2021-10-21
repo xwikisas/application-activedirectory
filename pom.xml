@@ -29,7 +29,7 @@
   </parent>
   <groupId>com.xwiki.activedirectory</groupId>
   <artifactId>application-activedirectory</artifactId>
-  <version>1.13-SNAPSHOT</version>
+  <version>1.13</version>
   <packaging>pom</packaging>
   <name>Active Directory - Parent POM</name>
   <issueManagement>
@@ -76,6 +76,6 @@
     <connection>scm:git:git://github.com/xwikisas/application-activedirectory.git</connection>
     <developerConnection>scm:git:git@github.com:xwikisas/application-activedirectory.git</developerConnection>
     <url>https://github.com/xwikisas/application-activedirectory/tree/master</url>
-    <tag>HEAD</tag>
+    <tag>application-activedirectory-1.13</tag>
   </scm>
 </project>
