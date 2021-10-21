@@ -52,5 +52,9 @@ public class ActiveDirectoryTest extends AbstractTest
         ViewPage vp = getUtil().createPage(getTestClassName(), "InstallADExtension", content, "AD Test");
         assertEquals("installed: com.xwiki.activedirectory:application-activedirectory-ui/" + VERSION,
             vp.getContent());
+
+        this.validateConsole.getLogCaptureConfiguration().registerExcludes(
+            "TLS certificate errors will be ignored for this session"
+        );
     }
 }
