@@ -24,28 +24,23 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>com.xwiki.activedirectory</groupId>
-    <artifactId>application-activedirectory</artifactId>
+    <artifactId>application-activedirectory-test</artifactId>
     <version>1.14-SNAPSHOT</version>
   </parent>
-  <artifactId>application-activedirectory-test</artifactId>
-  <name>Active Directory - Tests - Parent POM</name>
-  <packaging>pom</packaging>
-  <description>Tests for the Active Directory feature</description>
-  <properties>
-    <!-- Don't run backward-compatibility checks in test modules since we don't consider them as public APIs -->
-    <xwiki.revapi.skip>true</xwiki.revapi.skip>
-    <!-- Don't run Checkstyle in test modules -->
-    <xwiki.checkstyle.skip>true</xwiki.checkstyle.skip>
-  </properties>
-  <modules>
-    <module>application-activedirectory-test-pageobjects</module>
-  </modules>
-  <profiles>
-    <profile>
-      <id>docker</id>
-      <modules>
-        <module>application-activedirectory-test-docker</module>
-      </modules>
-    </profile>
-  </profiles>
+  <artifactId>application-activedirectory-test-pageobjects</artifactId>
+  <name>Active Directory - Tests - Page Objects</name>
+  <packaging>jar</packaging>
+  <description>Page Objects for Active Directory functional tests</description>
+  <dependencies>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-test-ui</artifactId>
+      <version>${platform.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-administration-test-pageobjects</artifactId>
+      <version>${platform.version}</version>
+    </dependency>
+  </dependencies>
 </project>
