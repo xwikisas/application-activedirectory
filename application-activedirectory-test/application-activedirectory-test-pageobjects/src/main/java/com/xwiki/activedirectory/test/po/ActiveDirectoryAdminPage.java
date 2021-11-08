@@ -27,6 +27,7 @@ import org.xwiki.administration.test.po.AdministrationSectionPage;
  * The administration section page used to configure the Active Directory.
  * 
  * @version $Id$
+ * @since 1.14
  */
 public class ActiveDirectoryAdminPage extends AdministrationSectionPage
 {

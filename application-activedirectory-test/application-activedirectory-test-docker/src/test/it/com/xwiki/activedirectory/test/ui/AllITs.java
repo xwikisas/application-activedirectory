@@ -27,6 +27,7 @@ import org.xwiki.test.docker.junit5.UITest;
  * All UI tests for the Active Directory application.
  *
  * @version $Id$
+ * @since 1.14
  */
 @UITest
 class AllITs

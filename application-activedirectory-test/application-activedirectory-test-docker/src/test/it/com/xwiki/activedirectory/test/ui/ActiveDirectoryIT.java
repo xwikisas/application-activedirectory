@@ -32,6 +32,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * Functional tests for Active Directory application.
  * 
  * @version $Id$
+ * @since 1.14
  */
 @UITest
 class ActiveDirectoryIT
