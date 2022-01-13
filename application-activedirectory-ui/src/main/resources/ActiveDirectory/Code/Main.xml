@@ -206,7 +206,7 @@
   #else
     {{warning}}
       $services.localization.render('activeDirectory.warning.ldapAuthenticationIsNotEnabled', ['webapps/xwiki/WEB-INF/xwiki.cfg'])
-      xwiki.authentication.authclass=org.xwiki.contrib.ldap.XWikiLDAPAuthServiceImpl
+      xwiki.authentication.authclass=com.xwiki.activedirectory.internal.ActiveDirectoryAuthServiceImpl
       xwiki.authentication.ldap.trylocal=1
     {{/warning}}
   #end
