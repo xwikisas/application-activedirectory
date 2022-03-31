@@ -443,7 +443,7 @@
         var textarea = propertiesParent.siblings('textarea');
         var content = textarea.val();
         var separator = textarea.data().separator;
-        var contentToRemove = property.children('.key').val() + '=' + escape(property.children('.value').val());
+        var contentToRemove = property.children('.key').val() + '=' + property.children('.value').val().replaceAll('\\', '\\\\');
         content = content.replace(contentToRemove, '').replace(separator + separator, separator);
         textarea.text(content);
       };
