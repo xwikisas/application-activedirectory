@@ -303,28 +303,6 @@
     <property>
       <code>require(['jquery'], function($) {
   $(document).ready(function() {
-    var escape = function (str) {
-      let result = '';
-      for (var i = str.length - 1; i &gt;= 0; i--) {
-        result = str[i] + result;
-        if (str[i] === '\\') {
-          result = '\\' + result;
-        }
-      }
-      return result;
-    };
-    var unescape = function (str) {
-      let result = '';
-      for (var i = 0; i &lt; str.length; i++) {
-        if (str[i] === '\\') {
-          i += 1;
-          result = result + str[i];
-          continue;
-        }
-        result = result + str[i];
-      }
-      return result;
-    };
     var feature = (function () {
       var textareaToInputList = function(textarea) {
         var content = textarea.val();
@@ -364,11 +342,10 @@
           'resultsParameter': 'results',
           'resultValue': 'value'
         });
-        var unescapedADValue = unescape(aDValue);
         var aDInput = $('&lt;input/&gt;').attr({
           'type': 'text',
           'class': 'value',
-          'value': unescapedADValue,
+          'value': aDValue.replaceAll('\\\\', '\\'),
           'placeholder': dataset.valueTip
         });
         var inputsWrapper = $('&lt;div class="property"/&gt;');
@@ -434,12 +411,12 @@
           var oldContentToUpdate = '';
           var newContentToUpdate = '';
           if (input.hasClass('key')) {
-            propertyPairValue = escape(propertyPairValue);
+            propertyPairValue = propertyPairValue.replaceAll('\\', '\\\\');
             oldContentToUpdate = oldValue + '=' + propertyPairValue;
             newContentToUpdate = newValue + '=' + propertyPairValue;
           } else {
-            oldContentToUpdate = propertyPairValue + '=' + escape(oldValue);
-            newContentToUpdate = propertyPairValue + '=' + escape(newValue);
+            oldContentToUpdate = propertyPairValue + '=' + oldValue.replaceAll('\\', '\\\\');
+            newContentToUpdate = propertyPairValue + '=' + newValue.replaceAll('\\', '\\\\');
           }
           var separatedOldContent = separator + oldContentToUpdate + separator;
           var separatedNewContent = separator + newContentToUpdate + separator;
