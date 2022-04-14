@@ -342,10 +342,10 @@
           'resultsParameter': 'results',
           'resultValue': 'value'
         });
-         var aDInput = $('&lt;input/&gt;').attr({
+        var aDInput = $('&lt;input/&gt;').attr({
           'type': 'text',
           'class': 'value',
-          'value': aDValue,
+          'value': aDValue.replaceAll('\\\\', '\\'),
           'placeholder': dataset.valueTip
         });
         var inputsWrapper = $('&lt;div class="property"/&gt;');
@@ -411,11 +411,12 @@
           var oldContentToUpdate = '';
           var newContentToUpdate = '';
           if (input.hasClass('key')) {
+            propertyPairValue = propertyPairValue.replaceAll('\\', '\\\\');
             oldContentToUpdate = oldValue + '=' + propertyPairValue;
             newContentToUpdate = newValue + '=' + propertyPairValue;
           } else {
-            oldContentToUpdate = propertyPairValue + '=' + oldValue;
-            newContentToUpdate = propertyPairValue + '=' + newValue;
+            oldContentToUpdate = propertyPairValue + '=' + oldValue.replaceAll('\\', '\\\\');
+            newContentToUpdate = propertyPairValue + '=' + newValue.replaceAll('\\', '\\\\');
           }
           var separatedOldContent = separator + oldContentToUpdate + separator;
           var separatedNewContent = separator + newContentToUpdate + separator;
@@ -442,7 +443,7 @@
         var textarea = propertiesParent.siblings('textarea');
         var content = textarea.val();
         var separator = textarea.data().separator;
-        var contentToRemove = property.children('.key').val() + '=' + property.children('.value').val();
+        var contentToRemove = property.children('.key').val() + '=' + property.children('.value').val().replaceAll('\\', '\\\\');
         content = content.replace(contentToRemove, '').replace(separator + separator, separator);
         textarea.text(content);
       };
