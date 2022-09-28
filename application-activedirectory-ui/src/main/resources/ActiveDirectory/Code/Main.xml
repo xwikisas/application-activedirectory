@@ -89,6 +89,7 @@
                                               'ldap_exclude_group'         : '',
                                               'ldap_update_user'           : '1',
                                               'ldap_update_photo'          : '0',
+                                              'ldap_photo_attribute'       : 'thumbnailPhoto',
                                               'ldap_groupcache_expiration' : '21600',
                                               'ldap_mode_group_sync'       : 'always'}
   })
