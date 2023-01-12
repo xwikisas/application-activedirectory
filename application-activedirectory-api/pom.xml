@@ -25,7 +25,7 @@
   <parent>
     <groupId>com.xwiki.activedirectory</groupId>
     <artifactId>application-activedirectory</artifactId>
-    <version>1.15</version>
+    <version>1.15.1-SNAPSHOT</version>
   </parent>
   <artifactId>application-activedirectory-api</artifactId>
   <packaging>jar</packaging>
