@@ -1,9 +1,9 @@
 # Active Directory Application
 
-* Project Lead: [Alexandru Nicolae Cotiugă](https://github.com/acotiuga)
+* Project Lead: N/A
 * [Documentation](https://store.xwiki.com/xwiki/bin/view/Extension/ActiveDirectoryApplication)
 * [Issue Tracker](https://github.com/xwikisas/application-activedirectory/issues)
-* [Development Practices](http://dev.xwiki.org/xwiki/bin/view/Community/DevelopmentPractices) (as much as you can !)
+* [Development Practices](http://dev.xwiki.org/xwiki/bin/view/Community/DevelopmentPractices)
 * Minimal XWiki version supported: XWiki 11.10
 * License: LGPL 2.1
 * Translations: N/A
