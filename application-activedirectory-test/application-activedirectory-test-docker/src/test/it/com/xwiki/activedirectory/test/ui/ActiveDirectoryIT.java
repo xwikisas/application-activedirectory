@@ -40,7 +40,7 @@ class ActiveDirectoryIT
     @Test
     void activeDirectoryConfiguration(TestUtils setup) throws Exception
     {
-        createAdminUser(setup);
+        setup.loginAsSuperAdmin();
         ActiveDirectoryAdminPage adminPage = ActiveDirectoryAdminPage.gotoPage();
 
         // Assert the default configuration values.
@@ -48,20 +48,5 @@ class ActiveDirectoryIT
         assertEquals("389", adminPage.getServerPort());
 
         // TODO: Add more tests.
-    }
-
-    /**
-     * TODO: Replace with TestUtils#createAdminUser() after upgrading parent to XWiki 12.10.
-     */
-    void createAdminUser(TestUtils setup)
-    {
-        setup.loginAsSuperAdmin();
-        setup.createUser(TestUtils.ADMIN_CREDENTIALS.getUserName(), TestUtils.ADMIN_CREDENTIALS.getPassword(), null);
-        setup.addObject("XWiki", "XWikiAdminGroup", "XWiki.XWikiGroups", "member", "XWiki.Admin");
-        setup.addObject("XWiki", "XWikiPreferences", "XWiki.XWikiGlobalRights", "groups", "XWiki.XWikiAdminGroup",
-            "allow", 1, "levels", "admin");
-        // Make sure the wiki administration is not locked by the superadmin user.
-        new ObjectEditPage().clickCancel();
-        setup.loginAsAdmin();
     }
 }
