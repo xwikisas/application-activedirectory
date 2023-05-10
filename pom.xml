@@ -37,7 +37,7 @@
     <url>https://github.com/xwikisas/application-activedirectory/issues</url>
   </issueManagement>
   <properties>
-    <ldap.version>9.9.1</ldap.version>
+    <ldap.version>9.11.0</ldap.version>
     <ldapuserimport.version>1.3</ldapuserimport.version>
     <licensing.version>1.24.1</licensing.version>
     <!-- Revapi produces too many false positives that come from transitive dependencies in platform. -->
