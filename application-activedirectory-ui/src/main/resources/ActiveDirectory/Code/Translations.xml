@@ -103,9 +103,9 @@ XWiki.XWikiPreferences_ldap_mode_group_sync_create=Upon creation of a user
 ActiveDirectory.Code.ActiveDirectoryConfigClass_ldap_ssl=Enable SSL connection to Active Directory server
 ActiveDirectory.Code.ActiveDirectoryConfigClass_ldap_ssl.hint=This is an optional configuration. Use it only if the Active Directory server is configured to support LDAP over SSL.
 ActiveDirectory.Code.ActiveDirectoryConfigClass_ldap_ssl.keystore=Path to SSL keystore
-ActiveDirectory.Code.ActiveDirectoryConfigClass_ldap_ssl.keystore.hint=Path to the keystore file to use in SSL connection.
+ActiveDirectory.Code.ActiveDirectoryConfigClass_ldap_ssl.keystore.hint=Path to the keystore file to use in SSL connection. Check the documentation for additional information.
 ActiveDirectory.Code.ActiveDirectoryConfigClass_ldap_ssl.secure_provider=SSL secure provider
-ActiveDirectory.Code.ActiveDirectoryConfigClass_ldap_ssl.secure_provider.hint=The java secure provider used in SSL connection. The default is com.sun.net.ssl.internal.ssl.Provider.
+ActiveDirectory.Code.ActiveDirectoryConfigClass_ldap_ssl.secure_provider.hint=A java secure provider to be used in SSL connection, besides the already preregistered ones.
 
 ## FREE LICENSE
 admin.activedirectory=Active Directory

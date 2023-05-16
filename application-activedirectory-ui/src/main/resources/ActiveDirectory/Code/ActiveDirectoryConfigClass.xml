@@ -58,7 +58,7 @@
       <disabled>0</disabled>
       <displayFormType>select</displayFormType>
       <displayType/>
-      <hint>This is an optional configuration.Use it only if the Active Directory server is configured to support LDAP over SSL.</hint>
+      <hint/>
       <name>ldap_ssl</name>
       <number>1</number>
       <prettyName>Enable SSL connection to Active Directory server</prettyName>
@@ -70,7 +70,7 @@
     <ldap_ssl.keystore>
       <customDisplay/>
       <disabled>0</disabled>
-      <hint>Path to the keystore file to use in SSL connection.</hint>
+      <hint/>
       <name>ldap_ssl.keystore</name>
       <number>2</number>
       <picker>0</picker>
@@ -84,7 +84,7 @@
     <ldap_ssl.secure_provider>
       <customDisplay/>
       <disabled>0</disabled>
-      <hint>The java secure provider used in SSL connection. The default is com.sun.net.ssl.internal.ssl.Provider.</hint>
+      <hint/>
       <name>ldap_ssl.secure_provider</name>
       <number>3</number>
       <picker>0</picker>
