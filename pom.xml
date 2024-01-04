@@ -38,7 +38,7 @@
   </issueManagement>
   <properties>
     <ldap.version>9.12.0</ldap.version>
-    <ldapuserimport.version>1.5.4</ldapuserimport.version>
+    <ldapuserimport.version>1.5.5</ldapuserimport.version>
     <licensing.version>1.24.3</licensing.version>
     <!-- Revapi produces too many false positives that come from transitive dependencies in platform. -->
     <xwiki.revapi.skip>true</xwiki.revapi.skip>
