@@ -110,7 +110,7 @@ ActiveDirectory.Code.ActiveDirectoryConfigClass_ldap_ssl.secure_provider.hint=A 
 ## FREE LICENSE
 admin.activedirectory=Active Directory
 admin.activedirectory.description=Configuration options to authenticate users against an Active Directory server.
-activeDirectory.extension.name=Active Directory Application</content>
+activeDirectory.extension.name=Active Directory Application (Pro)</content>
   <object>
     <name>ActiveDirectory.Code.Translations</name>
     <number>0</number>
