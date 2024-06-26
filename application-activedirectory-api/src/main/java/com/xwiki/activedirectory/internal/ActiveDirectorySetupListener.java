@@ -116,7 +116,7 @@ public class ActiveDirectorySetupListener implements EventListener, Initializabl
 
     private void setAuthService(XWiki xwiki)
     {
-        xwiki.setAuthService(new ActiveDirectoryAuthServiceImpl());
+        xwiki.setAuthService(new ActiveDirectoryAuthServiceImpl(xwiki.getAuthService()));
     }
 
     private XWiki getXWiki()

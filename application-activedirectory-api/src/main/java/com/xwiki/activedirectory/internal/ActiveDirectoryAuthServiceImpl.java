@@ -38,14 +38,13 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.user.api.XWikiAuthService;
 import com.xpn.xwiki.user.api.XWikiUser;
-import com.xpn.xwiki.user.impl.xwiki.XWikiAuthServiceImpl;
 import com.xpn.xwiki.web.Utils;
 import com.xwiki.licensing.Licensor;
 
 /**
  * Custom Active Directory authenticator that currently only serves as a way to make sure that a valid License for the
- * Active Directory application exists in order to authenticate requests. In the future it'll also serve as the place
- * to add new features for Active Directory authentication.
+ * Active Directory application exists in order to authenticate requests. In the future it'll also serve as the place to
+ * add new features for Active Directory authentication.
  *
  * @version $Id$
  * @since 1.1
@@ -67,9 +66,18 @@ public class ActiveDirectoryAuthServiceImpl extends XWikiLDAPAuthServiceImpl
 
     private InstalledExtensionRepository repository = Utils.getComponent(InstalledExtensionRepository.class);
 
-    private XWikiAuthService fallbackAuthService = new XWikiAuthServiceImpl();
+    private final XWikiAuthService fallbackAuthService;
 
     private ConfigurationSource configurationSource = Utils.getComponent(ConfigurationSource.class, "activedirectory");
+
+    /**
+     * @param oldAuthService the auth service that was registered before this one. Used to fallback in case the
+     *     authentication fails or if there is no license.
+     */
+    public ActiveDirectoryAuthServiceImpl(XWikiAuthService oldAuthService)
+    {
+        this.fallbackAuthService = oldAuthService;
+    }
 
     @Override
     protected XWikiLDAPConfig createXWikiLDAPConfig(String authInput)
@@ -110,10 +118,12 @@ public class ActiveDirectoryAuthServiceImpl extends XWikiLDAPAuthServiceImpl
     public XWikiUser checkAuth(XWikiContext context) throws XWikiException
     {
         if (isLicensed()) {
-            return super.checkAuth(context);
-        } else {
-            return this.fallbackAuthService.checkAuth(context);
+            XWikiUser user = super.checkAuth(context);
+            if (user != null) {
+                return user;
+            }
         }
+        return this.fallbackAuthService.checkAuth(context);
     }
 
     @Override
@@ -121,20 +131,24 @@ public class ActiveDirectoryAuthServiceImpl extends XWikiLDAPAuthServiceImpl
         throws XWikiException
     {
         if (isLicensed()) {
-            return super.checkAuth(username, password, rememberme, context);
-        } else {
-            return this.fallbackAuthService.checkAuth(username, password, rememberme, context);
+            XWikiUser user = super.checkAuth(username, password, rememberme, context);
+            if (user != null) {
+                return user;
+            }
         }
+        return this.fallbackAuthService.checkAuth(username, password, rememberme, context);
     }
 
     @Override
     public Principal authenticate(String userId, String password, XWikiContext context) throws XWikiException
     {
         if (isLicensed()) {
-            return super.authenticate(userId, password, context);
-        } else {
-            return this.fallbackAuthService.authenticate(userId, password, context);
+            Principal principal = super.authenticate(userId, password, context);
+            if (principal != null) {
+                return principal;
+            }
         }
+        return this.fallbackAuthService.authenticate(userId, password, context);
     }
 
     private boolean isLicensed()
