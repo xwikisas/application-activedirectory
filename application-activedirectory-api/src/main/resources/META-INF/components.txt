@@ -1,2 +1,2 @@
-com.xwiki.activedirectory.internal.ActiveDirectorySetupListener
+com.xwiki.activedirectory.internal.ActiveDirectoryAuthService
 com.xwiki.activedirectory.internal.ActiveDirectoryConfigurationSource

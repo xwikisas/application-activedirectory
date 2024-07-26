@@ -192,24 +192,23 @@
 #end
 ##
 #if ($services.ldap)
-  #if ($services.ldap.isXWikiLDAPAuthenticator())
-    #displayMainForm($configClassName)
-    #if ("$!section" != '')
-      {{html clean="false"}}
-        &lt;fieldset class='activeDirectoryMiscellaneous'&gt;
-          &lt;legend&gt;$services.localization.render('admin.activeDirectoryMiscellaneous')&lt;/legend&gt;
-          &lt;span class="xHint"&gt;$services.localization.render('admin.activeDirectoryMiscellaneous.hint')&lt;/span&gt;
-        &lt;/fieldset&gt;
-        &lt;div id='resetGroupCache'&gt;&lt;button class='btn btn-primary'&gt;$services.localization.render('activeDirectory.resetGroupCache.submit')&lt;/button&gt;&lt;/div&gt;
-        &lt;div class="box successmessage hidden"&gt;&lt;/div&gt;
-      {{/html}}
-    #end
-  #else
+  #if (!$services.ldap.isLDAPAuth() &amp;&amp; "$!xcontext.getXWiki().getAuthService().getAuthService().getId()" != 'activedirectory')
     {{warning}}
-      $services.localization.render('activeDirectory.warning.ldapAuthenticationIsNotEnabled', ['webapps/xwiki/WEB-INF/xwiki.cfg'])
-      xwiki.authentication.authclass=org.xwiki.contrib.ldap.XWikiLDAPAuthServiceImpl
-      xwiki.authentication.ldap.trylocal=1
+      #set ($authSectionURL = $xwiki.getURL('XWiki.XWikiPreferences', 'admin', $escapetool.url({'section' : 'Authentication'})))
+      [[$services.rendering.escape($services.localization.render('activeDirectory.warning.ldapAuthenticationIsNotSet'), $xwiki.currentContentSyntaxId)>>path:$authSectionURL]]
     {{/warning}}
+
+  #end
+  #displayMainForm($configClassName)
+  #if ("$!section" != '')
+    {{html clean="false"}}
+      &lt;fieldset class='activeDirectoryMiscellaneous'&gt;
+        &lt;legend&gt;$services.localization.render('admin.activeDirectoryMiscellaneous')&lt;/legend&gt;
+        &lt;span class="xHint"&gt;$services.localization.render('admin.activeDirectoryMiscellaneous.hint')&lt;/span&gt;
+      &lt;/fieldset&gt;
+      &lt;div id='resetGroupCache'&gt;&lt;button class='btn btn-primary'&gt;$services.localization.render('activeDirectory.resetGroupCache.submit')&lt;/button&gt;&lt;/div&gt;
+      &lt;div class="box successmessage hidden"&gt;&lt;/div&gt;
+    {{/html}}
   #end
 #else
   {{error}}$services.localization.render('activeDirectory.error.missingLdapService'){{/error}}
