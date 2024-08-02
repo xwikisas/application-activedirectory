@@ -59,5 +59,10 @@
       <artifactId>application-licensing-licensor-api</artifactId>
       <version>${licensing.version}</version>
     </dependency>
+    <dependency>
+      <groupId>org.xwiki.contrib</groupId>
+      <artifactId>authservice-backport-api</artifactId>
+      <version>${authservicebackport.version}</version>
+    </dependency>
   </dependencies>
 </project>

@@ -46,6 +46,7 @@ admin.activeDirectoryMiscellaneous=Miscellaneous
 admin.activeDirectoryMiscellaneous.hint=Force to empty the cache containing Active Directory groups.
 activeDirectory.error.missingLdapService=Active Directory service is not available. Please verify your installation.
 activeDirectory.warning.ldapAuthenticationIsNotEnabled=The system could not connect to Active Directory server because the LDAP authentication service is not enabled. Edit the ##{0}## file, add the following lines and restart the wiki:
+activeDirectory.warning.ldapAuthenticationIsNotSet=The ActiveDirectory Authentication Service is not currently active. To enable it, please visit the Authentication section of the Administration page.
 activeDirectory.default=(Default)
 activeDirectory.aDGroup.placehoder=Active Directory group
 activeDirectory.xWikiGroup.placeholder=XWiki group
@@ -106,6 +107,9 @@ ActiveDirectory.Code.ActiveDirectoryConfigClass_ldap_ssl.keystore=Path to SSL ke
 ActiveDirectory.Code.ActiveDirectoryConfigClass_ldap_ssl.keystore.hint=Path to the keystore file to use in SSL connection. Check the documentation for additional information.
 ActiveDirectory.Code.ActiveDirectoryConfigClass_ldap_ssl.secure_provider=SSL secure provider
 ActiveDirectory.Code.ActiveDirectoryConfigClass_ldap_ssl.secure_provider.hint=A java secure provider to be used in SSL connection, besides the already preregistered ones.
+
+security.authservice.service.activedirectory.name=Active Directory Authenticator
+security.authservice.service.activedirectory.description=Authenticate using the configured Active Directory server
 
 ## FREE LICENSE
 admin.activedirectory=Active Directory
