@@ -483,7 +483,7 @@
               var adForm = $('#activedirectory_XWiki\\.XWikiPreferences');
               $.post({
                 url: adForm.attr('action'),
-                data: adForm.serialize()
+                data: adForm.find('.activeDirectoryConnection,input[type=hidden]').serialize()
               });
             }
           }).done(function(data) {
