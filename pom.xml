@@ -25,7 +25,7 @@
   <parent>
     <groupId>com.xwiki.parent</groupId>
     <artifactId>xwikisas-parent-platform</artifactId>
-    <version>13.10-3</version>
+    <version>14.10-1</version>
   </parent>
   <groupId>com.xwiki.activedirectory</groupId>
   <artifactId>application-activedirectory</artifactId>
@@ -37,9 +37,9 @@
     <url>https://github.com/xwikisas/application-activedirectory/issues</url>
   </issueManagement>
   <properties>
-    <ldap.version>9.15.2</ldap.version>
-    <ldapuserimport.version>1.6.1</ldapuserimport.version>
-    <licensing.version>1.25</licensing.version>
+    <ldap.version>9.15.5</ldap.version>
+    <ldapuserimport.version>1.7.0</ldapuserimport.version>
+    <licensing.version>1.26</licensing.version>
     <authservicebackport.version>1.1.1</authservicebackport.version>
     <!-- Revapi produces too many false positives that come from transitive dependencies in platform. -->
     <xwiki.revapi.skip>true</xwiki.revapi.skip>
