@@ -28,6 +28,7 @@
     <version>1.16.15-SNAPSHOT</version>
   </parent>
   <artifactId>application-activedirectory-test-docker</artifactId>
+  <version>1.16.17-SNAPSHOT</version>
   <name>Active Directory - Tests - Functional Docker Tests</name>
   <!-- TODO: Move to use "functional-test" in the future when http://jira.codehaus.org/browse/MNG-1911 is fixed,
        see http://jira.xwiki.org/jira/browse/XWIKI-7683 -->

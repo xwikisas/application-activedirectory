@@ -29,7 +29,7 @@
   </parent>
   <groupId>com.xwiki.activedirectory</groupId>
   <artifactId>application-activedirectory</artifactId>
-  <version>1.16.15-SNAPSHOT</version>
+  <version>1.16.21-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>Active Directory - Parent POM</name>
   <issueManagement>
