@@ -192,7 +192,7 @@
 #end
 ##
 #if ($services.ldap)
-  #if (!$services.ldap.isLDAPAuth() &amp;&amp; "$!xcontext.getXWiki().getAuthService().getAuthService().getId()" != 'activedirectory')
+  #if (!$services.ldap.isLDAPAuth() &amp;&amp; "$!xcontext.getXWiki().getAuthService().getAuthService().getId()" != 'activedirectory' &amp;&amp; "$!xcontext.getXWiki().getAuthService().getId()" != 'activedirectory')
     {{warning}}
       #set ($authSectionURL = $xwiki.getURL('XWiki.XWikiPreferences', 'admin', $escapetool.url({'section' : 'Authentication'})))
       [[$services.rendering.escape($services.localization.render('activeDirectory.warning.ldapAuthenticationIsNotSet'), $xwiki.currentContentSyntaxId)>>path:$authSectionURL]]
