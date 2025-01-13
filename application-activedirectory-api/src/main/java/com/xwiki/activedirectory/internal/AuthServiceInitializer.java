@@ -50,7 +50,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 
 /**
- * Some info.
+ * Set the Active Directory authentication service as the default one when the application is installed.
  *
  * @version $Id$
  * @since 1.17.0
