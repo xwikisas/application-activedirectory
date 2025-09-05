@@ -38,7 +38,6 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.extension.InstalledExtension;
 import org.xwiki.extension.repository.InstalledExtensionRepository;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.observation.AbstractEventListener;
 import org.xwiki.observation.event.Event;
 import org.xwiki.observation.event.filter.EventFilter;
@@ -52,7 +51,6 @@ import org.xwiki.wiki.manager.WikiManagerException;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.doc.rcs.XWikiRCSNodeInfo;
 import com.xwiki.licensing.License;
 import com.xwiki.licensing.Licensor;
 import com.xwiki.licensing.internal.UserCounter;
@@ -163,29 +161,19 @@ public class UserLicenseDisabler extends AbstractEventListener
         if (mainExtension != null) {
             isLicensed = this.licensor.hasLicensure(mainExtension.getId(), user.getDocumentReference());
         }
-        boolean changeNeeded = isLicensed == (1 == user.getXObject(XWIKI_USER_CLASS_REFERENCE).getIntValue(ACTIVE));
+        // Get the actual document with the objects included.
+        try {
+            user = xcontext.getWiki().getDocument(user.getDocumentReference(), xcontext);
+        } catch (XWikiException e) {
+            logger.error("Failed to fetch user profile for [{}]. Cause: [{}]", user,
+                ExceptionUtils.getRootCauseMessage(e));
+            return;
+        }
+        boolean changeNeeded = isLicensed != (1 == user.getXObject(XWIKI_USER_CLASS_REFERENCE).getIntValue(ACTIVE));
 
         if (changeNeeded) {
-            boolean activeToSet = isLicensed;
-            if (isLicensed) {
-                XWikiRCSNodeInfo lastVersion = user.getDocumentArchive().getNodes().stream()
-                    .dropWhile(ver -> !ver.getComment().equals(EDIT_MESSAGE_DISABLE)).skip(1).findFirst().orElse(null);
+            int activeToSet = isLicensed ? 1 : 0;
 
-                if (lastVersion != null) {
-                    // If the user was disabled before the licensor came into effect, preserve that last
-                    // known state by treating the revision comment as a flag.
-                    try {
-//                        XWikiDocument xdoc = documentRevisionProvider.getRevision(user.getDocumentReference(),
-//                            lastVersion.getVersion().toString());
-                        XWikiDocument xdoc = xcontext.getWiki()
-                            .getDocument(user.getDocumentReference(), lastVersion.getVersion().toString(), xcontext);
-                        activeToSet = 1 == xdoc.getXObject(XWIKI_USER_CLASS_REFERENCE).getIntValue(ACTIVE);
-                    } catch (XWikiException e) {
-                        logger.warn("Failed to get last revision of user profile page [{}] when enforcing Active "
-                            + "Directory license. Cause: [{}]", user, ExceptionUtils.getRootCauseMessage(e));
-                    }
-                }
-            }
             String editMessage = isLicensed ? EDIT_MESSAGE_ENABLE : EDIT_MESSAGE_DISABLE;
             user.getXObject(XWIKI_USER_CLASS_REFERENCE).set(ACTIVE, activeToSet, xcontext);
             try {
