@@ -106,12 +106,7 @@ public class UserLicenseEnforcer extends AbstractEventListener
 
         if (!isLicensed) {
             sourceDocument.getXObject(XWIKI_USER_CLASS_REFERENCE).set("active", 0, xcontext);
-//            try {
-//                xcontext.getWiki().saveDocument(sourceDocument, "Enforce Active Directory license.", xcontext);
-//            } catch (XWikiException e) {
-//                logger.error("Failed to enforce Active Directory license. Cause: [{}]",
-//                    ExceptionUtils.getRootCauseMessage(e));
-//            }
+            sourceDocument.setComment(sourceDocument.getComment() + " + Enforce Active Directory license.");
         }
     }
 }

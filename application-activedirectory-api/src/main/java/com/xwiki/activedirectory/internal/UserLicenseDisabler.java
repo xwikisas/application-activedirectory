@@ -97,9 +97,6 @@ public class UserLicenseDisabler extends AbstractEventListener
     @Inject
     private Licensor licensor;
 
-//    @Inject
-//    private LicenseValidator licenseValidator;
-
     @Inject
     private InstalledExtensionRepository repository;
 
@@ -111,9 +108,6 @@ public class UserLicenseDisabler extends AbstractEventListener
 
     @Inject
     private QueryManager queryManager;
-
-//    @Inject
-//    private DocumentRevisionProvider documentRevisionProvider;
 
     /**
      * Default constructor.
