@@ -25,10 +25,10 @@
   <parent>
     <groupId>com.xwiki.activedirectory</groupId>
     <artifactId>application-activedirectory-test</artifactId>
-    <version>1.17.2-SNAPSHOT</version>
+    <version>1.17.3-SNAPSHOT</version>
   </parent>
   <artifactId>application-activedirectory-test-docker</artifactId>
-  <version>1.17.2-SNAPSHOT</version>
+  <version>1.17.3-SNAPSHOT</version>
   <name>Active Directory - Tests - Functional Docker Tests</name>
   <!-- TODO: Move to use "functional-test" in the future when http://jira.codehaus.org/browse/MNG-1911 is fixed,
        see http://jira.xwiki.org/jira/browse/XWIKI-7683 -->
@@ -66,12 +66,7 @@
       <type>xar</type>
       <scope>runtime</scope>
     </dependency>
-    <!-- Remove when licensing application has the parent to 14.10. -->
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-model-api</artifactId>
-      <version>${platform.version}</version>
-    </dependency>
+    <!-- Remove when licensing application has the parent to 15.10. -->
     <dependency>
       <groupId>org.xwiki.commons</groupId>
       <artifactId>xwiki-commons-extension-api</artifactId>
@@ -83,13 +78,6 @@
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-test-docker</artifactId>
       <version>${platform.version}</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>com.xwiki.licensing</groupId>
-      <artifactId>application-licensing-test-dependencies</artifactId>
-      <version>${licensing.version}</version>
-      <type>pom</type>
       <scope>test</scope>
     </dependency>
     <dependency>
