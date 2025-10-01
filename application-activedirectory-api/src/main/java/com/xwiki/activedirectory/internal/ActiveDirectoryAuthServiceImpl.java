@@ -66,6 +66,12 @@ public class ActiveDirectoryAuthServiceImpl extends XWikiLDAPAuthServiceImpl
 
     private static final String XWIKI_SPACE = "XWiki";
 
+    private static final String LDAP_USER_QUERY =
+        "select distinct doc.name from XWikiDocument as doc, BaseObject as obj, StringProperty as prop"
+            + " where doc.space = 'XWiki' and doc.fullName = obj.name"
+            + " and obj.className = 'XWiki.LDAPProfileClass' and obj.id=prop.id.id and prop.id.name='uid'"
+            + " and prop.value = :username";
+
     private static final SpaceReference AD_CODE_SPACE_REFERENCE =
         new SpaceReference("xwiki", Arrays.asList("ActiveDirectory", "Code"));
 
@@ -124,11 +130,33 @@ public class ActiveDirectoryAuthServiceImpl extends XWikiLDAPAuthServiceImpl
         }
     }
 
+    @Override
+    public Principal authenticate(String userId, String password, XWikiContext context) throws XWikiException
+    {
+//        DocumentReference userReference = findUserPage(userId, context);
+//        if (isLicensedForUser(userReference)) { //context.put("message", "LicenseExpired");
+        return super.authenticate(userId, password, context);
+//        } else {
+//            return this.fallbackAuthService.authenticate(userId, password, context);
+//        }
+    }
+
+    @Override
+    public XWikiUser checkAuth(String username, String password, String rememberme, XWikiContext context)
+        throws XWikiException
+    {
+        DocumentReference userReference = findUserPage(username, context);
+        if (isLicensedForUser(userReference)) {
+            return super.checkAuth(username, password, rememberme, context);
+        } else {
+            return this.fallbackAuthService.checkAuth(username, password, rememberme, context);
+        }
+    }
+
     /**
      * Find the user's profile page by the username. Copied with changes from
      * {@link XWikiAuthServiceImpl#findUser(String, XWikiContext)} to fix XWIKI-21117: NPE in XWikiHibernateStore.search
      * in older versions of XWiki.
-     * TODO: Use the original function once the XWiki parent contains the fix.
      *
      * @param username
      * @param context
@@ -153,11 +181,7 @@ public class ActiveDirectoryAuthServiceImpl extends XWikiLDAPAuthServiceImpl
             List<String> results;
             try {
                 // First, look for LDAP users.
-                Query query = this.queryManager.createQuery(
-                    "select distinct doc.name from XWikiDocument as doc, BaseObject as obj, StringProperty as prop"
-                        + " where doc.space = 'XWiki' and doc.fullName = obj.name"
-                        + " and obj.className = 'XWiki.LDAPProfileClass' and obj.id=prop.id.id and prop.id.name='uid'"
-                        + " and prop.value = :username", Query.HQL);
+                Query query = this.queryManager.createQuery(LDAP_USER_QUERY, Query.HQL);
                 query.setWiki(context.getWikiId()).bindValue("username", username).setLimit(1);
                 results = query.execute();
             } catch (QueryException e) {
@@ -171,29 +195,6 @@ public class ActiveDirectoryAuthServiceImpl extends XWikiLDAPAuthServiceImpl
         }
 
         return new DocumentReference(context.getWikiId(), XWIKI_SPACE, user);
-    }
-
-    @Override
-    public XWikiUser checkAuth(String username, String password, String rememberme, XWikiContext context)
-        throws XWikiException
-    {
-        DocumentReference userReference = findUserPage(username, context);
-        if (isLicensedForUser(userReference)) {
-            return super.checkAuth(username, password, rememberme, context);
-        } else {
-            return this.fallbackAuthService.checkAuth(username, password, rememberme, context);
-        }
-    }
-
-    @Override
-    public Principal authenticate(String userId, String password, XWikiContext context) throws XWikiException
-    {
-        DocumentReference userReference = findUserPage(userId, context);
-        if (isLicensedForUser(userReference)) {
-            return super.authenticate(userId, password, context);
-        } else {
-            return this.fallbackAuthService.authenticate(userId, password, context);
-        }
     }
 
     private boolean isLicensed()
