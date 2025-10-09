@@ -66,6 +66,15 @@ public class ActiveDirectoryAuthServiceImpl extends XWikiLDAPAuthServiceImpl
 
     private static final String XWIKI_SPACE = "XWiki";
 
+    private static final String XWIKI_WIKI = "xwiki";
+
+    private static final String ACTIVE_PROPERTY = "active";
+
+    private static final DocumentReference USER_CLASS = new DocumentReference(XWIKI_WIKI, XWIKI_SPACE, "XWikiUsers");
+
+    private static final DocumentReference LICENSE_USER_CHECKPOINT_CLASS_REFERENCE =
+        new DocumentReference(XWIKI_WIKI, List.of("Licenses", "Code"), "LicensingUserCheckpoint");
+
     private static final String LDAP_USER_QUERY =
         "select distinct doc.name from XWikiDocument as doc, BaseObject as obj, StringProperty as prop"
             + " where doc.space = 'XWiki' and doc.fullName = obj.name"
@@ -73,7 +82,7 @@ public class ActiveDirectoryAuthServiceImpl extends XWikiLDAPAuthServiceImpl
             + " and prop.value = :username";
 
     private static final SpaceReference AD_CODE_SPACE_REFERENCE =
-        new SpaceReference("xwiki", Arrays.asList("ActiveDirectory", "Code"));
+        new SpaceReference(XWIKI_WIKI, Arrays.asList("ActiveDirectory", "Code"));
 
     private Licensor licensor = Utils.getComponent(Licensor.class);
 
@@ -123,29 +132,43 @@ public class ActiveDirectoryAuthServiceImpl extends XWikiLDAPAuthServiceImpl
     @Override
     public XWikiUser checkAuth(XWikiContext context) throws XWikiException
     {
-        if (isLicensed()) {
-            return super.checkAuth(context);
-        } else {
-            return this.fallbackAuthService.checkAuth(context);
-        }
+//        if (isLicensed()) {
+        return super.checkAuth(context);
+//        } else {
+//            return this.fallbackAuthService.checkAuth(context);
+//        }
     }
 
     @Override
     public Principal authenticate(String userId, String password, XWikiContext context) throws XWikiException
     {
-//        DocumentReference userReference = findUserPage(userId, context);
-//        if (isLicensedForUser(userReference)) { //context.put("message", "LicenseExpired");
+        DocumentReference userReference = findLDAPUserPage(userId, context);
+        if (userReference != null) {
+            XWikiDocument userDoc = context.getWiki().getDocument(userReference, context);
+            if (!isLicensedForUser(userReference)) {
+                userDoc.getXObject(USER_CLASS).set(ACTIVE_PROPERTY, 0, context);
+                userDoc.createXObject(LICENSE_USER_CHECKPOINT_CLASS_REFERENCE, context);
+                userDoc.getXObject(LICENSE_USER_CHECKPOINT_CLASS_REFERENCE).set(ACTIVE_PROPERTY,
+                    userDoc.getXObject(USER_CLASS).get(ACTIVE_PROPERTY),
+                    context);
+                context.getWiki().saveDocument(userDoc, context);
+                // Also create checkpoint object.
+            } else if (userDoc.getXObject(LICENSE_USER_CHECKPOINT_CLASS_REFERENCE) != null) {
+                // If there is a checkpoint object, restore it.
+                userDoc.getXObject(USER_CLASS).set(ACTIVE_PROPERTY,
+                    userDoc.getXObject(LICENSE_USER_CHECKPOINT_CLASS_REFERENCE).get(ACTIVE_PROPERTY), context);
+                userDoc.removeXObjects(LICENSE_USER_CHECKPOINT_CLASS_REFERENCE);
+                context.getWiki().saveDocument(userDoc, context);
+            }
+        }
         return super.authenticate(userId, password, context);
-//        } else {
-//            return this.fallbackAuthService.authenticate(userId, password, context);
-//        }
     }
 
     @Override
     public XWikiUser checkAuth(String username, String password, String rememberme, XWikiContext context)
         throws XWikiException
     {
-        DocumentReference userReference = findUserPage(username, context);
+        DocumentReference userReference = findLDAPUserPage(username, context);
         if (isLicensedForUser(userReference)) {
             return super.checkAuth(username, password, rememberme, context);
         } else {
@@ -162,7 +185,7 @@ public class ActiveDirectoryAuthServiceImpl extends XWikiLDAPAuthServiceImpl
      * @param context
      * @return the user's profile page, if it exists.
      */
-    private DocumentReference findUserPage(String username, XWikiContext context) throws XWikiException
+    private DocumentReference findLDAPUserPage(String username, XWikiContext context) throws XWikiException
     {
         if (username == null) {
             return null;
