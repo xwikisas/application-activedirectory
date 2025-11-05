@@ -21,19 +21,15 @@ package com.xwiki.activedirectory.internal;
 
 import java.security.Principal;
 import java.util.Arrays;
-import java.util.List;
+import java.util.Date;
 
 import org.apache.commons.lang3.StringUtils;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.contrib.ldap.XWikiLDAPAuthServiceImpl;
 import org.xwiki.contrib.ldap.XWikiLDAPConfig;
-import org.xwiki.extension.InstalledExtension;
-import org.xwiki.extension.repository.InstalledExtensionRepository;
+import org.xwiki.extension.ExtensionId;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.SpaceReference;
-import org.xwiki.query.Query;
-import org.xwiki.query.QueryException;
-import org.xwiki.query.QueryManager;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -44,7 +40,10 @@ import com.xpn.xwiki.user.api.XWikiAuthService;
 import com.xpn.xwiki.user.api.XWikiUser;
 import com.xpn.xwiki.user.impl.xwiki.XWikiAuthServiceImpl;
 import com.xpn.xwiki.web.Utils;
+import com.xwiki.licensing.License;
 import com.xwiki.licensing.Licensor;
+import com.xwiki.licensing.internal.AuthExtensionUserManager;
+import com.xwiki.licensing.internal.UserCounter;
 
 /**
  * Custom Active Directory authenticator that currently only serves as a way to make sure that a valid License for the
@@ -56,43 +55,62 @@ import com.xwiki.licensing.Licensor;
  */
 public class ActiveDirectoryAuthServiceImpl extends XWikiLDAPAuthServiceImpl
 {
+    protected static final String EXTENSION_ID = "com.xwiki.activedirectory:application-activedirectory-ui";
+
     private static final String LDAP_SSL = "ldap_ssl";
 
     private static final String LDAP_SSL_KEYSTORE = "ldap_ssl.keystore";
 
     private static final String LDAP_SSL_SECURE_PROVIDER = "ldap_ssl.secure_provider";
 
-    private static final String EXTENSION_ID = "com.xwiki.activedirectory:application-activedirectory-api";
-
-    private static final String XWIKI_SPACE = "XWiki";
-
-    private static final String XWIKI_WIKI = "xwiki";
-
-    private static final String ACTIVE_PROPERTY = "active";
-
-    private static final DocumentReference USER_CLASS = new DocumentReference(XWIKI_WIKI, XWIKI_SPACE, "XWikiUsers");
-
-    private static final DocumentReference LICENSE_USER_CHECKPOINT_CLASS_REFERENCE =
-        new DocumentReference(XWIKI_WIKI, List.of("Licenses", "Code"), "LicensingUserCheckpoint");
-
-    private static final String LDAP_USER_QUERY =
-        "select distinct doc.name from XWikiDocument as doc, BaseObject as obj, StringProperty as prop"
-            + " where doc.space = 'XWiki' and doc.fullName = obj.name"
-            + " and obj.className = 'XWiki.LDAPProfileClass' and obj.id=prop.id.id and prop.id.name='uid'"
-            + " and prop.value = :username";
-
     private static final SpaceReference AD_CODE_SPACE_REFERENCE =
-        new SpaceReference(XWIKI_WIKI, Arrays.asList("ActiveDirectory", "Code"));
+        new SpaceReference("xwiki", Arrays.asList("ActiveDirectory", "Code"));
 
-    private Licensor licensor = Utils.getComponent(Licensor.class);
+    private final Licensor licensor = Utils.getComponent(Licensor.class);
 
-    private InstalledExtensionRepository repository = Utils.getComponent(InstalledExtensionRepository.class);
+    private final XWikiAuthService fallbackAuthService = new XWikiAuthServiceImpl();
 
-    private XWikiAuthService fallbackAuthService = new XWikiAuthServiceImpl();
+    private final ConfigurationSource configurationSource =
+        Utils.getComponent(ConfigurationSource.class, "activedirectory");
 
-    private ConfigurationSource configurationSource = Utils.getComponent(ConfigurationSource.class, "activedirectory");
+    private final AuthExtensionUserManager authExtensionUserManager =
+        Utils.getComponent(AuthExtensionUserManager.class, EXTENSION_ID);
 
-    private final QueryManager queryManager = Utils.getComponent(QueryManager.class);
+    private final UserCounter userCounter = Utils.getComponent(UserCounter.class);
+
+    @Override
+    public XWikiUser checkAuth(XWikiContext context) throws XWikiException
+    {
+        // We need to leave this open, else users who are logged in through AD might get invalid sessions.
+        return super.checkAuth(context);
+    }
+
+    @Override
+    public Principal authenticate(String userId, String password, XWikiContext context) throws XWikiException
+    {
+        Principal principal;
+        if (isLicensed() || shouldBypassLicense(userId, context)) {
+            principal = super.authenticate(userId, password, context);
+        } else {
+            principal = this.fallbackAuthService.authenticate(userId, password, context);
+            if (null != authExtensionUserManager.getUserDocFromUsername(userId, context)) {
+                // Custom login error message for AD users who were denied access.
+                context.put("message", "activeDirectory.login.license.invalid");
+            }
+        }
+        return principal;
+    }
+
+    @Override
+    public XWikiUser checkAuth(String username, String password, String rememberme, XWikiContext context)
+        throws XWikiException
+    {
+        if (isLicensed() || shouldBypassLicense(username, context)) {
+            return super.checkAuth(username, password, rememberme, context);
+        } else {
+            return this.fallbackAuthService.checkAuth(username, password, rememberme, context);
+        }
+    }
 
     @Override
     protected XWikiLDAPConfig createXWikiLDAPConfig(String authInput)
@@ -129,122 +147,21 @@ public class ActiveDirectoryAuthServiceImpl extends XWikiLDAPAuthServiceImpl
         return xWikiLDAPConfig;
     }
 
-    @Override
-    public XWikiUser checkAuth(XWikiContext context) throws XWikiException
+    private boolean shouldBypassLicense(String username, XWikiContext context)
     {
-//        if (isLicensed()) {
-        return super.checkAuth(context);
-//        } else {
-//            return this.fallbackAuthService.checkAuth(context);
-//        }
-    }
-
-    @Override
-    public Principal authenticate(String userId, String password, XWikiContext context) throws XWikiException
-    {
-        DocumentReference userReference = findLDAPUserPage(userId, context);
-        if (userReference != null) {
-            XWikiDocument userDoc = context.getWiki().getDocument(userReference, context);
-            if (!isLicensedForUser(userReference)) {
-                userDoc.getXObject(USER_CLASS).set(ACTIVE_PROPERTY, 0, context);
-                userDoc.createXObject(LICENSE_USER_CHECKPOINT_CLASS_REFERENCE, context);
-                userDoc.getXObject(LICENSE_USER_CHECKPOINT_CLASS_REFERENCE).set(ACTIVE_PROPERTY,
-                    userDoc.getXObject(USER_CLASS).get(ACTIVE_PROPERTY),
-                    context);
-                context.getWiki().saveDocument(userDoc, context);
-                // Also create checkpoint object.
-            } else if (userDoc.getXObject(LICENSE_USER_CHECKPOINT_CLASS_REFERENCE) != null) {
-                // If there is a checkpoint object, restore it.
-                userDoc.getXObject(USER_CLASS).set(ACTIVE_PROPERTY,
-                    userDoc.getXObject(LICENSE_USER_CHECKPOINT_CLASS_REFERENCE).get(ACTIVE_PROPERTY), context);
-                userDoc.removeXObjects(LICENSE_USER_CHECKPOINT_CLASS_REFERENCE);
-                context.getWiki().saveDocument(userDoc, context);
-            }
+        try {
+            DocumentReference userPage = authExtensionUserManager.getUserDocFromUsername(username, context);
+            License license = licensor.getLicense(EXTENSION_ID);
+            return null != license && license.getExpirationDate() > new Date().getTime()
+                && userCounter.isUserUnderLimit(userPage, license.getMaxUserCount());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
         }
-        return super.authenticate(userId, password, context);
-    }
-
-    @Override
-    public XWikiUser checkAuth(String username, String password, String rememberme, XWikiContext context)
-        throws XWikiException
-    {
-        DocumentReference userReference = findLDAPUserPage(username, context);
-        if (isLicensedForUser(userReference)) {
-            return super.checkAuth(username, password, rememberme, context);
-        } else {
-            return this.fallbackAuthService.checkAuth(username, password, rememberme, context);
-        }
-    }
-
-    /**
-     * Find the user's profile page by the username. Copied with changes from
-     * {@link XWikiAuthServiceImpl#findUser(String, XWikiContext)} to fix XWIKI-21117: NPE in XWikiHibernateStore.search
-     * in older versions of XWiki.
-     *
-     * @param username
-     * @param context
-     * @return the user's profile page, if it exists.
-     */
-    private DocumentReference findLDAPUserPage(String username, XWikiContext context) throws XWikiException
-    {
-        if (username == null) {
-            return null;
-        }
-
-        String user;
-
-        // First let's look in the cache
-        if (context.getWiki().exists(new DocumentReference(context.getWikiId(), XWIKI_SPACE, username), context)) {
-            user = username;
-        } else {
-            // Note: The result of this search depends on the Database. If the database is
-            // case-insensitive (like MySQL) then users will be able to log in by entering their
-            // username in any case. For case-sensitive databases (like HSQLDB) they'll need to
-            // enter it exactly as they've created it.
-            List<String> results;
-            try {
-                // First, look for LDAP users.
-                Query query = this.queryManager.createQuery(LDAP_USER_QUERY, Query.HQL);
-                query.setWiki(context.getWikiId()).bindValue("username", username).setLimit(1);
-                results = query.execute();
-            } catch (QueryException e) {
-                return null;
-            }
-            if (results.isEmpty()) {
-                return null;
-            } else {
-                user = results.get(0);
-            }
-        }
-
-        return new DocumentReference(context.getWikiId(), XWIKI_SPACE, user);
     }
 
     private boolean isLicensed()
     {
-        boolean isLicensed = false;
-
-        // The Licensor expects a version so we need to discover the installed version for now. Hopefully in the future
-        // the Licensor could find it how automatically.
-        // Note: The AD authenticator is installed in the root namespace, hence the passing of "null" in the call below.
-        InstalledExtension mainExtension = this.repository.getInstalledExtension(EXTENSION_ID, null);
-        if (mainExtension != null) {
-            isLicensed = this.licensor.hasLicensure(mainExtension.getId());
-        }
-        return isLicensed;
-    }
-
-    private boolean isLicensedForUser(DocumentReference userReference)
-    {
-        boolean isLicensed = false;
-
-        // The Licensor expects a version so we need to discover the installed version for now. Hopefully in the future
-        // the Licensor could find it how automatically.
-        // Note: The AD authenticator is installed in the root namespace, hence the passing of "null" in the call below.
-        InstalledExtension mainExtension = this.repository.getInstalledExtension(EXTENSION_ID, null);
-        if (mainExtension != null) {
-            isLicensed = this.licensor.hasLicensure(mainExtension.getId(), userReference);
-        }
-        return isLicensed;
+        return this.licensor.hasLicensure(new ExtensionId(EXTENSION_ID));
     }
 }

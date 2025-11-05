@@ -1,3 +1,4 @@
 com.xwiki.activedirectory.internal.ActiveDirectoryAuthService
 com.xwiki.activedirectory.internal.ActiveDirectoryConfigurationSource
 com.xwiki.activedirectory.internal.AuthServiceInitializer
+com.xwiki.activedirectory.internal.ActiveDirectoryAuthExtensionUserManager

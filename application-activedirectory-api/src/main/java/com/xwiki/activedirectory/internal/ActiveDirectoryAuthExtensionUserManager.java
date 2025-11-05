@@ -19,9 +19,11 @@
  */
 package com.xwiki.activedirectory.internal;
 
-import java.util.HashSet;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
-import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -31,11 +33,11 @@ import javax.inject.Singleton;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.extension.ExtensionId;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
+import org.xwiki.query.QueryFilter;
 import org.xwiki.query.QueryManager;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 import org.xwiki.wiki.manager.WikiManagerException;
@@ -43,7 +45,7 @@ import org.xwiki.wiki.manager.WikiManagerException;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
-import com.xwiki.licensing.Licensor;
+import com.xpn.xwiki.user.impl.xwiki.XWikiAuthServiceImpl;
 import com.xwiki.licensing.internal.AuthExtensionUserManager;
 
 /**
@@ -54,18 +56,26 @@ import com.xwiki.licensing.internal.AuthExtensionUserManager;
  */
 @Component
 @Singleton
-@Named(ActiveDirectoryAuthExtensionUserManager.EXTENSION_ID)
+@Named(ActiveDirectoryAuthServiceImpl.EXTENSION_ID)
 public class ActiveDirectoryAuthExtensionUserManager implements AuthExtensionUserManager
 {
-    protected static final String EXTENSION_ID = "com.xwiki.activedirectory:application-activedirectory-api";
-
     private static final String XWIKI_SPACE_NAME = "XWiki";
 
+    private static final String USER_QUERY_LDAP_FILTER = "where doc.space = 'XWiki' "
+        + "and doc.fullName = XWikiUserObj.name and XWikiUserObj.className = 'XWiki.XWikiUsers' "
+        + "and doc.fullName = LDAPObj.name and LDAPObj.className = 'XWiki.LDAPProfileClass' ";
+
+    private static final String USER_QUERY_SORT = "order by doc.creationDate";
+
     private static final String LDAP_USER_QUERY =
-        "select doc from XWikiDocument doc, BaseObject as XWikiUserObj, BaseObject as LDAPObj "
-            + "where doc.space = 'XWiki' "
-            + "and doc.fullName = XWikiUserObj.name and XWikiUserObj.className = 'XWiki.XWikiUsers' "
-            + "and doc.fullName = LDAPObj.name and LDAPObj.className = 'XWiki.LDAPProfileClass' ";
+        "select doc from XWikiDocument doc, BaseObject as XWikiUserObj, BaseObject as LDAPObj " + USER_QUERY_LDAP_FILTER
+            + USER_QUERY_SORT;
+
+    private static final String LDAP_ACTIVE_USER_QUERY =
+        "select doc from XWikiDocument doc, BaseObject as XWikiUserObj, BaseObject as LDAPObj"
+            + ", IntegerProperty as IsActive " + USER_QUERY_LDAP_FILTER
+            + "and XWikiUserObj.id=IsActive.id.id and IsActive.id.name='active' and IsActive.value = 1 "
+            + USER_QUERY_SORT;
 
     private static final LocalDocumentReference LDAP_USER_CLASS_REFERENCE =
         new LocalDocumentReference(XWIKI_SPACE_NAME, "LDAPProfileClass");
@@ -74,16 +84,11 @@ public class ActiveDirectoryAuthExtensionUserManager implements AuthExtensionUse
         new LocalDocumentReference(XWIKI_SPACE_NAME, "XWikiUsers");
 
     @Inject
-    private Logger logger;
+    @Named("unique")
+    private QueryFilter uniqueFilter;
 
     @Inject
-    private Licensor licensor;
-
-//    @Inject
-//    private InstalledExtensionRepository repository;
-//
-//    @Inject
-//    private UserCounter userCounter;
+    private Logger logger;
 
     @Inject
     private WikiDescriptorManager wikiDescriptorManager;
@@ -107,22 +112,6 @@ public class ActiveDirectoryAuthExtensionUserManager implements AuthExtensionUse
         }
     }
 
-//    //    @Inject
-////    private DocumentReferenceResolver<UserReference> documentReferenceResolver;
-//    @Override
-//    public boolean managesUser(UserReference userReference)
-//    {
-//        if (userReference.equals(SuperAdminUserReference.INSTANCE) || userReference.equals(
-//            GuestUserReference.INSTANCE))
-//        {
-//            return false;
-//        }
-////        DocumentReference user;
-////        if (CurrentUserReference.INSTANCE
-//        return false;
-
-    /// /        return managesUser(documentReferenceResolver.resolve(userReference));
-//    }
     @Override
     public boolean managesUser(XWikiDocument user)
     {
@@ -131,46 +120,91 @@ public class ActiveDirectoryAuthExtensionUserManager implements AuthExtensionUse
     }
 
     @Override
-    public boolean shouldBeActive(DocumentReference user)
+    public List<XWikiDocument> getManagedUsers()
     {
-//        InstalledExtension mainExtension = this.repository.getInstalledExtension(EXTENSION_ID, null);
-//        License license = licensor.getLicense(mainExtension.getId());
-//        try {
-//            if (license.getExpirationDate() > new Date().getTime()) {
-//                return false;
-//            } else if (userCounter.getUserCount() <= license.getMaxUserCount()) {
-////                 getManagedUsers() <= license.getMaxUserCount()
-//                return true;
-//            }
-//        } catch (Exception e) {
-//            logger.error("Failed to get license user count for Active Directory user license check. Cause: [{}]",
-//                ExceptionUtils.getRootCauseMessage(e));
-//            return true;
-//        }
-        return licensor.hasLicensure(new ExtensionId(EXTENSION_ID), user);
+        return executeQueryOnAllWikis(LDAP_USER_QUERY);
     }
 
     @Override
-    public Set<XWikiDocument> getManagedUsers()
+    public List<XWikiDocument> getActiveManagedUsers()
     {
-        Set<XWikiDocument> ldapUsers = new HashSet<>();
+        return executeQueryOnAllWikis(LDAP_ACTIVE_USER_QUERY);
+    }
+
+    /**
+     * Find the user's profile page by the username. Copied with changes from
+     * {@link XWikiAuthServiceImpl#findUser(String, XWikiContext)} to fix XWIKI-21117: NPE in XWikiHibernateStore.search
+     * in older versions of XWiki.
+     * <p>
+     * {@inheritDoc}
+     */
+    @Override
+    public DocumentReference getUserDocFromUsername(String username, XWikiContext context)
+    {
+        if (username == null) {
+            return null;
+        }
+
+        // First let's look in the cache.
+        boolean matchesExactly = false;
+        try {
+            matchesExactly = context.getWiki()
+                .exists(new DocumentReference(context.getWikiId(), XWIKI_SPACE_NAME, username), context);
+        } catch (XWikiException e) {
+            logger.error("Failed to verify existence of user page for username [{}]. Cause: [{}]", username,
+                ExceptionUtils.getRootCauseMessage(e));
+            return null;
+        }
+
+        String user;
+        if (matchesExactly) {
+            user = username;
+        } else {
+            // Note: The result of this search depends on the Database. If the database is
+            // case-insensitive (like MySQL) then users will be able to log in by entering their
+            // username in any case. For case-sensitive databases (like HSQLDB) they'll need to
+            // enter it exactly as they've created it.
+            List<String> results;
+            try {
+                // First, look for LDAP users.
+                Query query = this.queryManager.createQuery(LDAP_USER_QUERY, Query.HQL);
+                query.setWiki(context.getWikiId()).bindValue("username", username).setLimit(1);
+                results = query.execute();
+            } catch (QueryException e) {
+                logger.error("Error while querying LDAP user pages. Cause: [{}]",
+                    ExceptionUtils.getRootCauseMessage(e));
+                return null;
+            }
+            if (results.isEmpty()) {
+                return null;
+            } else {
+                user = results.get(0);
+            }
+        }
+
+        return new DocumentReference(context.getWikiId(), XWIKI_SPACE_NAME, user);
+    }
+
+    private List<XWikiDocument> executeQueryOnAllWikis(String query)
+    {
+        SortedSet<XWikiDocument> ldapUsers = new TreeSet<>(Comparator.comparing(XWikiDocument::getCreationDate));
         try {
             for (String wikiId : wikiDescriptorManager.getAllIds()) {
-                try {
-                    ldapUsers.addAll(getUsersOnWiki(wikiId));
-                } catch (QueryException e) {
-                    logger.error("Failed to get users managed by Active Directory on wiki [{}]. Cause: [{}]", wikiId,
-                        ExceptionUtils.getRootCauseMessage(e));
-                }
+                ldapUsers.addAll(executeQueryOnWiki(query, wikiId));
             }
         } catch (WikiManagerException e) {
             logger.error("Failed to get subwiki names. Cause: [{}]", ExceptionUtils.getRootCauseMessage(e));
         }
-        return ldapUsers;
+        return new ArrayList<>(ldapUsers);
     }
 
-    private List<XWikiDocument> getUsersOnWiki(String wikiId) throws QueryException
+    private List<XWikiDocument> executeQueryOnWiki(String query, String wikiId)
     {
-        return this.queryManager.createQuery(LDAP_USER_QUERY, Query.HQL).setWiki(wikiId).execute();
+        try {
+            return this.queryManager.createQuery(query, Query.HQL).setWiki(wikiId).addFilter(uniqueFilter).execute();
+        } catch (QueryException e) {
+            logger.error("Failed to get user count for wiki [{}]", wikiId);
+            return List.of();
+        }
     }
 }
