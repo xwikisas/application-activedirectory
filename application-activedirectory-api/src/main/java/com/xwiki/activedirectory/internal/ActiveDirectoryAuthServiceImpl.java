@@ -24,10 +24,11 @@ import java.util.Arrays;
 import java.util.Date;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.slf4j.Logger;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.contrib.ldap.XWikiLDAPAuthServiceImpl;
 import org.xwiki.contrib.ldap.XWikiLDAPConfig;
-import org.xwiki.extension.ExtensionId;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.SpaceReference;
 
@@ -55,13 +56,15 @@ import com.xwiki.licensing.internal.UserCounter;
  */
 public class ActiveDirectoryAuthServiceImpl extends XWikiLDAPAuthServiceImpl
 {
-    protected static final String EXTENSION_ID = "com.xwiki.activedirectory:application-activedirectory-ui";
+    protected static final String EXTENSION_ID = "com.xwiki.activedirectory:application-activedirectory-api";
 
     private static final String LDAP_SSL = "ldap_ssl";
 
     private static final String LDAP_SSL_KEYSTORE = "ldap_ssl.keystore";
 
     private static final String LDAP_SSL_SECURE_PROVIDER = "ldap_ssl.secure_provider";
+
+    private static final String PRINCIPAL_MESSAGE_FIELD = "message";
 
     private static final SpaceReference AD_CODE_SPACE_REFERENCE =
         new SpaceReference("xwiki", Arrays.asList("ActiveDirectory", "Code"));
@@ -73,44 +76,12 @@ public class ActiveDirectoryAuthServiceImpl extends XWikiLDAPAuthServiceImpl
     private final ConfigurationSource configurationSource =
         Utils.getComponent(ConfigurationSource.class, "activedirectory");
 
-    private final AuthExtensionUserManager authExtensionUserManager =
-        Utils.getComponent(AuthExtensionUserManager.class, EXTENSION_ID);
-
     private final UserCounter userCounter = Utils.getComponent(UserCounter.class);
 
-    @Override
-    public XWikiUser checkAuth(XWikiContext context) throws XWikiException
-    {
-        // We need to leave this open, else users who are logged in through AD might get invalid sessions.
-        return super.checkAuth(context);
-    }
+    private final AuthExtensionUserManager activeDirectoryUserManager =
+        Utils.getComponent(AuthExtensionUserManager.class, EXTENSION_ID);
 
-    @Override
-    public Principal authenticate(String userId, String password, XWikiContext context) throws XWikiException
-    {
-        Principal principal;
-        if (isLicensed() || shouldBypassLicense(userId, context)) {
-            principal = super.authenticate(userId, password, context);
-        } else {
-            principal = this.fallbackAuthService.authenticate(userId, password, context);
-            if (null != authExtensionUserManager.getUserDocFromUsername(userId, context)) {
-                // Custom login error message for AD users who were denied access.
-                context.put("message", "activeDirectory.login.license.invalid");
-            }
-        }
-        return principal;
-    }
-
-    @Override
-    public XWikiUser checkAuth(String username, String password, String rememberme, XWikiContext context)
-        throws XWikiException
-    {
-        if (isLicensed() || shouldBypassLicense(username, context)) {
-            return super.checkAuth(username, password, rememberme, context);
-        } else {
-            return this.fallbackAuthService.checkAuth(username, password, rememberme, context);
-        }
-    }
+    private final Logger logger = Utils.getComponent(Logger.class);
 
     @Override
     protected XWikiLDAPConfig createXWikiLDAPConfig(String authInput)
@@ -147,21 +118,84 @@ public class ActiveDirectoryAuthServiceImpl extends XWikiLDAPAuthServiceImpl
         return xWikiLDAPConfig;
     }
 
-    private boolean shouldBypassLicense(String username, XWikiContext context)
+    @Override
+    public XWikiUser checkAuth(XWikiContext context) throws XWikiException
     {
-        try {
-            DocumentReference userPage = authExtensionUserManager.getUserDocFromUsername(username, context);
-            License license = licensor.getLicense(EXTENSION_ID);
-            return null != license && license.getExpirationDate() > new Date().getTime()
-                && userCounter.isUserUnderLimit(userPage, license.getMaxUserCount());
-        } catch (Exception e) {
-            e.printStackTrace();
-            return false;
+        if (isLicensed()) {
+            return super.checkAuth(context);
+        } else {
+            return this.fallbackAuthService.checkAuth(context);
         }
+    }
+
+    @Override
+    public XWikiUser checkAuth(String username, String password, String rememberme, XWikiContext context)
+        throws XWikiException
+    {
+        if (isLicensed() || shouldBypassLicense(username, context)) {
+            return super.checkAuth(username, password, rememberme, context);
+        } else {
+            return this.fallbackAuthService.checkAuth(username, password, rememberme, context);
+        }
+    }
+
+    @Override
+    public Principal authenticate(String userId, String password, XWikiContext context) throws XWikiException
+    {
+        Principal principal;
+        if (isLicensed() || shouldBypassLicense(userId, context)) {
+            try {
+                long instanceUserCount = userCounter.getUserCount();
+                if (licensor.getLicense(EXTENSION_ID).getMaxUserCount() == instanceUserCount
+                    && null == activeDirectoryUserManager.getUserDocFromUsername(userId, context))
+                {
+                    // Block the creation of new LDAP users when the license user limit is reached.
+                    // The license limit is technically respected, but adding one more user would exceed it.
+                    principal = this.fallbackAuthService.authenticate(userId, password, context);
+                    // FIXME: Changing the error message enables malicious probing of the XWiki login page to get the
+                    //  usernames of Active Directory users.
+                    context.put(PRINCIPAL_MESSAGE_FIELD, "activeDirectory.loginError.license.userLimitExceeding");
+                } else {
+                    principal = super.authenticate(userId, password, context);
+                }
+            } catch (Exception e) {
+                logger.warn("Failed to get user count of instance for Active Directory license check. The license user "
+                    + "limit might be exceeded as a result. Cause: [{}]", ExceptionUtils.getRootCauseMessage(e));
+                // Allow the usage of the app, even if we can't determine the user count.
+                principal = super.authenticate(userId, password, context);
+            }
+        } else {
+            principal = this.fallbackAuthService.authenticate(userId, password, context);
+            if (null != activeDirectoryUserManager.getUserDocFromUsername(userId, context)) {
+                // Custom login error message for AD users who were denied access.
+                context.put(PRINCIPAL_MESSAGE_FIELD, "activeDirectory.loginError.license.invalid");
+            }
+        }
+        return principal;
     }
 
     private boolean isLicensed()
     {
-        return this.licensor.hasLicensure(new ExtensionId(EXTENSION_ID));
+        return this.licensor.hasLicensure(EXTENSION_ID);
+    }
+
+    private boolean shouldBypassLicense(String username, XWikiContext context)
+    {
+        try {
+            DocumentReference userPage = activeDirectoryUserManager.getUserDocFromUsername(username, context);
+            if (null == userPage) {
+                return false;
+            }
+            // This differs from hasLicensure() since we need the distinction between user limit and other types of
+            // expired licenses. If the licensor implementation differs from the default one, it might lead to
+            // unexpected behavior.
+            License license = licensor.getLicense(EXTENSION_ID);
+            return null != license && license.getExpirationDate() > new Date().getTime()
+                && userCounter.isUserUnderLimit(userPage, license.getMaxUserCount());
+        } catch (Exception e) {
+            logger.error("Failed to verify that the Active Directory user is under license limit. Cause: [{}]",
+                ExceptionUtils.getRootCauseMessage(e));
+            return false;
+        }
     }
 }

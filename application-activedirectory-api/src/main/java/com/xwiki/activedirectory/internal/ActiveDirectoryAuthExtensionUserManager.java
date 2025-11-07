@@ -61,20 +61,24 @@ public class ActiveDirectoryAuthExtensionUserManager implements AuthExtensionUse
 {
     private static final String XWIKI_SPACE_NAME = "XWiki";
 
-    private static final String USER_QUERY_LDAP_FILTER = "where doc.space = 'XWiki' "
+    private static final String USER_QUERY_LDAP_FILTER = " where doc.space = 'XWiki' "
         + "and doc.fullName = XWikiUserObj.name and XWikiUserObj.className = 'XWiki.XWikiUsers' "
-        + "and doc.fullName = LDAPObj.name and LDAPObj.className = 'XWiki.LDAPProfileClass' ";
+        + "and doc.fullName = LDAPObj.name and LDAPObj.className = 'XWiki.LDAPProfileClass'";
 
-    private static final String USER_QUERY_SORT = "order by doc.creationDate";
+    private static final String USER_QUERY_SORT = " order by doc.creationDate";
 
-    private static final String LDAP_USER_QUERY =
-        "select doc from XWikiDocument doc, BaseObject as XWikiUserObj, BaseObject as LDAPObj " + USER_QUERY_LDAP_FILTER
-            + USER_QUERY_SORT;
+    private static final String USER_QUERY_SELECT =
+        "select doc from XWikiDocument doc, BaseObject as XWikiUserObj, BaseObject as LDAPObj";
+
+    private static final String LDAP_USER_QUERY = USER_QUERY_SELECT + USER_QUERY_LDAP_FILTER + USER_QUERY_SORT;
+
+    private static final String USER_DOC_QUERY = "select doc.name from XWikiDocument doc, BaseObject as XWikiUserObj,"
+        + " BaseObject as LDAPObj, StringProperty as prop" + USER_QUERY_LDAP_FILTER
+        + " and LDAPObj.id=prop.id.id and prop.id.name='uid' and prop.value = :username" + USER_QUERY_SORT;
 
     private static final String LDAP_ACTIVE_USER_QUERY =
-        "select doc from XWikiDocument doc, BaseObject as XWikiUserObj, BaseObject as LDAPObj"
-            + ", IntegerProperty as IsActive " + USER_QUERY_LDAP_FILTER
-            + "and XWikiUserObj.id=IsActive.id.id and IsActive.id.name='active' and IsActive.value = 1 "
+        USER_QUERY_SELECT + ", IntegerProperty as IsActive" + USER_QUERY_LDAP_FILTER
+            + " and XWikiUserObj.id=IsActive.id.id and IsActive.id.name='active' and IsActive.value = 1"
             + USER_QUERY_SORT;
 
     private static final LocalDocumentReference LDAP_USER_CLASS_REFERENCE =
@@ -145,44 +149,33 @@ public class ActiveDirectoryAuthExtensionUserManager implements AuthExtensionUse
             return null;
         }
 
-        // First let's look in the cache.
-        boolean matchesExactly = false;
+        // First, check the normal user page location.
         try {
-            matchesExactly = context.getWiki()
-                .exists(new DocumentReference(context.getWikiId(), XWIKI_SPACE_NAME, username), context);
+            DocumentReference userRef = new DocumentReference(context.getWikiId(), XWIKI_SPACE_NAME, username);
+            if (context.getWiki().exists(userRef, context)) {
+                return userRef;
+            }
         } catch (XWikiException e) {
             logger.error("Failed to verify existence of user page for username [{}]. Cause: [{}]", username,
                 ExceptionUtils.getRootCauseMessage(e));
             return null;
         }
 
-        String user;
-        if (matchesExactly) {
-            user = username;
-        } else {
-            // Note: The result of this search depends on the Database. If the database is
-            // case-insensitive (like MySQL) then users will be able to log in by entering their
-            // username in any case. For case-sensitive databases (like HSQLDB) they'll need to
-            // enter it exactly as they've created it.
-            List<String> results;
-            try {
-                // First, look for LDAP users.
-                Query query = this.queryManager.createQuery(LDAP_USER_QUERY, Query.HQL);
-                query.setWiki(context.getWikiId()).bindValue("username", username).setLimit(1);
-                results = query.execute();
-            } catch (QueryException e) {
-                logger.error("Error while querying LDAP user pages. Cause: [{}]",
-                    ExceptionUtils.getRootCauseMessage(e));
-                return null;
-            }
-            if (results.isEmpty()) {
-                return null;
-            } else {
-                user = results.get(0);
-            }
+        // Then, look for LDAP users, for which the page name might be different from the username.
+        List<String> results;
+        try {
+            Query query = this.queryManager.createQuery(USER_DOC_QUERY, Query.HQL);
+            query.setWiki(context.getWikiId()).bindValue("username", username).setLimit(1);
+            results = query.execute();
+        } catch (QueryException e) {
+            logger.error("Error while querying LDAP user pages. Cause: [{}]", ExceptionUtils.getRootCauseMessage(e));
+            return null;
         }
-
-        return new DocumentReference(context.getWikiId(), XWIKI_SPACE_NAME, user);
+        if (results.isEmpty()) {
+            return null;
+        } else {
+            return new DocumentReference(context.getWikiId(), XWIKI_SPACE_NAME, results.get(0));
+        }
     }
 
     private List<XWikiDocument> executeQueryOnAllWikis(String query)
