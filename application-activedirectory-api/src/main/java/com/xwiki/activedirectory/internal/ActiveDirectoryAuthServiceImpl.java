@@ -69,19 +69,18 @@ public class ActiveDirectoryAuthServiceImpl extends XWikiLDAPAuthServiceImpl
     private static final SpaceReference AD_CODE_SPACE_REFERENCE =
         new SpaceReference("xwiki", Arrays.asList("ActiveDirectory", "Code"));
 
-    private final Licensor licensor = Utils.getComponent(Licensor.class);
+    private Licensor licensor = Utils.getComponent(Licensor.class);
 
-    private final XWikiAuthService fallbackAuthService = new XWikiAuthServiceImpl();
+    private XWikiAuthService fallbackAuthService = new XWikiAuthServiceImpl();
 
-    private final ConfigurationSource configurationSource =
-        Utils.getComponent(ConfigurationSource.class, "activedirectory");
+    private ConfigurationSource configurationSource = Utils.getComponent(ConfigurationSource.class, "activedirectory");
 
-    private final UserCounter userCounter = Utils.getComponent(UserCounter.class);
+    private UserCounter userCounter = Utils.getComponent(UserCounter.class);
 
-    private final AuthExtensionUserManager activeDirectoryUserManager =
+    private AuthExtensionUserManager activeDirectoryUserManager =
         Utils.getComponent(AuthExtensionUserManager.class, EXTENSION_ID);
 
-    private final Logger logger = Utils.getComponent(Logger.class);
+    private Logger logger = Utils.getComponent(Logger.class);
 
     @Override
     protected XWikiLDAPConfig createXWikiLDAPConfig(String authInput)
@@ -144,26 +143,7 @@ public class ActiveDirectoryAuthServiceImpl extends XWikiLDAPAuthServiceImpl
     {
         Principal principal;
         if (isLicensed() || shouldBypassLicense(userId, context)) {
-            try {
-                long instanceUserCount = userCounter.getUserCount();
-                if (licensor.getLicense(EXTENSION_ID).getMaxUserCount() == instanceUserCount
-                    && null == activeDirectoryUserManager.getUserDocFromUsername(userId, context))
-                {
-                    // Block the creation of new LDAP users when the license user limit is reached.
-                    // The license limit is technically respected, but adding one more user would exceed it.
-                    principal = this.fallbackAuthService.authenticate(userId, password, context);
-                    // FIXME: Changing the error message enables malicious probing of the XWiki login page to get the
-                    //  usernames of Active Directory users.
-                    context.put(PRINCIPAL_MESSAGE_FIELD, "activeDirectory.loginError.license.userLimitExceeding");
-                } else {
-                    principal = super.authenticate(userId, password, context);
-                }
-            } catch (Exception e) {
-                logger.warn("Failed to get user count of instance for Active Directory license check. The license user "
-                    + "limit might be exceeded as a result. Cause: [{}]", ExceptionUtils.getRootCauseMessage(e));
-                // Allow the usage of the app, even if we can't determine the user count.
-                principal = super.authenticate(userId, password, context);
-            }
+            principal = super.authenticate(userId, password, context);
         } else {
             principal = this.fallbackAuthService.authenticate(userId, password, context);
             if (null != activeDirectoryUserManager.getUserDocFromUsername(userId, context)) {
