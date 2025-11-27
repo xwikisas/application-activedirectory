@@ -26,6 +26,7 @@ import java.util.Date;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.contrib.ldap.XWikiLDAPAuthServiceImpl;
 import org.xwiki.contrib.ldap.XWikiLDAPConfig;
@@ -69,6 +70,8 @@ public class ActiveDirectoryAuthServiceImpl extends XWikiLDAPAuthServiceImpl
     private static final SpaceReference AD_CODE_SPACE_REFERENCE =
         new SpaceReference("xwiki", Arrays.asList("ActiveDirectory", "Code"));
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(ActiveDirectoryAuthServiceImpl.class);
+
     private Licensor licensor = Utils.getComponent(Licensor.class);
 
     private XWikiAuthService fallbackAuthService = new XWikiAuthServiceImpl();
@@ -79,8 +82,6 @@ public class ActiveDirectoryAuthServiceImpl extends XWikiLDAPAuthServiceImpl
 
     private AuthExtensionUserManager activeDirectoryUserManager =
         Utils.getComponent(AuthExtensionUserManager.class, EXTENSION_ID);
-
-    private Logger logger = Utils.getComponent(Logger.class);
 
     @Override
     protected XWikiLDAPConfig createXWikiLDAPConfig(String authInput)
@@ -173,7 +174,7 @@ public class ActiveDirectoryAuthServiceImpl extends XWikiLDAPAuthServiceImpl
             return null != license && license.getExpirationDate() > new Date().getTime()
                 && userCounter.isUserUnderLimit(userPage, license.getMaxUserCount());
         } catch (Exception e) {
-            logger.error("Failed to verify that the Active Directory user is under license limit. Cause: [{}]",
+            LOGGER.error("Failed to verify that the Active Directory user is under license limit. Cause: [{}]",
                 ExceptionUtils.getRootCauseMessage(e));
             return false;
         }

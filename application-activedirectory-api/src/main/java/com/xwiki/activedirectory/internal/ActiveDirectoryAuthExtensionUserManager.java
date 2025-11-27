@@ -169,7 +169,7 @@ public class ActiveDirectoryAuthExtensionUserManager implements AuthExtensionUse
             results = query.execute();
         } catch (QueryException e) {
             logger.error("Error while querying LDAP user pages. Cause: [{}]", ExceptionUtils.getRootCauseMessage(e));
-            return null;
+            results = List.of();
         }
         if (results.isEmpty()) {
             return null;
