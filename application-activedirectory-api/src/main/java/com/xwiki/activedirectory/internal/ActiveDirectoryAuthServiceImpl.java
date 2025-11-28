@@ -65,8 +65,6 @@ public class ActiveDirectoryAuthServiceImpl extends XWikiLDAPAuthServiceImpl
 
     private static final String LDAP_SSL_SECURE_PROVIDER = "ldap_ssl.secure_provider";
 
-    private static final String PRINCIPAL_MESSAGE_FIELD = "message";
-
     private static final SpaceReference AD_CODE_SPACE_REFERENCE =
         new SpaceReference("xwiki", Arrays.asList("ActiveDirectory", "Code"));
 
@@ -132,7 +130,7 @@ public class ActiveDirectoryAuthServiceImpl extends XWikiLDAPAuthServiceImpl
     public XWikiUser checkAuth(String username, String password, String rememberme, XWikiContext context)
         throws XWikiException
     {
-        if (isLicensed() || shouldBypassLicense(username, context)) {
+        if (isLicensed()) {
             return super.checkAuth(username, password, rememberme, context);
         } else {
             return this.fallbackAuthService.checkAuth(username, password, rememberme, context);
@@ -142,17 +140,11 @@ public class ActiveDirectoryAuthServiceImpl extends XWikiLDAPAuthServiceImpl
     @Override
     public Principal authenticate(String userId, String password, XWikiContext context) throws XWikiException
     {
-        Principal principal;
-        if (isLicensed() || shouldBypassLicense(userId, context)) {
-            principal = super.authenticate(userId, password, context);
+        if (shouldUseADAuthService(userId, context)) {
+            return super.authenticate(userId, password, context);
         } else {
-            principal = this.fallbackAuthService.authenticate(userId, password, context);
-            if (null != activeDirectoryUserManager.getUserDocFromUsername(userId, context)) {
-                // Custom login error message for AD users who were denied access.
-                context.put(PRINCIPAL_MESSAGE_FIELD, "activeDirectory.loginError.license.invalid");
-            }
+            return this.fallbackAuthService.authenticate(userId, password, context);
         }
-        return principal;
     }
 
     private boolean isLicensed()
@@ -160,21 +152,35 @@ public class ActiveDirectoryAuthServiceImpl extends XWikiLDAPAuthServiceImpl
         return this.licensor.hasLicensure(EXTENSION_ID);
     }
 
-    private boolean shouldBypassLicense(String username, XWikiContext context)
+    /**
+     * When on the login screen, decide if the LDAPAuthService should be used. Using LDAP means creating a new user if
+     * the given credentials are valid and point to a user wasn't imported in XWiki yet. This might lead to
+     * invalidation of the license.
+     * <br>
+     * This function will block logins of valid AD users which are not yet imported into XWiki, if the license cannot
+     * support another user.
+     *
+     * @param username the user to check
+     * @param context xwiki context
+     * @return true if the given user should use the LDAPAuthService to log in
+     */
+    private boolean shouldUseADAuthService(String username, XWikiContext context)
     {
+        License license = licensor.getLicense(EXTENSION_ID);
+        DocumentReference userPage = activeDirectoryUserManager.getUserDocFromUsername(username, context);
+        if (null == license) {
+            return false;
+        }
         try {
-            DocumentReference userPage = activeDirectoryUserManager.getUserDocFromUsername(username, context);
-            if (null == userPage) {
-                return false;
+            if (isLicensed()) {
+                // Don't allow the creation of new LDAP users if the license cannot hold more users.
+                return !(license.getMaxUserCount() == userCounter.getUserCount() && null == userPage);
+            } else {
+                return license.getExpirationDate() > new Date().getTime() && userCounter.isUserUnderLimit(userPage,
+                    license.getMaxUserCount());
             }
-            // This differs from hasLicensure() since we need the distinction between user limit and other types of
-            // expired licenses. If the licensor implementation differs from the default one, it might lead to
-            // unexpected behavior.
-            License license = licensor.getLicense(EXTENSION_ID);
-            return null != license && license.getExpirationDate() > new Date().getTime()
-                && userCounter.isUserUnderLimit(userPage, license.getMaxUserCount());
         } catch (Exception e) {
-            LOGGER.error("Failed to verify that the Active Directory user is under license limit. Cause: [{}]",
+            LOGGER.error("Failed to decide if the Active Directory user should be allowed to log in. Cause: [{}]",
                 ExceptionUtils.getRootCauseMessage(e));
             return false;
         }
