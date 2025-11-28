@@ -62,9 +62,6 @@ activeDirectory.checkConnection.hint=To check the connection for the current set
 activeDirectory.checkConnection.success=Test connection succeeded!
 activeDirecfory.config.initializationComment=Configuration initialized with the default values.
 
-activeDirectory.loginError.license.userLimitExceeding=You cannot add new Active Directory users to XWiki because the license user limit has been reached.
-activeDirectory.loginError.license.invalid=The license of the Active Directory application is not valid.
-
 XWiki.XWikiPreferences_ldap=Enable the Active Directory authentication
 XWiki.XWikiPreferences_ldap.hint=Enable the Active Directory authentication for this wiki, otherwise only XWiki authentication will work. If enabled and configured properly, an XWiki user will be created whenever an Active Directory user visits the wiki for the first time.
 XWiki.XWikiPreferences_ldap_server=Active Directory server address
