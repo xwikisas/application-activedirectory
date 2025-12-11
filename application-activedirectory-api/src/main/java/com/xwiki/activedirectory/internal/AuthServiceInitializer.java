@@ -38,10 +38,13 @@ import org.xwiki.extension.InstalledExtension;
 import org.xwiki.extension.event.ExtensionInstalledEvent;
 import org.xwiki.extension.event.ExtensionUpgradedEvent;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.observation.AbstractEventListener;
 import org.xwiki.observation.event.Event;
+import org.xwiki.user.UserReference;
+import org.xwiki.user.UserReferenceResolver;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -95,6 +98,9 @@ public class AuthServiceInitializer extends AbstractEventListener implements Ini
 
     @Inject
     private Logger logger;
+
+    @Inject
+    private UserReferenceResolver<EntityReference> userReferenceResolver;
 
     /**
      * Default constructor.
@@ -164,6 +170,15 @@ public class AuthServiceInitializer extends AbstractEventListener implements Ini
             }
             XWikiDocument flagDoc = wiki.getDocument(flagRef, xcontext);
             flagDoc.setHidden(true);
+
+            DocumentReference userDocRef = xcontext.getUserReference();
+            if (userDocRef != null) {
+                UserReference userReference = userReferenceResolver.resolve(userDocRef);
+                flagDoc.getAuthors().setCreator(userReference);
+                flagDoc.getAuthors().setEffectiveMetadataAuthor(userReference);
+                flagDoc.getAuthors().setContentAuthor(userReference);
+                flagDoc.getAuthors().setOriginalMetadataAuthor(userReference);
+            }
 
             XWikiDocument configurationDocument =
                 wiki.getDocument(new DocumentReference(DOC_REFERENCE, installationWiki), xcontext);
