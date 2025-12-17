@@ -38,7 +38,7 @@
   </issueManagement>
   <properties>
     <ldap.version>9.16.1</ldap.version>
-    <ldapuserimport.version>1.7.4-rc-1</ldapuserimport.version>
+    <ldapuserimport.version>1.7.4-rc-2</ldapuserimport.version>
     <licensing.version>1.30.1</licensing.version>
     <authservicebackport.version>1.1.1</authservicebackport.version>
     <!-- Revapi produces too many false positives that come from transitive dependencies in platform. -->
