@@ -42,6 +42,9 @@ import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.observation.AbstractEventListener;
 import org.xwiki.observation.event.Event;
+import org.xwiki.user.CurrentUserReference;
+import org.xwiki.user.UserReference;
+import org.xwiki.user.UserReferenceResolver;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -95,6 +98,10 @@ public class AuthServiceInitializer extends AbstractEventListener implements Ini
 
     @Inject
     private Logger logger;
+
+    @Inject
+    private UserReferenceResolver<CurrentUserReference> currentUserReferenceUserReferenceResolver;
+
 
     /**
      * Default constructor.
@@ -162,11 +169,11 @@ public class AuthServiceInitializer extends AbstractEventListener implements Ini
             if (wiki.exists(flagRef, xcontext)) {
                 return;
             }
-            XWikiDocument flagDoc = wiki.getDocument(flagRef, xcontext);
+            XWikiDocument flagDoc = wiki.getDocument(flagRef, xcontext).clone();
             flagDoc.setHidden(true);
 
             XWikiDocument configurationDocument =
-                wiki.getDocument(new DocumentReference(DOC_REFERENCE, installationWiki), xcontext);
+                wiki.getDocument(new DocumentReference(DOC_REFERENCE, installationWiki), xcontext).clone();
             configurationDocument.setHidden(true);
 
             BaseObject configurationObject =
@@ -178,11 +185,34 @@ public class AuthServiceInitializer extends AbstractEventListener implements Ini
                 StringUtils.defaultString(ActiveDirectoryAuthService.ID));
             configurationObject.setStringValue("service", ActiveDirectoryAuthService.ID);
 
+            setAuthors(xcontext, flagDoc, configurationDocument);
+
             wiki.saveDocument(configurationDocument, "Change authenticator service", xcontext);
-            wiki.saveDocument(wiki.getDocument(flagRef, xcontext), xcontext);
+            wiki.saveDocument(flagDoc, xcontext);
         } catch (XWikiException e) {
             logger.warn("Could not set the Active Directory authenticator as default. Cause: [{}].",
                 ExceptionUtils.getRootCauseMessage(e));
+        }
+    }
+
+    private void setAuthors(XWikiContext xcontext, XWikiDocument flagDoc, XWikiDocument configurationDocument)
+    {
+        UserReference currentUser =
+            this.currentUserReferenceUserReferenceResolver.resolve(CurrentUserReference.INSTANCE);
+        if (currentUser != null) {
+            flagDoc.getAuthors().setCreator(currentUser);
+            flagDoc.getAuthors().setEffectiveMetadataAuthor(currentUser);
+            flagDoc.getAuthors().setContentAuthor(currentUser);
+            flagDoc.getAuthors().setOriginalMetadataAuthor(currentUser);
+            flagDoc.setContent("");
+
+            if (configurationDocument.isNew()) {
+                configurationDocument.getAuthors().setCreator(currentUser);
+                configurationDocument.getAuthors().setContentAuthor(currentUser);
+                configurationDocument.getAuthors().setOriginalMetadataAuthor(currentUser);
+            }
+            configurationDocument.getAuthors().setEffectiveMetadataAuthor(currentUser);
+
         }
     }
 }
