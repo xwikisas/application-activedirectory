@@ -21,13 +21,15 @@ package com.xwiki.activedirectory.internal;
 
 import java.security.Principal;
 import java.util.Arrays;
+import java.util.Date;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.contrib.ldap.XWikiLDAPAuthServiceImpl;
 import org.xwiki.contrib.ldap.XWikiLDAPConfig;
-import org.xwiki.extension.InstalledExtension;
-import org.xwiki.extension.repository.InstalledExtensionRepository;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.SpaceReference;
 
@@ -40,7 +42,10 @@ import com.xpn.xwiki.user.api.XWikiAuthService;
 import com.xpn.xwiki.user.api.XWikiUser;
 import com.xpn.xwiki.user.impl.xwiki.XWikiAuthServiceImpl;
 import com.xpn.xwiki.web.Utils;
+import com.xwiki.licensing.License;
 import com.xwiki.licensing.Licensor;
+import com.xwiki.licensing.internal.AuthExtensionUserManager;
+import com.xwiki.licensing.internal.UserCounter;
 
 /**
  * Custom Active Directory authenticator that currently only serves as a way to make sure that a valid License for the
@@ -52,24 +57,29 @@ import com.xwiki.licensing.Licensor;
  */
 public class ActiveDirectoryAuthServiceImpl extends XWikiLDAPAuthServiceImpl
 {
+    protected static final String EXTENSION_ID = "com.xwiki.activedirectory:application-activedirectory-api";
+
     private static final String LDAP_SSL = "ldap_ssl";
 
     private static final String LDAP_SSL_KEYSTORE = "ldap_ssl.keystore";
 
     private static final String LDAP_SSL_SECURE_PROVIDER = "ldap_ssl.secure_provider";
 
-    private static final String EXTENSION_ID = "com.xwiki.activedirectory:application-activedirectory-api";
-
     private static final SpaceReference AD_CODE_SPACE_REFERENCE =
         new SpaceReference("xwiki", Arrays.asList("ActiveDirectory", "Code"));
 
-    private Licensor licensor = Utils.getComponent(Licensor.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ActiveDirectoryAuthServiceImpl.class);
 
-    private InstalledExtensionRepository repository = Utils.getComponent(InstalledExtensionRepository.class);
+    private Licensor licensor = Utils.getComponent(Licensor.class);
 
     private XWikiAuthService fallbackAuthService = new XWikiAuthServiceImpl();
 
     private ConfigurationSource configurationSource = Utils.getComponent(ConfigurationSource.class, "activedirectory");
+
+    private UserCounter userCounter = Utils.getComponent(UserCounter.class);
+
+    private AuthExtensionUserManager activeDirectoryUserManager =
+        Utils.getComponent(AuthExtensionUserManager.class, EXTENSION_ID);
 
     @Override
     protected XWikiLDAPConfig createXWikiLDAPConfig(String authInput)
@@ -130,7 +140,7 @@ public class ActiveDirectoryAuthServiceImpl extends XWikiLDAPAuthServiceImpl
     @Override
     public Principal authenticate(String userId, String password, XWikiContext context) throws XWikiException
     {
-        if (isLicensed()) {
+        if (shouldUseADAuthService(userId, context)) {
             return super.authenticate(userId, password, context);
         } else {
             return this.fallbackAuthService.authenticate(userId, password, context);
@@ -139,15 +149,40 @@ public class ActiveDirectoryAuthServiceImpl extends XWikiLDAPAuthServiceImpl
 
     private boolean isLicensed()
     {
-        boolean isLicensed = false;
+        return this.licensor.hasLicensure(EXTENSION_ID);
+    }
 
-        // The Licensor expects a version so we need to discover the installed version for now. Hopefully in the future
-        // the Licensor could find it how automatically.
-        // Note: The AD authenticator is installed in the root namespace, hence the passing of "null" in the call below.
-        InstalledExtension mainExtension = this.repository.getInstalledExtension(EXTENSION_ID, null);
-        if (mainExtension != null) {
-            isLicensed = this.licensor.hasLicensure(mainExtension.getId());
+    /**
+     * When on the login screen, decide if the LDAPAuthService should be used. Using LDAP means creating a new user if
+     * the given credentials are valid and point to a user wasn't imported in XWiki yet. This might lead to
+     * invalidation of the license.
+     * <br>
+     * This function will block logins of valid AD users which are not yet imported into XWiki, if the license cannot
+     * support another user.
+     *
+     * @param username the user to check
+     * @param context xwiki context
+     * @return true if the given user should use the LDAPAuthService to log in
+     */
+    private boolean shouldUseADAuthService(String username, XWikiContext context)
+    {
+        License license = licensor.getLicense(EXTENSION_ID);
+        DocumentReference userPage = activeDirectoryUserManager.getUserDocFromUsername(username, context);
+        if (null == license) {
+            return false;
         }
-        return isLicensed;
+        try {
+            if (isLicensed()) {
+                // Don't allow the creation of new LDAP users if the license cannot hold more users.
+                return !(license.getMaxUserCount() == userCounter.getUserCount() && null == userPage);
+            } else {
+                return license.getExpirationDate() > new Date().getTime() && userCounter.isUserUnderLimit(userPage,
+                    license.getMaxUserCount());
+            }
+        } catch (Exception e) {
+            LOGGER.error("Failed to decide if the Active Directory user should be allowed to log in. Cause: [{}]",
+                ExceptionUtils.getRootCauseMessage(e));
+            return false;
+        }
     }
 }
