@@ -44,7 +44,6 @@ import com.xpn.xwiki.user.impl.xwiki.XWikiAuthServiceImpl;
 import com.xpn.xwiki.web.Utils;
 import com.xwiki.licensing.License;
 import com.xwiki.licensing.Licensor;
-import com.xwiki.licensing.internal.AuthExtensionUserManager;
 import com.xwiki.licensing.internal.UserCounter;
 
 /**
@@ -78,8 +77,8 @@ public class ActiveDirectoryAuthServiceImpl extends XWikiLDAPAuthServiceImpl
 
     private UserCounter userCounter = Utils.getComponent(UserCounter.class);
 
-    private AuthExtensionUserManager activeDirectoryUserManager =
-        Utils.getComponent(AuthExtensionUserManager.class, EXTENSION_ID);
+    private ActiveDirectoryUserResolver activeDirectoryUserResolver =
+        Utils.getComponent(ActiveDirectoryUserResolver.class, "activedirectory-username-resolver");
 
     @Override
     protected XWikiLDAPConfig createXWikiLDAPConfig(String authInput)
@@ -167,7 +166,7 @@ public class ActiveDirectoryAuthServiceImpl extends XWikiLDAPAuthServiceImpl
     private boolean shouldUseADAuthService(String username, XWikiContext context)
     {
         License license = licensor.getLicense(EXTENSION_ID);
-        DocumentReference userPage = activeDirectoryUserManager.getUserDocFromUsername(username, context);
+        DocumentReference userPage = activeDirectoryUserResolver.resolve(username, context);
         if (null == license) {
             return false;
         }
