@@ -28,6 +28,7 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.configuration.ConfigurationSource;
+import org.xwiki.contrib.ldap.LDAPProfileXClass;
 import org.xwiki.contrib.ldap.XWikiLDAPAuthServiceImpl;
 import org.xwiki.contrib.ldap.XWikiLDAPConfig;
 import org.xwiki.model.reference.DocumentReference;
@@ -48,8 +49,8 @@ import com.xwiki.licensing.internal.UserCounter;
 
 /**
  * Custom Active Directory authenticator that currently only serves as a way to make sure that a valid License for the
- * Active Directory application exists in order to authenticate requests. In the future it'll also serve as the place
- * to add new features for Active Directory authentication.
+ * Active Directory application exists in order to authenticate requests. In the future it'll also serve as the place to
+ * add new features for Active Directory authentication.
  *
  * @version $Id$
  * @since 1.1
@@ -77,8 +78,6 @@ public class ActiveDirectoryAuthServiceImpl extends XWikiLDAPAuthServiceImpl
 
     private UserCounter userCounter = Utils.getComponent(UserCounter.class);
 
-    private ActiveDirectoryUserResolver activeDirectoryUserResolver =
-        Utils.getComponent(ActiveDirectoryUserResolver.class, "activedirectory-username-resolver");
 
     @Override
     protected XWikiLDAPConfig createXWikiLDAPConfig(String authInput)
@@ -151,10 +150,37 @@ public class ActiveDirectoryAuthServiceImpl extends XWikiLDAPAuthServiceImpl
         return this.licensor.hasLicensure(EXTENSION_ID);
     }
 
+    private DocumentReference resolveUser(String username, XWikiContext context) throws XWikiException
+    {
+        if (username == null) {
+            return null;
+        }
+
+        // First, check the normal user page location.
+        try {
+            DocumentReference userRef = new DocumentReference(context.getWikiId(), "XWiki", username);
+            if (context.getWiki().exists(userRef, context)) {
+                return userRef;
+            }
+        } catch (XWikiException e) {
+            LOGGER.error("Failed to verify existence of user page for username [{}]. Cause: [{}]", username,
+                ExceptionUtils.getRootCauseMessage(e));
+            return null;
+        }
+        // Otherwise, look for ldap users.
+        try {
+            XWikiDocument userDoc = new LDAPProfileXClass(context).searchDocumentByUid(username);
+            return userDoc != null ? userDoc.getDocumentReference() : null;
+        } catch (XWikiException e) {
+            LOGGER.error("Failed to verify existence of LDAP user page for username [{}]. Cause: [{}]", username,
+                ExceptionUtils.getRootCauseMessage(e));
+            return null;
+        }
+    }
+
     /**
      * When on the login screen, decide if the LDAPAuthService should be used. Using LDAP means creating a new user if
-     * the given credentials are valid and point to a user wasn't imported in XWiki yet. This might lead to
-     * invalidation of the license.
+     * the given credentials are valid and point to a user which wasn't imported in XWiki yet.
      * <br>
      * This function will block logins of valid AD users which are not yet imported into XWiki, if the license cannot
      * support another user.
@@ -163,10 +189,21 @@ public class ActiveDirectoryAuthServiceImpl extends XWikiLDAPAuthServiceImpl
      * @param context xwiki context
      * @return true if the given user should use the LDAPAuthService to log in
      */
-    private boolean shouldUseADAuthService(String username, XWikiContext context)
+    private boolean shouldUseADAuthService(String username, XWikiContext context) throws XWikiException
     {
+        /*
+          The intent for this function is:
+              * When the license is valid, allow everyone to use AD
+              * When the license is valid, but the user limit is reached (5/5), no more AD users can be created
+                  * In this case, any more users on the instance would invalidate the license
+                  * If this is not done, then the new user would be created fine, log in, but then their session would
+                    be invalidated (since they're over the user limit)
+              * When the license is invalidated by the user limit condition (so the date is still ok), only allow the
+                users which are below the user limit to use AD
+              * When the license is truly invalid (no license/expired) don't use AD
+         */
         License license = licensor.getLicense(EXTENSION_ID);
-        DocumentReference userPage = activeDirectoryUserResolver.resolve(username, context);
+        DocumentReference userPage = resolveUser(username, context);
         if (null == license) {
             return false;
         }
