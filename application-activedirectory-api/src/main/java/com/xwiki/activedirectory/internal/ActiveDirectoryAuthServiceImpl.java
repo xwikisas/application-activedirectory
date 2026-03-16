@@ -117,9 +117,15 @@ public class ActiveDirectoryAuthServiceImpl extends XWikiLDAPAuthServiceImpl
     @Override
     public XWikiUser checkAuth(XWikiContext context) throws XWikiException
     {
-        if (isLicensed()) {
-            return super.checkAuth(context);
-        } else {
+        try {
+            if (isLicensed()) {
+                return super.checkAuth(context);
+            } else {
+                return this.fallbackAuthService.checkAuth(context);
+            }
+        } catch (Exception e) {
+            LOGGER.error("Exception in Active Directory checkAuth with context, using fallback. Cause: [{}]",
+                ExceptionUtils.getRootCauseMessage(e));
             return this.fallbackAuthService.checkAuth(context);
         }
     }
@@ -128,9 +134,15 @@ public class ActiveDirectoryAuthServiceImpl extends XWikiLDAPAuthServiceImpl
     public XWikiUser checkAuth(String username, String password, String rememberme, XWikiContext context)
         throws XWikiException
     {
-        if (isLicensed()) {
-            return super.checkAuth(username, password, rememberme, context);
-        } else {
+        try {
+            if (isLicensed()) {
+                return super.checkAuth(username, password, rememberme, context);
+            } else {
+                return this.fallbackAuthService.checkAuth(username, password, rememberme, context);
+            }
+        } catch (Exception e) {
+            LOGGER.error("Exception in Active Directory checkAuth, using fallback. Cause: [{}]",
+                ExceptionUtils.getRootCauseMessage(e));
             return this.fallbackAuthService.checkAuth(username, password, rememberme, context);
         }
     }
@@ -138,9 +150,19 @@ public class ActiveDirectoryAuthServiceImpl extends XWikiLDAPAuthServiceImpl
     @Override
     public Principal authenticate(String userId, String password, XWikiContext context) throws XWikiException
     {
-        if (shouldUseADAuthService(userId, context)) {
-            return super.authenticate(userId, password, context);
-        } else {
+        try {
+            if (shouldUseADAuthService(userId, context)) {
+                return super.authenticate(userId, password, context);
+            } else {
+                Principal principal = this.fallbackAuthService.authenticate(userId, password, context);
+                if (null != userId) {
+                    context.put("message", "activeDirectory.loginError.userLimit");
+                }
+                return principal;
+            }
+        } catch (Exception e) {
+            LOGGER.error("Exception in Active Directory authenticate, using fallback. Cause: [{}]",
+                ExceptionUtils.getRootCauseMessage(e));
             return this.fallbackAuthService.authenticate(userId, password, context);
         }
     }
@@ -148,34 +170,6 @@ public class ActiveDirectoryAuthServiceImpl extends XWikiLDAPAuthServiceImpl
     private boolean isLicensed()
     {
         return this.licensor.hasLicensure(EXTENSION_ID);
-    }
-
-    private DocumentReference resolveUser(String username, XWikiContext context) throws XWikiException
-    {
-        if (username == null) {
-            return null;
-        }
-
-        // First, check the normal user page location.
-        try {
-            DocumentReference userRef = new DocumentReference(context.getWikiId(), "XWiki", username);
-            if (context.getWiki().exists(userRef, context)) {
-                return userRef;
-            }
-        } catch (XWikiException e) {
-            LOGGER.error("Failed to verify existence of user page for username [{}]. Cause: [{}]", username,
-                ExceptionUtils.getRootCauseMessage(e));
-            return null;
-        }
-        // Otherwise, look for ldap users.
-        try {
-            XWikiDocument userDoc = new LDAPProfileXClass(context).searchDocumentByUid(username);
-            return userDoc != null ? userDoc.getDocumentReference() : null;
-        } catch (XWikiException e) {
-            LOGGER.error("Failed to verify existence of LDAP user page for username [{}]. Cause: [{}]", username,
-                ExceptionUtils.getRootCauseMessage(e));
-            return null;
-        }
     }
 
     /**
@@ -192,31 +186,33 @@ public class ActiveDirectoryAuthServiceImpl extends XWikiLDAPAuthServiceImpl
     private boolean shouldUseADAuthService(String username, XWikiContext context) throws XWikiException
     {
         /*
-          The intent for this function is:
-              * When the license is valid, allow everyone to use AD
-              * When the license is valid, but the user limit is reached (5/5), no more AD users can be created
-                  * In this case, any more users on the instance would invalidate the license
-                  * If this is not done, then the new user would be created fine, log in, but then their session would
-                    be invalidated (since they're over the user limit)
-              * When the license is invalidated by the user limit condition (so the date is still ok), only allow the
-                users which are below the user limit to use AD
-              * When the license is truly invalid (no license/expired) don't use AD
+        Note that once any license condition is broken (e.g. expiration date, number of users), that license becomes
+         invalid. But we still want to accept older AD users to login once the user limit is reached, in order to
+         not block users out. We end up with these cases:
+        * When the license is valid
+            * no user limit reached -> allow everyone to use AD
+            * user limit is reached (e.g. users are at 5/5) -> no more AD users can be created
+        * When the license is invalidated by the user limit condition (i.e. the date is still ok, users are at 6/5) ->
+            only allow the users which are below the user limit to use AD (i.e. users created before the limit was
+            reached)
+        * When the license is truly invalid (i.e. no license/expired)  -> don't use AD
          */
         License license = licensor.getLicense(EXTENSION_ID);
-        DocumentReference userPage = resolveUser(username, context);
         if (null == license) {
             return false;
         }
         try {
+            XWikiDocument userPage =
+                null == username ? null : new LDAPProfileXClass(context).searchDocumentByUid(username);
             if (isLicensed()) {
                 // Don't allow the creation of new LDAP users if the license cannot hold more users.
                 return !(license.getMaxUserCount() == userCounter.getUserCount() && null == userPage);
             } else {
-                return license.getExpirationDate() > new Date().getTime() && userCounter.isUserUnderLimit(userPage,
-                    license.getMaxUserCount());
+                return license.getExpirationDate() > new Date().getTime() && null != userPage
+                    && userCounter.isUserUnderLimit(userPage.getDocumentReference(), license.getMaxUserCount());
             }
         } catch (Exception e) {
-            LOGGER.error("Failed to decide if the Active Directory user should be allowed to log in. Cause: [{}]",
+            LOGGER.error("Failed to determine Active Directory access status. Cause: [{}]",
                 ExceptionUtils.getRootCauseMessage(e));
             return false;
         }
