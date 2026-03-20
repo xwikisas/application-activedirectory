@@ -66,13 +66,6 @@
       <type>xar</type>
       <scope>runtime</scope>
     </dependency>
-    <!-- Remove when licensing application has the parent to 15.10. -->
-    <dependency>
-      <groupId>org.xwiki.commons</groupId>
-      <artifactId>xwiki-commons-extension-api</artifactId>
-      <version>${commons.version}</version>
-    </dependency>
-    <!-- End remove. -->
     <!-- Test dependencies -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
