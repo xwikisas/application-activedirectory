@@ -30,7 +30,7 @@ import org.xwiki.test.docker.junit5.UITest;
  * @since 1.14
  */
 @UITest
-class AllITs
+class AllIT
 {
     @Nested
     @DisplayName("Overall Active Directory UI")
