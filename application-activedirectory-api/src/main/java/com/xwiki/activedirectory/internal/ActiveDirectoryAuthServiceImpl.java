@@ -202,18 +202,18 @@ public class ActiveDirectoryAuthServiceImpl extends XWikiLDAPAuthServiceImpl
             return false;
         }
         try {
+            // Regular XWiki users are excluded from these checks.
             XWikiDocument userPage =
                 null == username ? null : new LDAPProfileXClass(context).searchDocumentByUid(username);
             if (isLicensed()) {
                 // Don't allow the creation of new LDAP users if the license cannot hold more users.
                 return !(license.getMaxUserCount() == userCounter.getUserCount() && null == userPage);
             } else {
-                return license.getExpirationDate() > new Date().getTime() && null != userPage
+                return null != userPage && license.getExpirationDate() > new Date().getTime()
                     && userCounter.isUserUnderLimit(userPage.getDocumentReference(), license.getMaxUserCount());
             }
         } catch (Exception e) {
-            LOGGER.error("Failed to determine Active Directory access status. Cause: [{}]",
-                ExceptionUtils.getRootCauseMessage(e));
+            LOGGER.error("Failed to determine Active Directory access status. Cause: ", e);
             return false;
         }
     }
