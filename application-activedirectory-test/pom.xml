@@ -25,9 +25,10 @@
   <parent>
     <groupId>com.xwiki.activedirectory</groupId>
     <artifactId>application-activedirectory</artifactId>
-    <version>1.18.2</version>
+    <version>1.18.3-SNAPSHOT</version>
   </parent>
   <artifactId>application-activedirectory-test</artifactId>
+  <version>1.18.2</version>
   <name>Active Directory - Tests - Parent POM</name>
   <packaging>pom</packaging>
   <description>Tests for the Active Directory feature</description>

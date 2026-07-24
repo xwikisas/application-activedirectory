@@ -43,7 +43,7 @@
       <groupId>com.xwiki.activedirectory</groupId>
       <artifactId>application-activedirectory-ui</artifactId>
       <type>xar</type>
-      <version>${project.version}</version>
+      <version>1.18.3-SNAPSHOT</version>
       <exclusions>
         <!-- Run the functional tests without a license. -->
         <exclusion>
