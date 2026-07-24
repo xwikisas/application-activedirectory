@@ -472,7 +472,7 @@
       };
 
       var checkConnection = function() {
-        $('#checkConnection button').click(function(event) {
+        $('#checkConnection button').on('click', function(event) {
           // For multiple checks, clear the response first.
           $('#checkConnectionResponse').empty();
           event.preventDefault();
@@ -492,7 +492,7 @@
             $('#checkConnectionResponse').html(data);
           }).fail(function(data) {
             $('#checkConnectionResponse').html(data.responseText);
-            $('#checkConnectionResponse .xwikirenderingerror').click(function() {
+            $('#checkConnectionResponse .xwikirenderingerror').on('click', function() {
               $(this).siblings('.xwikirenderingerrordescription').toggleClass('hidden');
             });
           });
@@ -504,13 +504,13 @@
         var show = $('#advancedConfigShow');
         var hide = $('#advancedConfigHide');
         var dl = $('.activeDirectoryConfigurationAdvanced dl');
-        show.click(function(event) {
+        show.on('click', function(event) {
           event.preventDefault();
           dl.show();
           $(this).hide();
           hide.show();
         });
-        hide.click(function(event) {
+        hide.on('click', function(event) {
           event.preventDefault();
           dl.hide();
           $(this).hide();
@@ -522,7 +522,7 @@
         // Reset Group Cache.
         var resetGroupCache = $('#resetGroupCache');
         var resetGroupCacheSuccess = resetGroupCache.siblings('.successmessage');
-        resetGroupCache.click(function() {
+        resetGroupCache.on('click', function() {
           $.post({
             url : new XWiki.Document('Actions', 'ActiveDirectory.Code').getURL('get', 'outputSyntax=plain&amp;resetGroupCache=true'),
             success: function(data) {
@@ -545,7 +545,7 @@
     feature.loadPropertiesEditor();
     feature.resetGroupCache();
 
-    $('#activedirectory_XWiki\\.XWikiPreferences').submit(function(event) {
+    $('#activedirectory_XWiki\\.XWikiPreferences').on('submit', function(event) {
       event.preventDefault();
       // Remove the separators from the beginning and the end of the mapping.
       $.each([$('#XWiki\\.XWikiPreferences_0_ldap_fields_mapping'), $('#XWiki\\.XWikiPreferences_0_ldap_group_mapping')], function() {
