@@ -24,7 +24,6 @@ import java.util.Arrays;
 import java.util.Date;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.configuration.ConfigurationSource;
@@ -116,54 +115,46 @@ public class ActiveDirectoryAuthServiceImpl extends XWikiLDAPAuthServiceImpl
     @Override
     public XWikiUser checkAuth(XWikiContext context) throws XWikiException
     {
-        try {
-            if (isLicensed()) {
+        if (isLicensed()) {
+            try {
                 return super.checkAuth(context);
-            } else {
-                return this.fallbackAuthService.checkAuth(context);
+            } catch (Exception e) {
+                LOGGER.error("Active Directory checkAuth failed, falling back to XWiki authentication.", e);
             }
-        } catch (Exception e) {
-            LOGGER.error("Exception in Active Directory checkAuth with context, using fallback. Cause: [{}]",
-                ExceptionUtils.getRootCauseMessage(e));
-            return this.fallbackAuthService.checkAuth(context);
         }
+        return this.fallbackAuthService.checkAuth(context);
     }
 
     @Override
     public XWikiUser checkAuth(String username, String password, String rememberme, XWikiContext context)
         throws XWikiException
     {
-        try {
-            if (isLicensed()) {
+        if (isLicensed()) {
+            try {
                 return super.checkAuth(username, password, rememberme, context);
-            } else {
-                return this.fallbackAuthService.checkAuth(username, password, rememberme, context);
+            } catch (Exception e) {
+                LOGGER.error("Active Directory credentials check failed, falling back to XWiki authentication.", e);
             }
-        } catch (Exception e) {
-            LOGGER.error("Exception in Active Directory checkAuth, using fallback. Cause: [{}]",
-                ExceptionUtils.getRootCauseMessage(e));
-            return this.fallbackAuthService.checkAuth(username, password, rememberme, context);
         }
+        return this.fallbackAuthService.checkAuth(username, password, rememberme, context);
     }
 
     @Override
     public Principal authenticate(String userId, String password, XWikiContext context) throws XWikiException
     {
-        try {
-            if (shouldUseADAuthService(userId, context)) {
+        if (shouldUseADAuthService(userId, context)) {
+            try {
                 return super.authenticate(userId, password, context);
-            } else {
-                Principal principal = this.fallbackAuthService.authenticate(userId, password, context);
-                if (null != userId) {
-                    context.put("message", "activeDirectory.loginError.userLimit");
-                }
-                return principal;
+            } catch (Exception e) {
+                LOGGER.error("Active Directory authentication failed, falling back to XWiki authentication.", e);
+                return this.fallbackAuthService.authenticate(userId, password, context);
             }
-        } catch (Exception e) {
-            LOGGER.error("Exception in Active Directory authenticate, using fallback. Cause: [{}]",
-                ExceptionUtils.getRootCauseMessage(e));
-            return this.fallbackAuthService.authenticate(userId, password, context);
         }
+        Principal principal = this.fallbackAuthService.authenticate(userId, password, context);
+        if (null != userId && principal == null) {
+            context.put("message", "activeDirectory.loginError.userLimit");
+        }
+        return principal;
     }
 
     private boolean isLicensed()
