@@ -49,21 +49,21 @@ import com.xwiki.licensing.internal.UserCounter;
 
 /**
  * Custom Active Directory authenticator that currently only serves as a way to make sure that a valid License for the
- * Active Directory application exists in order to authenticate requests. In the future it'll also serve as the place to
- * add new features for Active Directory authentication.
+ * Active Directory application exists in order to authenticate requests. In the future it'll also serve as the place
+ * to add new features for Active Directory authentication.
  *
  * @version $Id$
  * @since 1.1
  */
 public class ActiveDirectoryAuthServiceImpl extends XWikiLDAPAuthServiceImpl
 {
-    protected static final String EXTENSION_ID = "com.xwiki.activedirectory:application-activedirectory-api";
-
     private static final String LDAP_SSL = "ldap_ssl";
 
     private static final String LDAP_SSL_KEYSTORE = "ldap_ssl.keystore";
 
     private static final String LDAP_SSL_SECURE_PROVIDER = "ldap_ssl.secure_provider";
+
+    private static final String EXTENSION_ID = "com.xwiki.activedirectory:application-activedirectory-api";
 
     private static final SpaceReference AD_CODE_SPACE_REFERENCE =
         new SpaceReference("xwiki", Arrays.asList("ActiveDirectory", "Code"));
@@ -77,7 +77,6 @@ public class ActiveDirectoryAuthServiceImpl extends XWikiLDAPAuthServiceImpl
     private ConfigurationSource configurationSource = Utils.getComponent(ConfigurationSource.class, "activedirectory");
 
     private UserCounter userCounter = Utils.getComponent(UserCounter.class);
-
 
     @Override
     protected XWikiLDAPConfig createXWikiLDAPConfig(String authInput)
