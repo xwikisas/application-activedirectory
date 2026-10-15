@@ -22,7 +22,10 @@ package com.xwiki.activedirectory.internal;
 import java.security.Principal;
 import java.util.Arrays;
 
+import javax.servlet.http.HttpSession;
+
 import org.apache.commons.lang3.StringUtils;
+import org.securityfilter.filter.SecurityRequestWrapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.configuration.ConfigurationSource;
@@ -41,6 +44,7 @@ import com.xpn.xwiki.user.api.XWikiAuthService;
 import com.xpn.xwiki.user.api.XWikiUser;
 import com.xpn.xwiki.user.impl.xwiki.XWikiAuthServiceImpl;
 import com.xpn.xwiki.web.Utils;
+import com.xpn.xwiki.web.XWikiRequest;
 import com.xwiki.licensing.License;
 import com.xwiki.licensing.Licensor;
 import com.xwiki.licensing.internal.UserCounter;
@@ -62,6 +66,12 @@ public class ActiveDirectoryAuthServiceImpl extends XWikiLDAPAuthServiceImpl
     private static final String LDAP_SSL_SECURE_PROVIDER = "ldap_ssl.secure_provider";
 
     private static final String EXTENSION_ID = "com.xwiki.activedirectory:application-activedirectory-api";
+
+    /**
+     * Session attribute where the LDAP authenticator stores the SSO remote user, see
+     * {@code XWikiLDAPAuthServiceImpl#checkAuthSSO}.
+     */
+    private static final String LDAP_REMOTE_USER_SESSION_KEY = "ldap.remoteuser";
 
     private static final SpaceReference AD_CODE_SPACE_REFERENCE =
         new SpaceReference("xwiki", Arrays.asList("ActiveDirectory", "Code"));
@@ -114,13 +124,17 @@ public class ActiveDirectoryAuthServiceImpl extends XWikiLDAPAuthServiceImpl
     @Override
     public XWikiUser checkAuth(XWikiContext context) throws XWikiException
     {
-        if (isLicensed()) {
+        // checkAuth runs on every request, so the license is checked only when LDAP is about to log in an SSO user.
+        // Password logins are checked in authenticate().
+        String ssoUser = getSSOUserToAuthenticate(context);
+        if (ssoUser == null || shouldUseADAuthService(ssoUser, context)) {
             try {
                 return super.checkAuth(context);
             } catch (Exception e) {
                 LOGGER.error("Active Directory checkAuth failed, falling back to XWiki authentication.", e);
             }
         }
+        // Skip the LDAP SSO login. Existing sessions and password logins still work.
         return this.fallbackAuthService.checkAuth(context);
     }
 
@@ -128,7 +142,7 @@ public class ActiveDirectoryAuthServiceImpl extends XWikiLDAPAuthServiceImpl
     public XWikiUser checkAuth(String username, String password, String rememberme, XWikiContext context)
         throws XWikiException
     {
-        if (isLicensed()) {
+        if (shouldUseADAuthService(username, context)) {
             try {
                 return super.checkAuth(username, password, rememberme, context);
             } catch (Exception e) {
@@ -154,11 +168,6 @@ public class ActiveDirectoryAuthServiceImpl extends XWikiLDAPAuthServiceImpl
             context.put("message", "activeDirectory.loginError.userLimit");
         }
         return principal;
-    }
-
-    private boolean isLicensed()
-    {
-        return this.licensor.hasLicensure(EXTENSION_ID);
     }
 
     /**
@@ -225,5 +234,28 @@ public class ActiveDirectoryAuthServiceImpl extends XWikiLDAPAuthServiceImpl
             }
         }
         return profile;
+    }
+
+    /**
+     * Cheap check, run on every request. Mirrors {@code XWikiLDAPAuthServiceImpl#checkSessionPrincipal}.
+     *
+     * @return the SSO remote user if LDAP is about to log it in (not bound to the session yet), null otherwise
+     */
+    private String getSSOUserToAuthenticate(XWikiContext context)
+    {
+        XWikiRequest request = context.getRequest();
+        if (request == null) {
+            return null;
+        }
+        String header = getConfiguration().getHttpHeader();
+        String remoteUser = StringUtils.isEmpty(header) ? request.getRemoteUser() : request.getHeader(header);
+        if (remoteUser == null) {
+            return null;
+        }
+        HttpSession session = request.getSession(false);
+        boolean alreadyLoggedIn = session != null
+            && session.getAttribute(SecurityRequestWrapper.PRINCIPAL_SESSION_KEY) != null
+            && remoteUser.equals(session.getAttribute(LDAP_REMOTE_USER_SESSION_KEY));
+        return alreadyLoggedIn ? null : remoteUser;
     }
 }
