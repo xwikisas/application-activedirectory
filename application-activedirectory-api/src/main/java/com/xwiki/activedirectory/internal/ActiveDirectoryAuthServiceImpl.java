@@ -47,7 +47,6 @@ import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.web.XWikiRequest;
 import com.xwiki.licensing.License;
 import com.xwiki.licensing.Licensor;
-import com.xwiki.licensing.internal.UserCounter;
 
 /**
  * Custom Active Directory authenticator that currently only serves as a way to make sure that a valid License for the
@@ -83,8 +82,6 @@ public class ActiveDirectoryAuthServiceImpl extends XWikiLDAPAuthServiceImpl
     private XWikiAuthService fallbackAuthService = new XWikiAuthServiceImpl();
 
     private ConfigurationSource configurationSource = Utils.getComponent(ConfigurationSource.class, "activedirectory");
-
-    private UserCounter userCounter = Utils.getComponent(UserCounter.class);
 
     @Override
     protected XWikiLDAPConfig createXWikiLDAPConfig(String authInput)
@@ -199,12 +196,12 @@ public class ActiveDirectoryAuthServiceImpl extends XWikiLDAPAuthServiceImpl
             }
             long maxUserCount = license.getMaxUserCount();
             // Room for a new user: no need to know if this one already exists.
-            if (maxUserCount < 0 || this.userCounter.getUserCount() < maxUserCount) {
+            if (maxUserCount < 0 || this.licensor.getUserCount() < maxUserCount) {
                 return true;
             }
             XWikiDocument userProfile = findLDAPProfile(username, context);
             return userProfile != null
-                && this.userCounter.isUserUnderLimit(userProfile.getDocumentReference(), maxUserCount);
+                && this.licensor.isUserUnderLimit(userProfile.getDocumentReference(), maxUserCount);
         } catch (Exception e) {
             LOGGER.error("Failed to determine Active Directory access status.", e);
             return false;
