@@ -192,18 +192,18 @@ public class ActiveDirectoryAuthServiceImpl extends XWikiLDAPAuthServiceImpl
     {
         try {
             License license = this.licensor.getLicense(EXTENSION_ID);
-            if (license == null) {
+            // The expiration check must match DefaultLicenseValidator#isValid. Checked first, so that an unlicensed or
+            // expired instance doesn't look the user profile up for nothing.
+            if (license == null || license.getExpirationDate() < System.currentTimeMillis()) {
                 return false;
             }
             long maxUserCount = license.getMaxUserCount();
             // Room for a new user: no need to know if this one already exists.
-            if (this.licensor.hasLicensure(EXTENSION_ID)
-                && (maxUserCount < 0 || this.userCounter.getUserCount() < maxUserCount)) {
+            if (maxUserCount < 0 || this.userCounter.getUserCount() < maxUserCount) {
                 return true;
             }
             XWikiDocument userProfile = findLDAPProfile(username, context);
-            // The expiration check must match DefaultLicenseValidator#isValid.
-            return userProfile != null && license.getExpirationDate() >= System.currentTimeMillis()
+            return userProfile != null
                 && this.userCounter.isUserUnderLimit(userProfile.getDocumentReference(), maxUserCount);
         } catch (Exception e) {
             LOGGER.error("Failed to determine Active Directory access status.", e);
