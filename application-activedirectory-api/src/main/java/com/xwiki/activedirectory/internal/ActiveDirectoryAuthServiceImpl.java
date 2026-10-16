@@ -160,11 +160,7 @@ public class ActiveDirectoryAuthServiceImpl extends XWikiLDAPAuthServiceImpl
                 return this.fallbackAuthService.authenticate(userId, password, context);
             }
         }
-        Principal principal = this.fallbackAuthService.authenticate(userId, password, context);
-        if (null != userId && principal == null) {
-            context.put("message", "activeDirectory.loginError.userLimit");
-        }
-        return principal;
+        return this.fallbackAuthService.authenticate(userId, password, context);
     }
 
     /**
@@ -200,8 +196,13 @@ public class ActiveDirectoryAuthServiceImpl extends XWikiLDAPAuthServiceImpl
                 return true;
             }
             XWikiDocument userProfile = findLDAPProfile(username, context);
-            return userProfile != null
+            boolean underLimit = userProfile != null
                 && this.licensor.isUserUnderLimit(userProfile.getDocumentReference(), maxUserCount);
+            if (!underLimit) {
+                LOGGER.debug("Not using Active Directory for [{}]: the license user limit [{}] is reached.", username,
+                    maxUserCount);
+            }
+            return underLimit;
         } catch (Exception e) {
             LOGGER.error("Failed to determine Active Directory access status.", e);
             return false;
