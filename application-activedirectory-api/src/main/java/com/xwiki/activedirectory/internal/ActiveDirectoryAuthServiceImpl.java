@@ -181,7 +181,7 @@ public class ActiveDirectoryAuthServiceImpl extends XWikiLDAPAuthServiceImpl
      * @param context xwiki context
      * @return true if the given user should use the LDAP authentication
      */
-    private boolean shouldUseADAuthService(String username, XWikiContext context)
+    boolean shouldUseADAuthService(String username, XWikiContext context)
     {
         try {
             License license = this.licensor.getLicense(EXTENSION_ID);
@@ -213,7 +213,7 @@ public class ActiveDirectoryAuthServiceImpl extends XWikiLDAPAuthServiceImpl
      * Find the profile of an existing LDAP user, the same way the LDAP authenticator does it before binding: by the
      * trimmed login input, in the current wiki and then in the main wiki.
      */
-    private XWikiDocument findLDAPProfile(String username, XWikiContext context) throws XWikiException
+    XWikiDocument findLDAPProfile(String username, XWikiContext context) throws XWikiException
     {
         if (username == null) {
             return null;
