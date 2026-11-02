@@ -25,11 +25,11 @@
   <parent>
     <groupId>com.xwiki.parent</groupId>
     <artifactId>xwikisas-parent-platform</artifactId>
-    <version>15.10</version>
+    <version>15.10-6</version>
   </parent>
   <groupId>com.xwiki.activedirectory</groupId>
   <artifactId>application-activedirectory</artifactId>
-  <version>1.18.3-SNAPSHOT</version>
+  <version>1.18.3-user-limit-RC-2-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>Active Directory - Parent POM</name>
   <issueManagement>

@@ -30,6 +30,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.contrib.ldap.LDAPProfileXClass;
+import org.xwiki.contrib.ldap.LDAPProfileXClass;
 import org.xwiki.contrib.ldap.XWikiLDAPAuthServiceImpl;
 import org.xwiki.contrib.ldap.XWikiLDAPConfig;
 import org.xwiki.model.reference.DocumentReference;
@@ -47,17 +48,20 @@ import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.web.XWikiRequest;
 import com.xwiki.licensing.License;
 import com.xwiki.licensing.Licensor;
+import com.xwiki.licensing.internal.UserCounter;
 
 /**
  * Custom Active Directory authenticator that currently only serves as a way to make sure that a valid License for the
- * Active Directory application exists in order to authenticate requests. In the future it'll also serve as the place
- * to add new features for Active Directory authentication.
+ * Active Directory application exists in order to authenticate requests. In the future it'll also serve as the place to
+ * add new features for Active Directory authentication.
  *
  * @version $Id$
  * @since 1.1
  */
 public class ActiveDirectoryAuthServiceImpl extends XWikiLDAPAuthServiceImpl
 {
+    protected static final String EXTENSION_ID = "com.xwiki.activedirectory:application-activedirectory-api";
+
     private static final String LDAP_SSL = "ldap_ssl";
 
     private static final String LDAP_SSL_KEYSTORE = "ldap_ssl.keystore";
@@ -77,11 +81,16 @@ public class ActiveDirectoryAuthServiceImpl extends XWikiLDAPAuthServiceImpl
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ActiveDirectoryAuthServiceImpl.class);
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(ActiveDirectoryAuthServiceImpl.class);
+
     private Licensor licensor = Utils.getComponent(Licensor.class);
 
     private XWikiAuthService fallbackAuthService = new XWikiAuthServiceImpl();
 
     private ConfigurationSource configurationSource = Utils.getComponent(ConfigurationSource.class, "activedirectory");
+
+    private UserCounter userCounter = Utils.getComponent(UserCounter.class);
+
 
     @Override
     protected XWikiLDAPConfig createXWikiLDAPConfig(String authInput)
