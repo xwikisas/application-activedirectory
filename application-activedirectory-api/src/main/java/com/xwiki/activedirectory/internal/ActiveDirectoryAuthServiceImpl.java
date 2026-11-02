@@ -157,7 +157,6 @@ public class ActiveDirectoryAuthServiceImpl extends XWikiLDAPAuthServiceImpl
                 return super.authenticate(userId, password, context);
             } catch (Exception e) {
                 LOGGER.error("Active Directory authentication failed, falling back to XWiki authentication.", e);
-                return this.fallbackAuthService.authenticate(userId, password, context);
             }
         }
         return this.fallbackAuthService.authenticate(userId, password, context);
