@@ -36,6 +36,7 @@
     <xwiki.extension.name>Active Directory Authenticator</xwiki.extension.name>
     <!-- XWiki supports only one authenticator for the same instance -->
     <xwiki.extension.namespaces>{root}</xwiki.extension.namespaces>
+    <xwiki.jacoco.instructionRatio>0.12</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>
     <dependency>

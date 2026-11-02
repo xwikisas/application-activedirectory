@@ -30,7 +30,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.contrib.ldap.LDAPProfileXClass;
-import org.xwiki.contrib.ldap.LDAPProfileXClass;
 import org.xwiki.contrib.ldap.XWikiLDAPAuthServiceImpl;
 import org.xwiki.contrib.ldap.XWikiLDAPConfig;
 import org.xwiki.model.reference.DocumentReference;
@@ -48,7 +47,6 @@ import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.web.XWikiRequest;
 import com.xwiki.licensing.License;
 import com.xwiki.licensing.Licensor;
-import com.xwiki.licensing.internal.UserCounter;
 
 /**
  * Custom Active Directory authenticator that currently only serves as a way to make sure that a valid License for the
@@ -68,8 +66,6 @@ public class ActiveDirectoryAuthServiceImpl extends XWikiLDAPAuthServiceImpl
 
     private static final String LDAP_SSL_SECURE_PROVIDER = "ldap_ssl.secure_provider";
 
-    private static final String EXTENSION_ID = "com.xwiki.activedirectory:application-activedirectory-api";
-
     /**
      * Session attribute where the LDAP authenticator stores the SSO remote user, see
      * {@code XWikiLDAPAuthServiceImpl#checkAuthSSO}.
@@ -81,15 +77,11 @@ public class ActiveDirectoryAuthServiceImpl extends XWikiLDAPAuthServiceImpl
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ActiveDirectoryAuthServiceImpl.class);
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ActiveDirectoryAuthServiceImpl.class);
-
     private Licensor licensor = Utils.getComponent(Licensor.class);
 
     private XWikiAuthService fallbackAuthService = new XWikiAuthServiceImpl();
 
     private ConfigurationSource configurationSource = Utils.getComponent(ConfigurationSource.class, "activedirectory");
-
-    private UserCounter userCounter = Utils.getComponent(UserCounter.class);
 
 
     @Override
