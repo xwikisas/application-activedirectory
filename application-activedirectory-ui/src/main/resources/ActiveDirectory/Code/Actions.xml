@@ -37,7 +37,12 @@
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
   <content>{{velocity}}
-#if ($request.checkConnection)
+## These actions are reserved to wiki administrators and must be triggered by them from the administration UI.
+#set ($isAllowed = $xwiki.hasAccessLevel('admin', $xcontext.user, 'XWiki.XWikiPreferences'))
+#set ($isAllowed = $isAllowed &amp;&amp; $services.csrf.isTokenValid($request.form_token))
+#if (!$isAllowed &amp;&amp; ($request.checkConnection || $request.resetGroupCache))
+  #set ($discard = $response.setStatus(403))
+#elseif ($request.checkConnection)
   #set ($discard = $response.setStatus(400))
   #set ($ldapKeyPrefix = 'XWiki.XWikiPreferences_0_ldap_')
   #set ($server = $request.get("${ldapKeyPrefix}server"))
@@ -62,14 +67,14 @@
         $services.localization.render('activeDirectory.checkConnection.error')
       &lt;/div&gt;
       &lt;div class="xwikirenderingerrordescription hidden"&gt;
-        &lt;pre&gt;$exceptiontool.getStackTrace($services.ldap.error)&lt;/pre&gt;
+        &lt;pre&gt;$escapetool.xml($exceptiontool.getStackTrace($services.ldap.error))&lt;/pre&gt;
       &lt;/div&gt;
     #end
   {{/html}}
 #end
 {{/velocity}}
 {{velocity wiki="false"}}
-#if ($request.resetGroupCache)
+#if ($isAllowed &amp;&amp; $request.resetGroupCache)
   #set ($discard = $response.setContentType('application/json'))
   #set ($discard = $services.ldap.resetGroupCache())
   $jsontool.serialize({'message': $services.localization.render('activeDirectory.resetGroupCacheSuccess')})

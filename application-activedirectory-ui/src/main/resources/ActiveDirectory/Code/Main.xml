@@ -303,7 +303,7 @@
       <cache>long</cache>
     </property>
     <property>
-      <code>require(['jquery'], function($) {
+      <code>require(['jquery', 'xwiki-meta'], function($, xm) {
   $(document).ready(function() {
     var feature = (function () {
       var textareaToInputList = function(textarea) {
@@ -477,6 +477,7 @@
           $('#checkConnectionResponse').empty();
           event.preventDefault();
           var connectionData = $('.activeDirectoryConnection input').serializeArray();
+          connectionData.push({name: 'form_token', value: xm.form_token});
           $.post({
             url : new XWiki.Document('Actions', 'ActiveDirectory.Code').getURL('get', 'checkConnection=true'),
             data: $.param(connectionData),
@@ -525,6 +526,7 @@
         resetGroupCache.on('click', function() {
           $.post({
             url : new XWiki.Document('Actions', 'ActiveDirectory.Code').getURL('get', 'outputSyntax=plain&amp;resetGroupCache=true'),
+            data: {form_token: xm.form_token},
             success: function(data) {
               resetGroupCacheSuccess.html(data.message);
               resetGroupCacheSuccess.removeClass('hidden');
