@@ -36,6 +36,7 @@
     <xwiki.extension.name>Active Directory Authenticator</xwiki.extension.name>
     <!-- XWiki supports only one authenticator for the same instance -->
     <xwiki.extension.namespaces>{root}</xwiki.extension.namespaces>
+    <xwiki.jacoco.instructionRatio>0.04</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>
     <dependency>
@@ -63,6 +64,18 @@
       <groupId>org.xwiki.contrib</groupId>
       <artifactId>authservice-backport-api</artifactId>
       <version>${authservicebackport.version}</version>
+    </dependency>
+    <!-- Test dependencies -->
+    <dependency>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-tool-test-component</artifactId>
+      <version>${commons.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>javax.servlet</groupId>
+      <artifactId>javax.servlet-api</artifactId>
+      <scope>test</scope>
     </dependency>
   </dependencies>
 </project>

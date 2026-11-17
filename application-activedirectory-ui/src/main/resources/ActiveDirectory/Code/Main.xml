@@ -96,6 +96,16 @@
   ## TODO: Transform the maps from $params in arrays holding
   ## only property names when https://jira.xwikisas.com/browse/ADAPP-30 is implemented
   #set ($configDoc = $xwiki.getDocument('ActiveDirectory.Code.ActiveDirectoryConfig'))
+  ## The authenticator ignores the configuration if it was not last saved by a wiki administrator. Only a wiki
+  ## administrator can initialize or update the configuration automatically, and only if it is used by the
+  ## authenticator.
+  #set ($isWikiAdmin = $xwiki.hasAccessLevel('admin', $xcontext.user, 'XWiki.XWikiPreferences'))
+  #set ($isConfigTrusted = $configDoc.isNew())
+  #if (!$isConfigTrusted)
+    #set ($isConfigTrusted = $xwiki.hasAccessLevel('admin', $configDoc.author, 'XWiki.XWikiPreferences'))
+  #end
+  #set ($saveConfigDoc = false)
+  #set ($saveConfigComment = '')
   ## Create the config doc if it doesn't exist and set the default values defined above.
   #if ($configDoc.isNew())
     #set ($newConfigObj = $configDoc.newObject($configClassName))
@@ -109,19 +119,37 @@
     #set ($newAdConfigObj = $configDoc.newObject($adConfigClassName))
     #set ($discard = $newAdConfigObj.set('ldap_ssl', 0))
     #set ($discard = $configDoc.setHidden(true))
-    #set ($discard = $configDoc.save($services.localization.render('activeDirecfory.config.initializationComment'), 'true'))
+    #set ($saveConfigComment = $services.localization.render('activeDirecfory.config.initializationComment'))
+    #set ($saveConfigDoc = true)
   #end
   #set ($configObj = $configDoc.getObject($configClassName))
   #set ($adConfigObj = $configDoc.getObject($adConfigClassName))
   ## Backwards compatibility for versions that do not have the ActiveDirectoryConfigClass object.
   #if (!$adConfigObj)
     #set ($adConfigObj = $configDoc.newObject($adConfigClassName))
-    #set ($discard = $configDoc.save())
+    #set ($saveConfigDoc = true)
+  #end
+  ## Only wiki administrators can modify the configuration.
+  #if (!$configDoc.getObject('XWiki.XWikiRights'))
+    #set ($rightsObj = $configDoc.newObject('XWiki.XWikiRights'))
+    #set ($discard = $rightsObj.set('groups', 'XWiki.XWikiAdminGroup'))
+    #set ($discard = $rightsObj.set('levels', ['edit', 'delete', 'comment']))
+    #set ($discard = $rightsObj.set('allow', 1))
+    #set ($saveConfigDoc = true)
+  #end
+  #if ($saveConfigDoc &amp;&amp; $isWikiAdmin &amp;&amp; $isConfigTrusted)
+    #set ($discard = $configDoc.save($saveConfigComment, true))
   #end
   #if ("$!section" != '')
     #set ($discard = $xwiki.jsx.use('ActiveDirectory.Code.Main'))
     #set ($discard = $xwiki.ssx.use('ActiveDirectory.Code.Main'))
     {{info}}$services.localization.render('admin.activeDirectory.info'){{/info}}
+
+    #if (!$isConfigTrusted)
+      #set ($configAuthorName = $xwiki.getUserName($configDoc.author, false))
+      #set ($untrustedMessage = $services.localization.render('activeDirectory.config.untrusted', [$configAuthorName]))
+      {{warning}}$services.rendering.escape($untrustedMessage, $xwiki.currentContentSyntaxId){{/warning}}
+    #end
 
     #set($formId = "${section.toLowerCase()}_${configClassName}")
     {{html clean="false"}}

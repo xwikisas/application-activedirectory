@@ -19,6 +19,7 @@
  */
 package com.xwiki.activedirectory.internal;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
@@ -27,8 +28,14 @@ import org.xwiki.configuration.internal.AbstractXWikiPreferencesConfigurationSou
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.SpaceReference;
 
+import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.objects.BaseObject;
+
 /**
- * Active Directory LDAP configuration is stored in {@code ActiveDirectory.Code.ActiveDirectoryConfig}.
+ * Active Directory LDAP configuration is stored in {@code ActiveDirectory.Code.ActiveDirectoryConfig}. The stored
+ * configuration is ignored when it was not last saved by a wiki administrator (see
+ * {@link ActiveDirectoryConfigurationChecker}).
  *
  * @version $Id$
  * @since 1.1
@@ -38,6 +45,8 @@ import org.xwiki.model.reference.SpaceReference;
 @Singleton
 public class ActiveDirectoryConfigurationSource extends AbstractXWikiPreferencesConfigurationSource
 {
+    @Inject
+    private ActiveDirectoryConfigurationChecker configurationChecker;
 
     @Override
     protected String getCacheId()
@@ -57,5 +66,27 @@ public class ActiveDirectoryConfigurationSource extends AbstractXWikiPreferences
         return new DocumentReference("ActiveDirectoryConfig", new SpaceReference("Code",
             new SpaceReference("ActiveDirectory", getCurrentWikiReference())));
     }
-}
 
+    @Override
+    protected BaseObject getBaseObject() throws XWikiException
+    {
+        BaseObject baseObject = super.getBaseObject();
+        return baseObject != null && isTrusted(baseObject.getOwnerDocument()) ? baseObject : null;
+    }
+
+    @Override
+    protected BaseObject getBaseObject(XWikiDocument document, String language)
+    {
+        return isTrusted(document) ? super.getBaseObject(document, language) : null;
+    }
+
+    private boolean isTrusted(XWikiDocument document)
+    {
+        boolean trusted = this.configurationChecker.isTrusted(document);
+        if (!trusted && document != null && !document.isNew()) {
+            this.logger.debug("Ignoring the Active Directory configuration from [{}] because its author [{}] is not"
+                + " allowed to administrate the wiki.", document.getDocumentReference(), document.getAuthorReference());
+        }
+        return trusted;
+    }
+}

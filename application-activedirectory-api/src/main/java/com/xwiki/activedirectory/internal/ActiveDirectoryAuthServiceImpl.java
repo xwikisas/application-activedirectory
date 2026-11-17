@@ -71,6 +71,9 @@ public class ActiveDirectoryAuthServiceImpl extends XWikiLDAPAuthServiceImpl
 
     private ConfigurationSource configurationSource = Utils.getComponent(ConfigurationSource.class, "activedirectory");
 
+    private ActiveDirectoryConfigurationChecker configurationChecker =
+        Utils.getComponent(ActiveDirectoryConfigurationChecker.class);
+
     @Override
     protected XWikiLDAPConfig createXWikiLDAPConfig(String authInput)
     {
@@ -91,7 +94,8 @@ public class ActiveDirectoryAuthServiceImpl extends XWikiLDAPAuthServiceImpl
             XWiki xwiki = context.getWiki();
             XWikiDocument adConfigDoc = xwiki.getDocument(adConfigRef, context);
             BaseObject adConfigObj = adConfigDoc.getXObject(adConfigClassRef);
-            if (adConfigObj != null) {
+            // Ignore the configuration when it was not saved by a wiki administrator.
+            if (adConfigObj != null && this.configurationChecker.isTrusted(adConfigDoc)) {
                 xWikiLDAPConfig.setFinalProperty(LDAP_SSL, adConfigObj.getStringValue(LDAP_SSL));
                 xWikiLDAPConfig.setFinalProperty(LDAP_SSL_KEYSTORE, adConfigObj.getStringValue(LDAP_SSL_KEYSTORE));
 
