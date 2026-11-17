@@ -17,7 +17,7 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
- * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ * 02110-1301 USA, or see the FSF site: https://www.fsf.org.
 -->
 
 <xwikidoc version="1.5" reference="ActiveDirectory.Code.Translations" locale="fr">
@@ -61,6 +61,7 @@ activeDirectory.checkConnection.error=Echec de la connexion au serveur Active Di
 activeDirectory.checkConnection.hint=Pour vérifier la connexion pour la configuration actuelle, les données doivent d'abord être enregistrées. Cette action sera gérée par le bouton "Vérifier connexion" lorsque vous cliquez dessus.
 activeDirectory.checkConnection.success=Réussite du test de connexion !
 activeDirecfory.config.initializationComment=Configuration initialisée avec les valeurs par défaut.
+activeDirectory.config.untrusted=La configuration ci-dessous a été sauvegardée la dernière fois par {0], qui n'est pas un administrateur wiki, aussi, elle n'est pas utilisée pour l'authentification. Vérifiez-la et sauvegardez-la pour l'utiliser à nouveau.
 XWiki.XWikiPreferences_ldap=Activer l'authentification Active Directory
 XWiki.XWikiPreferences_ldap.hint=Activer l'authentification Active Directory pour ce wiki. Si activé et configuré correctement, un utilisateur XWiki sera créé à chaque fois qu'un utilisateur Active Directory visitera ce wiki pour la première fois.
 XWiki.XWikiPreferences_ldap_server=Adresse du serveur Active Directory
