@@ -37,8 +37,10 @@
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
   <content>{{velocity}}
-## These actions are reserved to wiki administrators and must be triggered by them from the administration UI.
+## These actions are reserved to wiki administrators and must be triggered by them from the administration UI, with a
+## POST request.
 #set ($isAllowed = $xwiki.hasAccessLevel('admin', $xcontext.user, 'XWiki.XWikiPreferences'))
+#set ($isAllowed = $isAllowed &amp;&amp; $request.method == 'POST')
 #set ($isAllowed = $isAllowed &amp;&amp; $services.csrf.isTokenValid($request.form_token))
 #if (!$isAllowed &amp;&amp; ($request.checkConnection || $request.resetGroupCache))
   #set ($discard = $response.setStatus(403))
