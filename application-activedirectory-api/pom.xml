@@ -54,6 +54,13 @@
       <groupId>org.xwiki.contrib.ldap</groupId>
       <artifactId>ldap-authenticator</artifactId>
       <version>${ldap.version}</version>
+      <exclusions>
+        <!-- Only needed for XWiki < 13.3 and it brings an old version of xwiki-platform-model. -->
+        <exclusion>
+          <groupId>org.xwiki.contrib</groupId>
+          <artifactId>userauthenticatedevent-backport</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>com.xwiki.licensing</groupId>
