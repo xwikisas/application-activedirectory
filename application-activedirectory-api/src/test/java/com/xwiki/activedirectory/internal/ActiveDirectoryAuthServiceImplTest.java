@@ -37,6 +37,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.CALLS_REAL_METHODS;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
@@ -84,6 +85,13 @@ class ActiveDirectoryAuthServiceImplTest
         this.userProfile = mock(XWikiDocument.class);
         when(this.userProfile.getDocumentReference()).thenReturn(USER_REFERENCE);
         doReturn(null).when(this.authService).findLDAPProfile(any(), any());
+    }
+
+    @Test
+    void noUsername() throws Exception
+    {
+        assertFalse(this.authService.shouldUseADAuthService(null, this.context));
+        verify(this.licensor, never()).getLicense(anyString());
     }
 
     @Test
@@ -165,6 +173,8 @@ class ActiveDirectoryAuthServiceImplTest
         when(this.licensor.isUserUnderLimit(USER_REFERENCE, 10)).thenReturn(false);
 
         assertFalse(this.authService.shouldUseADAuthService(USERNAME, this.context));
+        assertEquals("Active Directory user [xwiki:XWiki.jdoe] cannot log in: the license user limit [10] is exceeded.",
+            this.logCapture.getMessage(0));
     }
 
     @Test
@@ -174,7 +184,8 @@ class ActiveDirectoryAuthServiceImplTest
         when(this.licensor.getUserCount()).thenThrow(new Exception("Failed to count the users."));
 
         assertFalse(this.authService.shouldUseADAuthService(USERNAME, this.context));
-        assertEquals("Failed to determine Active Directory access status.", this.logCapture.getMessage(0));
+        assertEquals("Failed to determine Active Directory access status. Root cause is: "
+            + "[Exception: Failed to count the users.].", this.logCapture.getMessage(0));
     }
 
     private void setLicense(long expirationFromNow, long maxUserCount)

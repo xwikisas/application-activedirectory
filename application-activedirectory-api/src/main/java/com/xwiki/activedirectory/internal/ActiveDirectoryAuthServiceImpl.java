@@ -25,6 +25,7 @@ import java.util.Arrays;
 import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.securityfilter.filter.SecurityRequestWrapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,9 +50,10 @@ import com.xwiki.licensing.License;
 import com.xwiki.licensing.Licensor;
 
 /**
- * Custom Active Directory authenticator that currently only serves as a way to make sure that a valid License for the
- * Active Directory application exists in order to authenticate requests. In the future it'll also serve as the place
- * to add new features for Active Directory authentication.
+ * The LDAP authenticator, configured for Active Directory, used only while the Active Directory application has a
+ * valid license. Once the license user limit is reached, the existing users within that limit can still log in, but
+ * no new user is created (see {@code shouldUseADAuthService}). Requests that can't use Active Directory fall back to
+ * the XWiki authentication.
  *
  * @version $Id$
  * @since 1.1
@@ -170,10 +172,13 @@ public class ActiveDirectoryAuthServiceImpl extends XWikiLDAPAuthServiceImpl
      * invalid. But we still want to accept older AD users once the user limit is exceeded, in order to not block
      * everyone out:
      * <ul>
+     * <li>no login (e.g. a guest request): don't use AD; both authenticators do nothing without a login</li>
      * <li>no license, or expired license: don't use AD</li>
      * <li>there is room for one more user: use AD</li>
-     * <li>the license is full (5/5) or exceeded (6/5): only the AD users created before the limit was reached can use
-     * AD</li>
+     * <li>the license is full (5/5) or exceeded (6/5): only the users with an existing LDAP profile that are among the
+     * 5 oldest active users of the instance, all wikis included, can use AD (see
+     * {@link Licensor#isUserUnderLimit(DocumentReference, long)}). This rank changes as users are enabled, disabled or
+     * deleted. New users are refused.</li>
      * </ul>
      *
      * @param username the login input (form login) or the SSO remote user
@@ -182,6 +187,9 @@ public class ActiveDirectoryAuthServiceImpl extends XWikiLDAPAuthServiceImpl
      */
     boolean shouldUseADAuthService(String username, XWikiContext context)
     {
+        if (username == null) {
+            return false;
+        }
         try {
             License license = this.licensor.getLicense(EXTENSION_ID);
             // The expiration check must match DefaultLicenseValidator#isValid. Checked first, so that an unlicensed or
@@ -197,13 +205,19 @@ public class ActiveDirectoryAuthServiceImpl extends XWikiLDAPAuthServiceImpl
             XWikiDocument userProfile = findLDAPProfile(username, context);
             boolean underLimit = userProfile != null
                 && this.licensor.isUserUnderLimit(userProfile.getDocumentReference(), maxUserCount);
-            if (!underLimit) {
+            if (userProfile == null) {
+                // New user, local account or typo: logged at debug level only, so that the raw login input (possibly
+                // a password typed in the wrong field) doesn't reach the logs.
                 LOGGER.debug("Not using Active Directory for [{}]: the license user limit [{}] is reached.", username,
                     maxUserCount);
+            } else if (!underLimit) {
+                LOGGER.warn("Active Directory user [{}] cannot log in: the license user limit [{}] is exceeded.",
+                    userProfile.getDocumentReference(), maxUserCount);
             }
             return underLimit;
         } catch (Exception e) {
-            LOGGER.error("Failed to determine Active Directory access status.", e);
+            LOGGER.warn("Failed to determine Active Directory access status. Root cause is: [{}].",
+                ExceptionUtils.getRootCauseMessage(e));
             return false;
         }
     }
