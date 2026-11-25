@@ -21,10 +21,12 @@ package com.xwiki.activedirectory.internal;
 
 import java.security.Principal;
 import java.util.Arrays;
-import java.util.Date;
+
+import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.securityfilter.filter.SecurityRequestWrapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.configuration.ConfigurationSource;
@@ -43,27 +45,34 @@ import com.xpn.xwiki.user.api.XWikiAuthService;
 import com.xpn.xwiki.user.api.XWikiUser;
 import com.xpn.xwiki.user.impl.xwiki.XWikiAuthServiceImpl;
 import com.xpn.xwiki.web.Utils;
+import com.xpn.xwiki.web.XWikiRequest;
 import com.xwiki.licensing.License;
 import com.xwiki.licensing.Licensor;
-import com.xwiki.licensing.internal.UserCounter;
 
 /**
- * Custom Active Directory authenticator that currently only serves as a way to make sure that a valid License for the
- * Active Directory application exists in order to authenticate requests. In the future it'll also serve as the place to
- * add new features for Active Directory authentication.
+ * The LDAP authenticator, configured for Active Directory, used only while the Active Directory application has a
+ * valid license. Once the license user limit is reached, the existing users within that limit can still log in, but
+ * no new user is created (see {@code shouldUseADAuthService}). Requests that can't use Active Directory fall back to
+ * the XWiki authentication.
  *
  * @version $Id$
  * @since 1.1
  */
 public class ActiveDirectoryAuthServiceImpl extends XWikiLDAPAuthServiceImpl
 {
-    protected static final String EXTENSION_ID = "com.xwiki.activedirectory:application-activedirectory-api";
-
     private static final String LDAP_SSL = "ldap_ssl";
 
     private static final String LDAP_SSL_KEYSTORE = "ldap_ssl.keystore";
 
     private static final String LDAP_SSL_SECURE_PROVIDER = "ldap_ssl.secure_provider";
+
+    private static final String EXTENSION_ID = "com.xwiki.activedirectory:application-activedirectory-api";
+
+    /**
+     * Session attribute where the LDAP authenticator stores the SSO remote user, see
+     * {@code XWikiLDAPAuthServiceImpl#checkAuthSSO}.
+     */
+    private static final String LDAP_REMOTE_USER_SESSION_KEY = "ldap.remoteuser";
 
     private static final SpaceReference AD_CODE_SPACE_REFERENCE =
         new SpaceReference("xwiki", Arrays.asList("ActiveDirectory", "Code"));
@@ -75,9 +84,6 @@ public class ActiveDirectoryAuthServiceImpl extends XWikiLDAPAuthServiceImpl
     private XWikiAuthService fallbackAuthService = new XWikiAuthServiceImpl();
 
     private ConfigurationSource configurationSource = Utils.getComponent(ConfigurationSource.class, "activedirectory");
-
-    private UserCounter userCounter = Utils.getComponent(UserCounter.class);
-
 
     @Override
     protected XWikiLDAPConfig createXWikiLDAPConfig(String authInput)
@@ -117,104 +123,150 @@ public class ActiveDirectoryAuthServiceImpl extends XWikiLDAPAuthServiceImpl
     @Override
     public XWikiUser checkAuth(XWikiContext context) throws XWikiException
     {
-        try {
-            if (isLicensed()) {
+        // checkAuth runs on every request, so the license is checked only when LDAP is about to log in an SSO user.
+        // Password logins are checked in authenticate().
+        String ssoUser = getSSOUserToAuthenticate(context);
+        if (ssoUser == null || shouldUseADAuthService(ssoUser, context)) {
+            try {
                 return super.checkAuth(context);
-            } else {
-                return this.fallbackAuthService.checkAuth(context);
+            } catch (Exception e) {
+                LOGGER.error("Active Directory checkAuth failed, falling back to XWiki authentication.", e);
             }
-        } catch (Exception e) {
-            LOGGER.error("Exception in Active Directory checkAuth with context, using fallback. Cause: [{}]",
-                ExceptionUtils.getRootCauseMessage(e));
-            return this.fallbackAuthService.checkAuth(context);
         }
+        // Skip the LDAP SSO login. Existing sessions and password logins still work.
+        return this.fallbackAuthService.checkAuth(context);
     }
 
     @Override
     public XWikiUser checkAuth(String username, String password, String rememberme, XWikiContext context)
         throws XWikiException
     {
-        try {
-            if (isLicensed()) {
+        if (shouldUseADAuthService(username, context)) {
+            try {
                 return super.checkAuth(username, password, rememberme, context);
-            } else {
-                return this.fallbackAuthService.checkAuth(username, password, rememberme, context);
+            } catch (Exception e) {
+                LOGGER.error("Active Directory credentials check failed, falling back to XWiki authentication.", e);
             }
-        } catch (Exception e) {
-            LOGGER.error("Exception in Active Directory checkAuth, using fallback. Cause: [{}]",
-                ExceptionUtils.getRootCauseMessage(e));
-            return this.fallbackAuthService.checkAuth(username, password, rememberme, context);
         }
+        return this.fallbackAuthService.checkAuth(username, password, rememberme, context);
     }
 
     @Override
     public Principal authenticate(String userId, String password, XWikiContext context) throws XWikiException
     {
-        try {
-            if (shouldUseADAuthService(userId, context)) {
+        if (shouldUseADAuthService(userId, context)) {
+            try {
                 return super.authenticate(userId, password, context);
-            } else {
-                Principal principal = this.fallbackAuthService.authenticate(userId, password, context);
-                if (null != userId) {
-                    context.put("message", "activeDirectory.loginError.userLimit");
-                }
-                return principal;
+            } catch (Exception e) {
+                LOGGER.error("Active Directory authentication failed, falling back to XWiki authentication.", e);
             }
-        } catch (Exception e) {
-            LOGGER.error("Exception in Active Directory authenticate, using fallback. Cause: [{}]",
-                ExceptionUtils.getRootCauseMessage(e));
-            return this.fallbackAuthService.authenticate(userId, password, context);
         }
-    }
-
-    private boolean isLicensed()
-    {
-        return this.licensor.hasLicensure(EXTENSION_ID);
+        return this.fallbackAuthService.authenticate(userId, password, context);
     }
 
     /**
-     * When on the login screen, decide if the LDAPAuthService should be used. Using LDAP means creating a new user if
-     * the given credentials are valid and point to a user which wasn't imported in XWiki yet.
+     * Decide if the LDAP authentication should be used for the given user. Using LDAP means creating a new user if the
+     * given credentials are valid and point to a user which wasn't imported in XWiki yet.
      * <br>
-     * This function will block logins of valid AD users which are not yet imported into XWiki, if the license cannot
-     * support another user.
+     * Note that once any license condition is broken (e.g. expiration date, number of users), that license becomes
+     * invalid. But we still want to accept older AD users once the user limit is exceeded, in order to not block
+     * everyone out:
+     * <ul>
+     * <li>no login (e.g. a guest request): don't use AD; both authenticators do nothing without a login</li>
+     * <li>no license, or expired license: don't use AD</li>
+     * <li>there is room for one more user: use AD</li>
+     * <li>the license is full (5/5) or exceeded (6/5): only the users with an existing LDAP profile that are among the
+     * 5 oldest active users of the instance, all wikis included, can use AD (see
+     * {@link Licensor#isUserUnderLimit(DocumentReference, long)}). This rank changes as users are enabled, disabled or
+     * deleted. New users are refused.</li>
+     * </ul>
      *
-     * @param username the user to check
+     * @param username the login input (form login) or the SSO remote user
      * @param context xwiki context
-     * @return true if the given user should use the LDAPAuthService to log in
+     * @return true if the given user should use the LDAP authentication
      */
-    private boolean shouldUseADAuthService(String username, XWikiContext context) throws XWikiException
+    boolean shouldUseADAuthService(String username, XWikiContext context)
     {
-        /*
-        Note that once any license condition is broken (e.g. expiration date, number of users), that license becomes
-         invalid. But we still want to accept older AD users to login once the user limit is reached, in order to
-         not block users out. We end up with these cases:
-        * When the license is valid
-            * no user limit reached -> allow everyone to use AD
-            * user limit is reached (e.g. users are at 5/5) -> no more AD users can be created
-        * When the license is invalidated by the user limit condition (i.e. the date is still ok, users are at 6/5) ->
-            only allow the users which are below the user limit to use AD (i.e. users created before the limit was
-            reached)
-        * When the license is truly invalid (i.e. no license/expired)  -> don't use AD
-         */
-        License license = licensor.getLicense(EXTENSION_ID);
-        if (null == license) {
+        if (username == null) {
             return false;
         }
         try {
-            // Regular XWiki users are excluded from these checks.
-            XWikiDocument userPage =
-                null == username ? null : new LDAPProfileXClass(context).searchDocumentByUid(username);
-            if (isLicensed()) {
-                // Don't allow the creation of new LDAP users if the license cannot hold more users.
-                return !(license.getMaxUserCount() == userCounter.getUserCount() && null == userPage);
-            } else {
-                return null != userPage && license.getExpirationDate() > new Date().getTime()
-                    && userCounter.isUserUnderLimit(userPage.getDocumentReference(), license.getMaxUserCount());
+            License license = this.licensor.getLicense(EXTENSION_ID);
+            // The expiration check must match DefaultLicenseValidator#isValid. Checked first, so that an unlicensed or
+            // expired instance doesn't look the user profile up for nothing.
+            if (license == null || license.getExpirationDate() < System.currentTimeMillis()) {
+                return false;
             }
+            long maxUserCount = license.getMaxUserCount();
+            // Room for a new user: no need to know if this one already exists.
+            if (maxUserCount < 0 || this.licensor.getUserCount() < maxUserCount) {
+                return true;
+            }
+            XWikiDocument userProfile = findLDAPProfile(username, context);
+            boolean underLimit = userProfile != null
+                && this.licensor.isUserUnderLimit(userProfile.getDocumentReference(), maxUserCount);
+            if (userProfile == null) {
+                // New user, local account or typo: logged at debug level only, so that the raw login input (possibly
+                // a password typed in the wrong field) doesn't reach the logs.
+                LOGGER.debug("Not using Active Directory for [{}]: the license user limit [{}] is reached.", username,
+                    maxUserCount);
+            } else if (!underLimit) {
+                LOGGER.warn("Active Directory user [{}] cannot log in: the license user limit [{}] is exceeded.",
+                    userProfile.getDocumentReference(), maxUserCount);
+            }
+            return underLimit;
         } catch (Exception e) {
-            LOGGER.error("Failed to determine Active Directory access status. Cause: ", e);
+            LOGGER.warn("Failed to determine Active Directory access status. Root cause is: [{}].",
+                ExceptionUtils.getRootCauseMessage(e));
             return false;
         }
+    }
+
+    /**
+     * Find the profile of an existing LDAP user, the same way the LDAP authenticator does it before binding: by the
+     * trimmed login input, in the current wiki and then in the main wiki.
+     */
+    XWikiDocument findLDAPProfile(String username, XWikiContext context) throws XWikiException
+    {
+        if (username == null) {
+            return null;
+        }
+        // Note: the LDAP authenticator also finds profiles by DN after the bind (e.g. a user imported as "jdoe"
+        // logging in as "jdoe@domain"). Such users are seen as new here, which only matters when the license is full.
+        String uid = username.trim();
+        XWikiDocument profile = new LDAPProfileXClass(context).searchDocumentByUid(uid);
+        if (profile == null && !context.isMainWiki()) {
+            String wiki = context.getWikiId();
+            try {
+                context.setWikiId(context.getMainXWiki());
+                profile = new LDAPProfileXClass(context).searchDocumentByUid(uid);
+            } finally {
+                context.setWikiId(wiki);
+            }
+        }
+        return profile;
+    }
+
+    /**
+     * Cheap check, run on every request. Mirrors {@code XWikiLDAPAuthServiceImpl#checkSessionPrincipal}.
+     *
+     * @return the SSO remote user if LDAP is about to log it in (not bound to the session yet), null otherwise
+     */
+    private String getSSOUserToAuthenticate(XWikiContext context)
+    {
+        XWikiRequest request = context.getRequest();
+        if (request == null) {
+            return null;
+        }
+        String header = getConfiguration().getHttpHeader();
+        String remoteUser = StringUtils.isEmpty(header) ? request.getRemoteUser() : request.getHeader(header);
+        if (remoteUser == null) {
+            return null;
+        }
+        HttpSession session = request.getSession(false);
+        boolean alreadyLoggedIn = session != null
+            && session.getAttribute(SecurityRequestWrapper.PRINCIPAL_SESSION_KEY) != null
+            && remoteUser.equals(session.getAttribute(LDAP_REMOTE_USER_SESSION_KEY));
+        return alreadyLoggedIn ? null : remoteUser;
     }
 }
